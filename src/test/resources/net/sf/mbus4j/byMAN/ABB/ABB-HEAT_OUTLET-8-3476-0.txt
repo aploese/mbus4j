@@ -1,0 +1,86 @@
+683A3A680801727634000042040804B200000004071611060004156B772500025B4B00025F3C0002629300043D3C000000042E51000000046D2A17EF0C1F8916
+control code = RSP_UD
+isAcd = false
+isDcf = false
+address = 0x01
+ident number = 00003476
+manufacturer = ABB
+version = 0x08
+accessnumber = 178
+status = [No application error]
+signature = 0x0000
+medium = Heat/outlet
+lastPackage = false
+datablock[0]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 397590 * 10 [kWh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = Volume
+  value = 2455403 * 100 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 16 Bit Integer
+  description = Flow Temperature
+  value = 75 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 16 Bit Integer
+  description = Return Temperature
+  value = 60 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 16 Bit Integer
+  description = Temperature Difference
+  value = 147 * 0.1 [K]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 32 Bit Integer
+  description = Volume Flow
+  value = 60 * 100 [l/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 81 [kW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 15.12.2007 23:42:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[8]:
+  dataType = Special Function Manufacturer specific data more records follow in next telegram
+  value = (hex)[]

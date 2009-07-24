@@ -1,0 +1,21 @@
+681515680802727856341224400107130000000C78040302019D16
+control code = RSP_UD
+isAcd = false
+isDcf = false
+address = 0x02
+ident number = 12345678
+manufacturer = PAD
+version = 0x01
+accessnumber = 19
+status = [No application error]
+signature = 0x0000
+medium = Water
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 01020304
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
