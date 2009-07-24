@@ -1,0 +1,37 @@
+681F1F680802727856341224400107550000000313153100DA023B13018B60043718021816
+control code = RSP_UD
+isAcd = false
+isDcf = false
+address = 0x02
+ident number = 12345678
+manufacturer = PAD
+version = 0x01
+accessnumber = 85
+status = [No application error]
+signature = 0x0000
+medium = Water
+lastPackage = true
+datablock[0]:
+  dataType = 24 Bit Integer
+  description = Volume
+  value = 12565 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 4 digit BCD
+  description = Volume Flow
+  value = 0113 [l/h]
+  tariff = 0
+  storageNumber = 5
+  functionField = Maximum value
+  subUnit = 0
+datablock[2]:
+  dataType = 6 digit BCD
+  description = Energy
+  value = 021837 * 10 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1

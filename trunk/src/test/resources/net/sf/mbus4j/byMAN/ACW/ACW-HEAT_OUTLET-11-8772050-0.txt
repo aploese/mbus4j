@@ -1,0 +1,118 @@
+684D4D680800725020770877040B042D0000000C78502077080407DA3800000C15203308000B2D2602000B3B9312000A5A39060A5E87040B61221500046D23092D130227FB0009FD0E1009FD0F200F00001916
+control code = RSP_UD
+isAcd = false
+isDcf = false
+address = 0x00
+ident number = 08772050
+manufacturer = ACW
+version = 0x0B
+accessnumber = 45
+status = [No application error]
+signature = 0x0000
+medium = Heat/outlet
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 08772050
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 14554 * 10 [kWh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 00083320 * 100 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 6 digit BCD
+  description = Power
+  value = 000226 * 100 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 6 digit BCD
+  description = Volume Flow
+  value = 001293 [l/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 4 digit BCD
+  description = Flow Temperature
+  value = 0639 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 4 digit BCD
+  description = Return Temperature
+  value = 0487 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 6 digit BCD
+  description = Temperature Difference
+  value = 001522 * 0.01 [K]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 13.03.2009 09:35:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[9]:
+  dataType = 16 Bit Integer
+  description = Operating Time
+  value = 251 [d]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[10]:
+  dataType = 2 digit BCD
+  description = Firmware version #
+  value = 10
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[11]:
+  dataType = 2 digit BCD
+  description = Software version #
+  value = 20
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[12]:
+  dataType = Special Function Manufacturer specific data
+  value = (hex)[0000]

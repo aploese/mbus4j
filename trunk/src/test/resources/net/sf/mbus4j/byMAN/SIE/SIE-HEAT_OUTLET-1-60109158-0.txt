@@ -1,0 +1,192 @@
+6885856808007258911060254D0104000000000974020970020C07940836000C14097371070B2D3113000B3B6058000A5B84000A5F64000A6298014C14839436034C07781429000C7858911060891071609B102D703000DB102D4830009B103B8024019A105B40019A105F80000C23381700003C23440100007C2344010000426C01010F04010000009D16
+control code = RSP_UD
+isAcd = false
+isDcf = false
+address = 0x00
+ident number = 60109158
+manufacturer = SIE
+version = 0x01
+accessnumber = 0
+status = [No application error]
+signature = 0x0000
+medium = Heat/outlet
+lastPackage = true
+datablock[0]:
+  dataType = 2 digit BCD
+  description = Actually Duration
+  value = 02 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 2 digit BCD
+  description = Averaging Duration
+  value = 02 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00360894 * 10 [kWh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 07717309 * 10 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 6 digit BCD
+  description = Power
+  value = 001331 * 100 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 6 digit BCD
+  description = Volume Flow
+  value = 005860 [l/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 4 digit BCD
+  description = Flow Temperature
+  value = 0084 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 4 digit BCD
+  description = Return Temperature
+  value = 0064 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 4 digit BCD
+  description = Temperature Difference
+  value = 0198 * 0.1 [K]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 03369483 * 10 [l]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[10]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00291478 * 10 [kWh]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[11]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 60109158
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[12]:
+  dataType = 2 digit BCD
+  description = Averaging Duration
+  value = 60 [min]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[13]:
+  dataType = 6 digit BCD
+  description = Power
+  value = 003070 * 100 [W]
+  tariff = 1
+  storageNumber = 0
+  functionField = Maximum value
+  subUnit = 0
+datablock[14]:
+  dataType = 6 digit BCD
+  description = Power
+  value = 003048 * 100 [W]
+  tariff = 1
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+datablock[15]:
+  dataType = 6 digit BCD
+  description = Volume Flow
+  value = 012480 [l/h]
+  tariff = 1
+  storageNumber = 0
+  functionField = Maximum value
+  subUnit = 0
+datablock[16]:
+  dataType = 4 digit BCD
+  description = Flow Temperature
+  value = 0140 [°C]
+  tariff = 1
+  storageNumber = 0
+  functionField = Maximum value
+  subUnit = 0
+datablock[17]:
+  dataType = 4 digit BCD
+  description = Return Temperature
+  value = 0080 [°C]
+  tariff = 1
+  storageNumber = 0
+  functionField = Maximum value
+  subUnit = 0
+datablock[18]:
+  dataType = 8 digit BCD
+  description = On Time
+  value = 00001738 [d]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[19]:
+  dataType = 8 digit BCD
+  description = On Time
+  value = 00000144 [d]
+  tariff = 0
+  storageNumber = 0
+  functionField = Value during error state
+  subUnit = 0
+datablock[20]:
+  dataType = 8 digit BCD
+  description = On Time
+  value = 00000144 [d]
+  tariff = 0
+  storageNumber = 1
+  functionField = Value during error state
+  subUnit = 0
+datablock[21]:
+  dataType = 16 Bit Integer
+  description = Time Point
+  value = 01.01.2000 [Date]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[22]:
+  dataType = Special Function Manufacturer specific data
+  value = (hex)[0401000000]
