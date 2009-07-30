@@ -13,6 +13,7 @@ import net.sf.mbus4j.dataframes.GeneralApplicationError;
 import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.ShortFrame;
@@ -68,6 +69,9 @@ public class Encoder {
             pushGeneralApplicationError((GeneralApplicationError) frame);
         } else if (frame instanceof UserDataResponse) {
             pushVariableDataStructure((UserDataResponse) frame);
+        } else if (frame instanceof SelectionOfSlaves) {
+            pushSelectionOfSlavesDataHeader((SelectionOfSlaves)frame);
+            pushVariableDataBlocks(frame);
         } else if (frame instanceof SendUserData) {
             pushVariableDataBlocks(frame);
         } else {
@@ -197,6 +201,8 @@ public class Encoder {
                     data[currentPos] = (byte) (0x53 + (((SetBaudrate) frame).isFcb() ? 0x20 : 0));
                 } else if (frame instanceof SendUserData) {
                     data[currentPos] = (byte) (0x53 + (((SendUserData) frame).isFcb() ? 0x20 : 0));
+                } else if (frame instanceof SelectionOfSlaves) {
+                    data[currentPos] = (byte) (0x53 + (((SelectionOfSlaves) frame).isFcb() ? 0x20 : 0));
                 }
 
                 break;
@@ -232,6 +238,8 @@ public class Encoder {
             data[currentPos] = 0x50;
         } else if (frame instanceof SendUserData) {
             data[currentPos] = 0x51;
+        } else if (frame instanceof SelectionOfSlaves) {
+            data[currentPos] = 0x52;
         } else if (frame instanceof GeneralApplicationError) {
             data[currentPos] = 0x70;
         } else if (frame instanceof UserDataResponse) {
@@ -463,6 +471,13 @@ public class Encoder {
         data[currentPos++] = (byte) frame.getAccessNumber();
         data[currentPos++] = (byte) StatusCode.toId(frame.getStatus());
         pushInteger(frame.getSignature(), 2);
+    }
+
+    private void pushSelectionOfSlavesDataHeader(SelectionOfSlaves frame) {
+        pushInteger(frame.getMaskedId(), 4);
+        pushInteger(frame.getMaskedMan(), 2);
+        data[currentPos++] = (byte) frame.getMaskedVersion();
+        data[currentPos++] = (byte) frame.getMaskedMedium();
     }
 
     private void pushManufacturer(String man) {

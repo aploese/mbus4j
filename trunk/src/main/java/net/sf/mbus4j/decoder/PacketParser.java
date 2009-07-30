@@ -283,7 +283,7 @@ public class PacketParser {
                     parsingFrame = null;
                     start = b;
                     setState(DecodeState.C_FIELD);
-                } else if (b == 0xE5) {
+                } else if ((b & 0xFF) == 0xE5) {
                     parsingFrame = SingleCharFrame.SINGLE_CHAR_FRAME;
                     return parsingFrame;
                 } else {

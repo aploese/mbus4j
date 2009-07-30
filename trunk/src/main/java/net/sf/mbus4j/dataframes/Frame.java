@@ -21,4 +21,12 @@ public interface Frame {
     }
 
     ControlCode getControlCode();
+
+    //TODO GarbageFrame for unparsable stuff ie multiple answers??
+    //TODO Timespamps for send/receive tracking
+//    long getFirstByteTimeStamp();
+//    void setFirstByteTimeStamp(long timestamp);
+//    long getLastByteTimeStamp();
+//    void setLastByteTimeStamp(long timestamp);
+
 }
