@@ -7,14 +7,16 @@ package net.sf.mbus4j.master;
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
-import gnu.io.RXTXPort;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
@@ -31,10 +33,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author aploese
  */
-public class Master {
+public class Master implements Iterable<MBusDevice> {
 
     public static SerialPort openPort(String portName) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
         return openPort(portName, 2400);
+    }
+
+    public void addSlaveByAddress(int address) throws InterruptedException, IOException {
+        Frame f = sendRequestUserData(address);
+        if (f instanceof UserDataResponse) {
+            UserDataResponse udr = (UserDataResponse) f;
+            //TODO detect dev and create
+            devices.add(DeviceFactory.createDevice(udr));
+            //TODO check wenn dev braucht mehr ( falsces udr)
+        }
     }
 
     /**
@@ -58,7 +70,7 @@ public class Master {
         int result = 0;
         final long time = System.currentTimeMillis();
         while (System.currentTimeMillis() - time <= timeout) {
-            Frame frame = streamListener.waitForFrame(time - System.currentTimeMillis() + timeout);
+            Frame frame = waitAndPollFrame(time - System.currentTimeMillis() + timeout);
             if (frame instanceof SingleCharFrame) {
                 result++;
             } else {
@@ -68,9 +80,21 @@ public class Master {
         return result;
     }
 
+    public int deviceCount() {
+        return devices.size();
+    }
+
+    public MBusDevice getDevice(int i) {
+        return devices.get(i);
+    }
+
+    @Override
+    public Iterator<MBusDevice> iterator() {
+        return devices.iterator();
+    }
+
     private class StreamListener implements Runnable {
 
-        Frame lastParsedFrame = null;
 
         @Override
         public void run() {
@@ -79,6 +103,7 @@ public class Master {
                 PacketParser parser = new PacketParser();
                 try {
                     while (!closed) {
+                        try {
                         if ((theData = is.read()) == -1) {
                             if (log.isTraceEnabled()) {
                                 log.trace("Thread interrupted or eof on waiting occured");
@@ -95,6 +120,11 @@ public class Master {
                                 log.error("Error during createPackage()", e);
                             }
                         }
+                        } catch (NullPointerException npe) {
+                            if (!closed) {
+                                throw new RuntimeException(npe);
+                            }
+                        }
                     }
                     log.info("closing down - finish waiting for new data");
                 } catch (IOException e) {
@@ -107,27 +137,37 @@ public class Master {
             }
         }
 
-        private synchronized void clearFrame() {
-            lastParsedFrame = null;
+            }
+
+
+        private Frame removeFrame() {
+            return frameQueue.remove();
         }
 
-        private synchronized Frame waitForFrame(long timeout) throws InterruptedException {
-            if (lastParsedFrame == null) {
-                if (timeout <= 0) {
-                    //wait(0) means wait without timeout
-                    return lastParsedFrame;
-                } else {
-                    wait(timeout);
+        private Frame waitAndPollFrame(long timeout) throws InterruptedException {
+            synchronized (frameQueue) {
+            if (frameQueue.peek() == null) {
+                if (timeout > 0) {
+                    frameQueue.wait(timeout);
                 }
             }
-            return lastParsedFrame;
+            return frameQueue.poll();
+            }
         }
 
         private synchronized void setLastFrame(Frame frame) {
-            lastParsedFrame = frame;
-            notifyAll();
+            log.debug(String.format("New frame parsed %s", frame));
+            synchronized (frameQueue) {
+                frameQueue.add(frame);
+                frameQueue.notifyAll();
+            }
         }
-    }
+
+        private void clearFrameQueue() {
+            synchronized (frameQueue) {
+                frameQueue.clear();
+            }
+        }
 
     public Master() {
         super();
@@ -150,6 +190,7 @@ public class Master {
     private Thread t;
     private StreamListener streamListener = new StreamListener();
     private int bitPerSecond;
+    private final Queue<Frame> frameQueue = new ConcurrentLinkedQueue<Frame>();
 
     private void start() {
         closed = false;
@@ -180,13 +221,7 @@ public class Master {
     public MBusDevice[] searchDevicesByPrimaryAddress(int first, int last) throws IOException, InterruptedException {
         clear();
         for (int i = first; i <= last; i++) {
-            Frame f = sendRequestUserData(i);
-            if (f instanceof UserDataResponse) {
-                UserDataResponse udr = (UserDataResponse) f;
-                //TODO detect dev and create
-                devices.add(DeviceFactory.createDevice(udr));
-                //TODO check wenn dev braucht mehr ( falsces udr)
-            }
+            addSlaveByAddress(i);
         }
         return devices.toArray(new MBusDevice[devices.size()]);
     }
@@ -224,19 +259,22 @@ public class Master {
     }
 
     public void releaseStreams() {
+        closed = true;
         is = null;
         os = null;
     }
 
     private Frame send(Frame frame) throws IOException, InterruptedException {
         for (int trys = 0; trys <= 2; trys++) {
-            streamListener.clearFrame();
-            byte[] b = encoder.encode(frame);
-            os.write(encoder.encode(frame));
+            clearFrameQueue();
+            final byte[] b = encoder.encode(frame);
+            os.write(b);
             os.flush();
             final long time = System.currentTimeMillis();
-            log.debug("Data Sent: " + PacketParser.bytes2Ascii(b));
-            Frame result = streamListener.waitForFrame(getResponseTimeout());
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Data Sent (try: %d): %s ", trys, PacketParser.bytes2Ascii(b)));
+            }
+            Frame result = waitAndPollFrame(getResponseTimeout());
             log.info(String.format("Answer took %d ms", System.currentTimeMillis() - time));
             if (result != null) {
                 return result;
@@ -284,7 +322,9 @@ public class Master {
 
     //TODO all BCD
     public void widcardSearch(int leadingBcdDigitsId, int maskLength, int maskedMan, int maskedVersion, int maskedMedium) throws IOException, InterruptedException {
-        SelectionOfSlaves sud = new SelectionOfSlaves((byte) Master.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS, true);
+        clear();
+        log.debug(String.format("widcardSearch leadingBcdDigitsId: 0x%08X, maskLength: %d", leadingBcdDigitsId, maskLength));
+        SelectionOfSlaves sud = new SelectionOfSlaves((byte) Master.SLAVE_SELECT_PRIMARY_ADDRESS);
         int idMask = 0;
         for (int i = 1; i <= maskLength ; i++) {
             idMask <<= 4;
@@ -293,22 +333,28 @@ public class Master {
 
         for (int i = 0; i <= 9; i++) {
             sud.setMaskedId((leadingBcdDigitsId << (maskLength * 4)) + idMask);
-            leadingBcdDigitsId++;
             sud.setMaskedMan(maskedMan);
             sud.setMaskedVersion(maskedVersion);
             sud.setMaskedMedium(maskedMedium);
             Frame result = send(sud);
             if (result instanceof SingleCharFrame) {
+            log.debug(String.format("got answer with mask: 0x%08X", leadingBcdDigitsId));
                 int answers = waitForSingleChars(getResponseTimeout());
                 if (answers == 0) {
-                    // nothing found
-                } else if (answers == 1) {
-                    searchDevicesByPrimaryAddress(sud.getAddress(), sud.getAddress());
+                   log.debug(String.format("detect slave with mask: 0x%08X", leadingBcdDigitsId));
+                    addSlaveByAddress(SLAVE_SELECT_PRIMARY_ADDRESS);
                 } else {
-                    // wenn idMask == 8 man ver und medium ???
-                    widcardSearch(leadingBcdDigitsId * 10, maskLength - 1, maskedMan, maskedVersion, maskedMedium);
+                    if (maskLength > 0) {
+                   log.debug(String.format("multiple slaves (%d) with mask: 0x%08X", answers, leadingBcdDigitsId));
+                    widcardSearch(leadingBcdDigitsId << 4, maskLength - 1, maskedMan, maskedVersion, maskedMedium);
+                } else {                    // wenn idMask == 8 man ver und medium ???
+                   log.error(String.format("Cant separate slaves (%d) with id: 0x%08X", answers, leadingBcdDigitsId));
                 }
+                }
+            } else {
+                   log.debug(String.format("no slave with mask: 0x%08X", leadingBcdDigitsId));
             }
+            leadingBcdDigitsId++;
         }
     }
 

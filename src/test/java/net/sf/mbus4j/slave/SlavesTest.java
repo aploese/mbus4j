@@ -5,8 +5,8 @@
 
 package net.sf.mbus4j.slave;
 
-import net.sf.mbus4j.MBusTestInputStream;
-import net.sf.mbus4j.MBusTestOutputStream;
+import net.sf.mbus4j.LogInit;
+import net.sf.mbus4j.MasterStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -23,14 +23,14 @@ import static org.junit.Assert.*;
 public class SlavesTest {
 
     private Slaves slaves;
-    private MBusTestInputStream is;
-    private MBusTestOutputStream os;
+    private MasterStreams master;
 
     public SlavesTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        LogInit.initLog(LogInit.DEBUG);
     }
 
     @AfterClass
@@ -39,23 +39,22 @@ public class SlavesTest {
 
     @Before
     public void setUp() {
-        is = new MBusTestInputStream();
-        os = new MBusTestOutputStream();
+        master = new MasterStreams();
         slaves = new Slaves();
-        slaves.setStreams(is, os);
+        slaves.setStreams(master.getInputStream(), master.getOutputStream());
     }
 
     @After
     public void tearDown() throws Exception {
+        master.close();
         slaves.releaseStreams();
         slaves = null;
-        is.close();
     }
 
     /**
      * Test of addSlave method, of class Slaves.
      */
-    @Test
+    @Test(timeout=10000)
     public void testUserDataResponse() throws Exception {
         System.out.println("userDataResponse");
         Slave slave = new Slave(0x01, 12345678, "AMK", 0, MBusMedium.StdMedium.OTHER);
@@ -66,41 +65,15 @@ public class SlavesTest {
         slaves.addSlave(slave);
         slave = new Slave(0xFA, 00012345, "AMK", 0, MBusMedium.StdMedium.OTHER);
         slaves.addSlave(slave);
-        is.setBytes("107B017C16");
-        os.waitFor("680F0F6808017278563412AB050000000000003F16", 1000);
-        // Accessnumber ?
-        os.clear();
-        is.setBytes("107B017C16");
-        os.waitFor("680F0F6808017278563412AB050000010000004016", 1000);
+        master.sendRequestAndCollectResponse("107B017C16", "680F0F6808017278563412AB050000000000003F16");
+        master.sendRequestAndCollectResponse("107B017C16", "680F0F6808017278563412AB050000010000004016");
+        master.replay();
+        synchronized (master) {
+            master.wait();
+        }
+        assertTrue(master.isOK());
         //TODO  FCB ACB ??
         // BCD behandlung ???
     }
-
-    /**
-     * Test of close method, of class Slaves.
-     */
-    @Test
-    @Ignore
-    public void testClose() throws Exception {
-        System.out.println("close");
-        Slaves instance = null;
-        instance.close();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of main method, of class Slaves.
-     */
-    @Test
-    @Ignore
-    public void testMain() throws Exception {
-        System.out.println("main");
-        String[] args = null;
-        Slaves.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
 
 }

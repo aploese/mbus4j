@@ -18,7 +18,7 @@ public class DeviceFactory {
         if (AcwDeviceFactory.ACW.equals(udResp.getManufacturer())) {
             return AcwDeviceFactory.createDevice(udResp);
         } else {
-            return null;
+            return createGenericDevice(udResp);
         }
     }
 
