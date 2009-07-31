@@ -1,15 +1,38 @@
+/*
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sf.mbus4j.dataframes.datablocks;
 
-import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
-import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
-import net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
+import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
+import net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix;
+import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
+
+/**
+ *
+ * @author arnep@users.sourceforge.net
+ * $Id$
+ */
 public abstract class DataBlock {
 
     private ObjectAction action;
@@ -25,6 +48,75 @@ public abstract class DataBlock {
     private final DataFieldCode dataFieldCode;
     private short subUnit;
 
+    public DataBlock(DataBlock dataBlock) {
+        this(dataBlock.dataFieldCode);
+        this.vif = dataBlock.getVif();
+        this.vifes = dataBlock.getVifes();
+        this.storageNumber = dataBlock.getStorageNumber();
+        this.functionField = dataBlock.getFunctionField();
+        this.subUnit = dataBlock.getSubUnit();
+        this.tariff = dataBlock.getTariff();
+    }
+
+    public DataBlock(DataFieldCode dataFieldCode) {
+        super();
+        this.dataFieldCode = dataFieldCode;
+    }
+
+    public DataBlock(DataFieldCode dif, FunctionField functionField, short subUnit, int tariff, long storageNumber, Vif vif, Vife... vifes) {
+        super();
+        this.dataFieldCode = dif;
+        this.functionField = functionField;
+        this.subUnit = subUnit;
+        this.tariff = tariff;
+        this.storageNumber = storageNumber;
+        this.vif = vif;
+        if (vifes != null && vifes.length > 0) {
+            this.vifes = new ArrayList<Vife>(vifes.length);
+            for (Vife vife : vifes) {
+                this.vifes.add(vife);
+            }
+        }
+    }
+
+    public DataBlock(DataFieldCode dif, Vif vif, Vife... vifes) {
+        super();
+        this.dataFieldCode = dif;
+        this.vif = vif;
+        if (vifes != null && vifes.length > 0) {
+            this.vifes = new ArrayList<Vife>(vifes.length);
+            for (Vife vife : vifes) {
+                this.vifes.add(vife);
+            }
+        }
+    }
+
+    public boolean addVife(Vife vife) {
+        if (vifes == null) {
+            vifes = new ArrayList<Vife>(1);
+        }
+        return vifes.add(vife);
+    }
+
+    /**
+     * @return the action
+     */
+    public ObjectAction getAction() {
+        return action;
+    }
+
+    public DataFieldCode getDataFieldCode() {
+        return dataFieldCode;
+    }
+
+    public Integer getExponent() {
+        return vif.getExponent();
+    }
+
+    public FunctionField getFunctionField() {
+        return functionField;
+    }
+
     public String getParamDescr() {
         StringBuilder sb = new StringBuilder();
         if (vif != null) {
@@ -38,85 +130,12 @@ public abstract class DataBlock {
         return sb.toString();
     }
 
-    public abstract String getValueAsString();
-
-    public UnitOfMeasurement getUnitOfMeasurement() {
-        return vif.getUnitOfMeasurement();
-    }
-
-    public Integer getExponent() {
-        return vif.getExponent();
-    }
-
-    public FunctionField getFunctionField() {
-        return functionField;
-    }
-
-    public void setFunctionField(FunctionField functionField) {
-        this.functionField = functionField;
-    }
-
-    public void setStorageNumber(long storageNumber) {
-        this.storageNumber = storageNumber;
-    }
-
-    public int getTariff() {
-        return tariff;
-    }
-
-    public void setTariff(int tariff) {
-        this.tariff = tariff;
+    public SiPrefix getSiPrefix() {
+        return vif.getSiPrefix();
     }
 
     public long getStorageNumber() {
         return storageNumber;
-    }
-
-    public DataBlock(DataFieldCode dataFieldCode) {
-        super();
-        this.dataFieldCode = dataFieldCode;
-    }
-
-    public DataBlock(DataFieldCode dif, Vif vif, Vife ... vifes) {
-        super();
-        this.dataFieldCode = dif;
-        this.vif = vif;
-        if (vifes != null && vifes.length > 0) {
-            this.vifes = new ArrayList<Vife>(vifes.length);
-            for (Vife vife: vifes) {
-                this.vifes.add(vife);
-            }
-        }
-    }
-
-    public DataBlock(DataFieldCode dif, FunctionField functionField, short subUnit, int tariff, long storageNumber, Vif vif, Vife ... vifes) {
-        super();
-        this.dataFieldCode = dif;
-        this.functionField = functionField;
-        this.subUnit = subUnit;
-        this.tariff = tariff;
-        this.storageNumber = storageNumber;
-        this.vif = vif;
-        if (vifes != null && vifes.length > 0) {
-            this.vifes = new ArrayList<Vife>(vifes.length);
-            for (Vife vife: vifes) {
-                this.vifes.add(vife);
-            }
-        }
-    }
-
-    public DataBlock(DataBlock dataBlock) {
-        this(dataBlock.dataFieldCode);
-        this.vif = dataBlock.getVif();
-        this.vifes = dataBlock.getVifes();
-        this.storageNumber = dataBlock.getStorageNumber();
-        this.functionField = dataBlock.getFunctionField();
-        this.subUnit = dataBlock.getSubUnit();
-        this.tariff = dataBlock.getTariff();
-    }
-
-    public DataFieldCode getDataFieldCode() {
-        return dataFieldCode;
     }
 
     /**
@@ -126,22 +145,22 @@ public abstract class DataBlock {
         return subUnit;
     }
 
-    /**
-     * @param deviceUnit the deviceUnit to set
-     */
-    public void setSubUnit(short subUnit) {
-        this.subUnit = subUnit;
+    public int getTariff() {
+        return tariff;
     }
 
-    public void setObjectAction(ObjectAction action) {
-        this.action = action;
+    public UnitOfMeasurement getUnitOfMeasurement() {
+        return vif.getUnitOfMeasurement();
     }
 
-    /**
-     * @return the action
-     */
-    public ObjectAction getAction() {
-        return action;
+    public abstract String getValueAsString();
+
+    public Vif getVif() {
+        return vif;
+    }
+
+    public List<Vife> getVifes() {
+        return vifes;
     }
 
     /**
@@ -149,6 +168,33 @@ public abstract class DataBlock {
      */
     public void setAction(ObjectAction action) {
         this.action = action;
+    }
+
+    public void setFunctionField(FunctionField functionField) {
+        this.functionField = functionField;
+    }
+
+    public void setObjectAction(ObjectAction action) {
+        this.action = action;
+    }
+
+    public void setStorageNumber(long storageNumber) {
+        this.storageNumber = storageNumber;
+    }
+
+    /**
+     * @param deviceUnit the deviceUnit to set
+     */
+    public void setSubUnit(short subUnit) {
+        this.subUnit = subUnit;
+    }
+
+    public void setTariff(int tariff) {
+        this.tariff = tariff;
+    }
+
+    public void setVif(Vif vif) {
+        this.vif = vif;
     }
 
     public void toString(StringBuilder sb, String inset) {
@@ -190,33 +236,10 @@ public abstract class DataBlock {
             }
         }
         if (functionField != null) {
-        sb.append(inset).append("tariff = ").append(getTariff()).append('\n');
-        sb.append(inset).append("storageNumber = ").append(getStorageNumber()).append("\n");
-        sb.append(inset).append("functionField = ").append(getFunctionField()).append("\n");
-        sb.append(inset).append("subUnit = ").append(getSubUnit()).append("\n");
+            sb.append(inset).append("tariff = ").append(getTariff()).append('\n');
+            sb.append(inset).append("storageNumber = ").append(getStorageNumber()).append("\n");
+            sb.append(inset).append("functionField = ").append(getFunctionField()).append("\n");
+            sb.append(inset).append("subUnit = ").append(getSubUnit()).append("\n");
         }
-    }
-
-    public Vif getVif() {
-        return vif;
-    }
-
-    public List<Vife> getVifes() {
-        return vifes;
-    }
-
-    public boolean addVife(Vife vife) {
-        if (vifes == null) {
-            vifes = new ArrayList<Vife>(1);
-        }
-        return vifes.add(vife);
-    }
-
-    public void setVif(Vif vif) {
-        this.vif = vif;
-    }
-
-    public SiPrefix getSiPrefix() {
-        return vif.getSiPrefix();
     }
 }

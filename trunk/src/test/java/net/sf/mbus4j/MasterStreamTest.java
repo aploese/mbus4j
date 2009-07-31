@@ -1,26 +1,40 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import junit.framework.AssertionFailedError;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import junit.framework.AssertionFailedError;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class MasterStreamTest {
-
-    public MasterStreamTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -30,21 +44,13 @@ public class MasterStreamTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-
     private MasterStreams master;
 
-    @Before
-    public void setUp() {
-        master = new MasterStreams();
+    public MasterStreamTest() {
     }
 
-    @After
-    public void tearDown() {
-        master = null;
-    }
-
-    @Test(timeout=10000)
-     public void sendRequestAndCollectResponse() throws Exception {
+    @Test(timeout = 10000)
+    public void sendRequestAndCollectResponse() throws Exception {
         master.sendRequestAndCollectResponse("0102", "0201");
         master.sendRequestAndCollectResponse("0304", "0403");
         master.sendRequestAndCollectResponse("0506", 100);
@@ -75,8 +81,8 @@ public class MasterStreamTest {
         assertTrue(master.isOK());
     }
 
-     @Test(timeout=10000)
-     public void sendRequestAndCollectResponseWriteError() throws Exception {
+    @Test(timeout = 10000)
+    public void sendRequestAndCollectResponseWriteError() throws Exception {
         master.sendRequestAndCollectResponse("0102", "0201");
         master.replay();
         assertEquals(0x01, master.is.read());
@@ -94,6 +100,13 @@ public class MasterStreamTest {
         assertFalse(master.isOK());
     }
 
+    @Before
+    public void setUp() {
+        master = new MasterStreams();
+    }
 
-
+    @After
+    public void tearDown() {
+        master = null;
+    }
 }

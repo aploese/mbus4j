@@ -1,18 +1,28 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
-import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
-import net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import java.util.Arrays;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class ManufacturerSpecificVif implements Vif {
 
@@ -26,7 +36,30 @@ public class ManufacturerSpecificVif implements Vif {
 
     public void addVIFE(byte b) {
         vifes = Arrays.copyOf(vifes, vifes.length + 1);
-        vifes[vifes.length -1] = b;
+        vifes[vifes.length - 1] = b;
+    }
+
+    @Override
+    public Integer getExponent() {
+        return null;
+    }
+
+    @Override
+    public String getLabel() {
+        return toString();
+    }
+
+    /**
+     * @return the siPrefix
+     */
+    @Override
+    public SiPrefix getSiPrefix() {
+        return null;
+    }
+
+    @Override
+    public UnitOfMeasurement getUnitOfMeasurement() {
+        return null;
     }
 
     public byte[] getVifes() {
@@ -43,28 +76,4 @@ public class ManufacturerSpecificVif implements Vif {
         sb.append("]");
         return sb.toString();
     }
-
-    @Override
-    public UnitOfMeasurement getUnitOfMeasurement() {
-        return null;
-        }
-    /**
-     * @return the siPrefix
-     */
-    @Override
-    public SiPrefix getSiPrefix() {
-        return null;
-    }
-
-    @Override
-    public Integer getExponent() {
-        return null;
-    }
-
-        @Override
-    public String getLabel() {
-        return toString();
-    }
-
-    
 }

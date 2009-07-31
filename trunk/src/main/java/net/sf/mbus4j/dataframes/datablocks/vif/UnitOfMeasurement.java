@@ -1,15 +1,29 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public enum UnitOfMeasurement {
+
     WATT_HOUR("Wh"),
     JOULE("J"),
     LITRE("l"),
@@ -31,7 +45,7 @@ public enum UnitOfMeasurement {
     MINUTE("min"),
     HOUR("h"),
     DAY("d"),
-//    DAY_OF_MONTH("day of month"),
+    //    DAY_OF_MONTH("day of month"),
     MONTH("m"),
     YEAR("y"),
     BAUD("Baud"),
@@ -49,7 +63,6 @@ public enum UnitOfMeasurement {
     KELVIN("K"),
     BAR("bar"),
     DATE("Date");
-
     private final String name;
 
     private UnitOfMeasurement(String name) {
@@ -60,5 +73,4 @@ public enum UnitOfMeasurement {
     public String toString() {
         return name;
     }
-
 }

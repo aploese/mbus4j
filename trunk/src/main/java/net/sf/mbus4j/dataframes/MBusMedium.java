@@ -1,20 +1,28 @@
 /*
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
  *
- * $Id: MBusMedium.java 400 2009-03-11 19:54:32Z aploese $
- * 
- * @author aploese
- * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.dataframes;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public interface MBusMedium {
-
-    int getId();
-    String name();
 
     public static enum StdMedium implements MBusMedium {
 
@@ -44,13 +52,6 @@ public interface MBusMedium {
         DUAL_WATER(0x17, "Dual Water"),
         PRESSURE(0x18, "Pressure"),
         AD_CONVERTER(0x19, "A/D Converter");
-        final public int id;
-        final public String mname;
-
-        StdMedium(int id, String mname) {
-            this.id = id;
-            this.mname = mname;
-        }
 
         public static MBusMedium valueOf(int id) {
             for (StdMedium medium : StdMedium.values()) {
@@ -60,10 +61,12 @@ public interface MBusMedium {
             }
             return new UnknownMBusMedium(id);
         }
+        final public int id;
+        final public String mname;
 
-        @Override
-        public String toString() {
-            return mname;
+        StdMedium(int id, String mname) {
+            this.id = id;
+            this.mname = mname;
         }
 
         @Override
@@ -71,11 +74,14 @@ public interface MBusMedium {
             return id;
         }
 
-
+        @Override
+        public String toString() {
+            return mname;
+        }
     }
 
     /** Something really bad happend... Someone dont take care of Specifications....
-     * 
+     *
      */
     public static class UnknownMBusMedium implements MBusMedium {
 
@@ -86,8 +92,8 @@ public interface MBusMedium {
         }
 
         @Override
-        public String toString() {
-            return String.format("Unknown ID (0x%02X)",id);
+        public int getId() {
+            return id;
         }
 
         @Override
@@ -96,8 +102,12 @@ public interface MBusMedium {
         }
 
         @Override
-        public int getId() {
-            return id;
+        public String toString() {
+            return String.format("Unknown ID (0x%02X)", id);
         }
     }
+
+    int getId();
+
+    String name();
 }

@@ -1,10 +1,46 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.slave.acw;
 
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._16_BIT_INTEGER;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._2_DIGIT_BCD;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._32_BIT_INTEGER;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._32_BIT_REAL;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._4_DIGIT_BCD;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._6_DIGIT_BCD;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._8_DIGIT_BCD;
+import static net.sf.mbus4j.dataframes.datablocks.dif.FunctionField.INSTANTANEOUS_VALUE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FABRICATION_NO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FLOW_TEMPERATURE_C_E_0;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FLOW_TEMPERATURE_C_E__1;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.OPERATING_TIME_D;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.POWER_KILO_W_E_0;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.RETURN_TEMPERATURE_C_E__1;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TEMPERATURE_DIFFERENCE_K_E__2;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TIMEPOINT_DATE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TIMEPOINT_TIME_AND_DATE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.VOLUME_FLOW_CBM_PER_H_E_0;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.VOLUME_FLOW_L_PER_H_E_0;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifeStd.TIMESTAMP_END_LAST_UPPER;
+
 import java.util.Date;
+
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -21,174 +57,13 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
 import net.sf.mbus4j.slave.Slave;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode.*;
-import static net.sf.mbus4j.dataframes.datablocks.dif.FunctionField.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifeStd.*;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class AcwHeatMeter extends Slave {
-
-    private final static int EFFECTIVE_DAY_COUNT = 13;
-    private final boolean isCF50Mode;
-
-    private void addDataBlocks(UserDataResponse result) {
-        switch (getState()) {
-            case STANDARD:
-                if (isCF50Mode) {
-                    getCF50Resp(result);
-                } else {
-                    getStdResp(result);
-                }
-                break;
-            case CF50:
-                if (isCF50Mode) {
-                    getStdResp(result);
-                } else {
-                    getCF50Resp(result);
-                }
-                break;
-            case EFFECTIVE_DAY_1:
-                getEffectiveDayResp(result, 1);
-                break;
-            case EFFECTIVE_DAY_2:
-                getEffectiveDayResp(result, 2);
-                break;
-            case EFFECTIVE_DAY_3:
-                getEffectiveDayResp(result, 3);
-                break;
-            case EFFECTIVE_DAY_4:
-                getEffectiveDayResp(result, 4);
-                break;
-            case EFFECTIVE_DAY_5:
-                getEffectiveDayResp(result, 5);
-                break;
-            case EFFECTIVE_DAY_6:
-                getEffectiveDayResp(result, 6);
-                break;
-            case EFFECTIVE_DAY_7:
-                getEffectiveDayResp(result, 7);
-                break;
-            case EFFECTIVE_DAY_8:
-                getEffectiveDayResp(result, 8);
-                break;
-            case EFFECTIVE_DAY_9:
-                getEffectiveDayResp(result, 9);
-                break;
-            case EFFECTIVE_DAY_10:
-                getEffectiveDayResp(result, 10);
-                break;
-            case EFFECTIVE_DAY_11:
-                getEffectiveDayResp(result, 11);
-                break;
-            case EFFECTIVE_DAY_12:
-                getEffectiveDayResp(result, 12);
-                break;
-            case EFFECTIVE_DAY_13:
-                getEffectiveDayResp(result, 13);
-                break;
-            case MAX:
-                getMaxResponse(result);
-                break;
-            case ERROR:
-                getErrorResponse(result);
-                break;
-            case EMPTY:
-                getEmptyResponse(result);
-                break;
-            default:
-
-        }
-    }
-
-    /**
-     * @return the state
-     */
-    public State getState() {
-        return state;
-    }
-
-    private void getCF50Resp(UserDataResponse result) {
-        result.addDataBlock(energy[0]);
-        result.addDataBlock(volume[0]);
-        result.addDataBlock(power);
-        result.addDataBlock(flow);
-        result.addDataBlock(flowTemp);
-        result.addDataBlock(returnTemp);
-        result.addDataBlock(tempDiff);
-        result.addDataBlock(currentTime);
-        result.addDataBlock(operatingTime);
-        result.addDataBlock(manSpecData);
-    }
-
-    private void getStdResp(UserDataResponse result) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(energy[0]);
-        result.addDataBlock(volume[0]);
-        result.addDataBlock(power);
-        result.addDataBlock(flow);
-        result.addDataBlock(flowTemp);
-        result.addDataBlock(returnTemp);
-        result.addDataBlock(tempDiff);
-        result.addDataBlock(currentTime);
-        result.addDataBlock(operatingTime);
-        result.addDataBlock(firmwareVer);
-        result.addDataBlock(softwareVer);
-        if (water1 != null) {
-            result.addDataBlock(water1[0]);
-        }
-        if (water2 != null) {
-            result.addDataBlock(water2[0]);
-        }
-        if (coolingEnergy != null) {
-            result.addDataBlock(coolingEnergy[0]);
-        }
-        result.addDataBlock(manSpecData);
-    }
-
-    private void getEffectiveDayResp(UserDataResponse result, int storagenumber) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(effectiveDayTimeStamp[storagenumber]);
-        result.addDataBlock(energy[storagenumber]);
-        result.addDataBlock(volume[storagenumber]);
-        result.addDataBlock(maxPowerTimeStamp[storagenumber]);
-        result.addDataBlock(maxPower[storagenumber]);
-        result.addDataBlock(maxFlowTimeStamp[storagenumber]);
-        result.addDataBlock(maxFlow[storagenumber]);
-        result.addDataBlock(maxFlowTempTimeStamp[storagenumber]);
-        result.addDataBlock(maxFlowTemp[storagenumber]);
-        if (water1 != null) {
-            result.addDataBlock(water1[storagenumber]);
-        }
-        if (water2 != null) {
-            result.addDataBlock(water2[storagenumber]);
-        }
-        if (coolingEnergy != null) {
-            result.addDataBlock(energy[storagenumber]);
-        }
-    }
-
-    private void getMaxResponse(UserDataResponse result) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(storageInterval);
-        result.addDataBlock(maxPowerTimeStamp[0]);
-        result.addDataBlock(maxPower[0]);
-        result.addDataBlock(maxFlowTimeStamp[0]);
-        result.addDataBlock(maxFlow[0]);
-        result.addDataBlock(maxFlowTempTimeStamp[0]);
-        result.addDataBlock(maxFlowTemp[0]);
-    }
-
-    private void getErrorResponse(UserDataResponse result) {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    private void getEmptyResponse(UserDataResponse result) {
-        result.addDataBlock(fabNo);
-    }
 
     public enum State {
 
@@ -211,6 +86,8 @@ public class AcwHeatMeter extends Slave {
         CF50,
         EMPTY;
     }
+    private final static int EFFECTIVE_DAY_COUNT = 13;
+    private final boolean isCF50Mode;
     private State state = State.STANDARD;
     private final IntegerDataBlock fabNo;
     private final IntegerDataBlock storageInterval;
@@ -322,14 +199,163 @@ public class AcwHeatMeter extends Slave {
 
     }
 
-    @Override
-    public Frame handleReqUd2(RequestClassXData request) {
-        Frame result = super.handleReqUd2(request);
-        if (result instanceof UserDataResponse) {
-            currentTime.setValue(new Date());
-            addDataBlocks((UserDataResponse)result);
+    private void addDataBlocks(UserDataResponse result) {
+        switch (getState()) {
+            case STANDARD:
+                if (isCF50Mode) {
+                    getCF50Resp(result);
+                } else {
+                    getStdResp(result);
+                }
+                break;
+            case CF50:
+                if (isCF50Mode) {
+                    getStdResp(result);
+                } else {
+                    getCF50Resp(result);
+                }
+                break;
+            case EFFECTIVE_DAY_1:
+                getEffectiveDayResp(result, 1);
+                break;
+            case EFFECTIVE_DAY_2:
+                getEffectiveDayResp(result, 2);
+                break;
+            case EFFECTIVE_DAY_3:
+                getEffectiveDayResp(result, 3);
+                break;
+            case EFFECTIVE_DAY_4:
+                getEffectiveDayResp(result, 4);
+                break;
+            case EFFECTIVE_DAY_5:
+                getEffectiveDayResp(result, 5);
+                break;
+            case EFFECTIVE_DAY_6:
+                getEffectiveDayResp(result, 6);
+                break;
+            case EFFECTIVE_DAY_7:
+                getEffectiveDayResp(result, 7);
+                break;
+            case EFFECTIVE_DAY_8:
+                getEffectiveDayResp(result, 8);
+                break;
+            case EFFECTIVE_DAY_9:
+                getEffectiveDayResp(result, 9);
+                break;
+            case EFFECTIVE_DAY_10:
+                getEffectiveDayResp(result, 10);
+                break;
+            case EFFECTIVE_DAY_11:
+                getEffectiveDayResp(result, 11);
+                break;
+            case EFFECTIVE_DAY_12:
+                getEffectiveDayResp(result, 12);
+                break;
+            case EFFECTIVE_DAY_13:
+                getEffectiveDayResp(result, 13);
+                break;
+            case MAX:
+                getMaxResponse(result);
+                break;
+            case ERROR:
+                getErrorResponse(result);
+                break;
+            case EMPTY:
+                getEmptyResponse(result);
+                break;
+            default:
+
         }
-        return result;
+    }
+
+    public void calc() {
+        tempDiff.setValue(flowTemp.getValue() - returnTemp.getValue());
+    }
+
+    private void getCF50Resp(UserDataResponse result) {
+        result.addDataBlock(energy[0]);
+        result.addDataBlock(volume[0]);
+        result.addDataBlock(power);
+        result.addDataBlock(flow);
+        result.addDataBlock(flowTemp);
+        result.addDataBlock(returnTemp);
+        result.addDataBlock(tempDiff);
+        result.addDataBlock(currentTime);
+        result.addDataBlock(operatingTime);
+        result.addDataBlock(manSpecData);
+    }
+
+    private void getEffectiveDayResp(UserDataResponse result, int storagenumber) {
+        result.addDataBlock(fabNo);
+        result.addDataBlock(effectiveDayTimeStamp[storagenumber]);
+        result.addDataBlock(energy[storagenumber]);
+        result.addDataBlock(volume[storagenumber]);
+        result.addDataBlock(maxPowerTimeStamp[storagenumber]);
+        result.addDataBlock(maxPower[storagenumber]);
+        result.addDataBlock(maxFlowTimeStamp[storagenumber]);
+        result.addDataBlock(maxFlow[storagenumber]);
+        result.addDataBlock(maxFlowTempTimeStamp[storagenumber]);
+        result.addDataBlock(maxFlowTemp[storagenumber]);
+        if (water1 != null) {
+            result.addDataBlock(water1[storagenumber]);
+        }
+        if (water2 != null) {
+            result.addDataBlock(water2[storagenumber]);
+        }
+        if (coolingEnergy != null) {
+            result.addDataBlock(energy[storagenumber]);
+        }
+    }
+
+    private void getEmptyResponse(UserDataResponse result) {
+        result.addDataBlock(fabNo);
+    }
+
+    private void getErrorResponse(UserDataResponse result) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    private void getMaxResponse(UserDataResponse result) {
+        result.addDataBlock(fabNo);
+        result.addDataBlock(storageInterval);
+        result.addDataBlock(maxPowerTimeStamp[0]);
+        result.addDataBlock(maxPower[0]);
+        result.addDataBlock(maxFlowTimeStamp[0]);
+        result.addDataBlock(maxFlow[0]);
+        result.addDataBlock(maxFlowTempTimeStamp[0]);
+        result.addDataBlock(maxFlowTemp[0]);
+    }
+
+    /**
+     * @return the state
+     */
+    public State getState() {
+        return state;
+    }
+
+    private void getStdResp(UserDataResponse result) {
+        result.addDataBlock(fabNo);
+        result.addDataBlock(energy[0]);
+        result.addDataBlock(volume[0]);
+        result.addDataBlock(power);
+        result.addDataBlock(flow);
+        result.addDataBlock(flowTemp);
+        result.addDataBlock(returnTemp);
+        result.addDataBlock(tempDiff);
+        result.addDataBlock(currentTime);
+        result.addDataBlock(operatingTime);
+        result.addDataBlock(firmwareVer);
+        result.addDataBlock(softwareVer);
+        if (water1 != null) {
+            result.addDataBlock(water1[0]);
+        }
+        if (water2 != null) {
+            result.addDataBlock(water2[0]);
+        }
+        if (coolingEnergy != null) {
+            result.addDataBlock(coolingEnergy[0]);
+        }
+        result.addDataBlock(manSpecData);
     }
 
     @Override
@@ -401,6 +427,16 @@ public class AcwHeatMeter extends Slave {
         return result;
     }
 
+    @Override
+    public Frame handleReqUd2(RequestClassXData request) {
+        Frame result = super.handleReqUd2(request);
+        if (result instanceof UserDataResponse) {
+            currentTime.setValue(new Date());
+            addDataBlocks((UserDataResponse) result);
+        }
+        return result;
+    }
+
     public void setFlow(float value) {
         flow.setValue(Math.round(value));
         calc();
@@ -414,9 +450,5 @@ public class AcwHeatMeter extends Slave {
     public void setReturnTemp(float temp) {
         returnTemp.setValue((short) Math.round(temp * 10));
         calc();
-    }
-
-    public void calc() {
-        tempDiff.setValue(flowTemp.getValue() - returnTemp.getValue());
     }
 }

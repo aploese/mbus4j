@@ -1,14 +1,31 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.encoder;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
 import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -18,21 +35,19 @@ import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.decoder.PacketParser;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class MBusDocumentationExamplesTest {
-        private PacketParser parser;
-        private Encoder instance;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -41,6 +56,24 @@ public class MBusDocumentationExamplesTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private PacketParser parser;
+    private Encoder instance;
+
+    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
+        System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
+        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+
+        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
+        for (byte b : data) {
+            parser.addByte(b);
+        }
+        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, parser.getState());
+        assertNotNull("DataValue not available", parser.getFrame());
+        assertEquals(clazz, parser.getFrame().getClass());
+        byte[] result = instance.encode(parser.getFrame());
+        assertArrayEquals(data, result);
     }
 
     @Before
@@ -54,7 +87,6 @@ public class MBusDocumentationExamplesTest {
         parser = null;
         instance = null;
     }
-
 
     @Test
     public void testExample_6_1__0() throws Exception {
@@ -144,25 +176,8 @@ public class MBusDocumentationExamplesTest {
     public void testRequestClass2Data() throws Exception {
         Frame dv = null;
         for (byte b : PacketParser.ascii2Bytes("107BFE7916")) {
-            dv = parser.addByte((byte) b);
+            dv = parser.addByte(b);
         }
         assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());
     }
-
-    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
-        System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
-        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
-        for (byte b : data) {
-            parser.addByte(b);
-        }
-        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, parser.getState());
-        assertNotNull("DataValue not available", parser.getFrame());
-        assertEquals(clazz, parser.getFrame().getClass());
-        byte[] result = instance.encode(parser.getFrame());
-        assertArrayEquals(data, result);
-    }
-
 }

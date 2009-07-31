@@ -1,6 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j;
 
@@ -9,12 +22,30 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author aploese
- * Slave kennt keinen Timeout, er antwortet einfach nicht
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class SlaveStreams extends MockStreams {
-    
+
     private final static Logger log = LoggerFactory.getLogger(SlaveStreams.class);
+
+    @Override
+    protected synchronized void dataReaded() {
+        setNextData(true);
+    }
+
+    @Override
+    protected synchronized void dataWritten() {
+        is.releaseReadLock();
+        if (data.get(0).response == null) {
+            setNextData(true);
+        }
+    }
+
+    @Override
+    protected Logger getLog() {
+        return log;
+    }
 
     public void respondToRequest(String request, int times) {
         for (int i = 0; i < times; i++) {
@@ -34,19 +65,6 @@ public class SlaveStreams extends MockStreams {
     }
 
     @Override
-    protected synchronized void dataWritten() {
-        is.releaseReadLock();
-        if (data.get(0).response == null) {
-            setNextData(true);
-        }
-    }
-
-    @Override
-    protected  synchronized void dataReaded() {
-        setNextData(true);
-    }
-
-    @Override
     protected synchronized void setNextData(boolean removeFirst) {
         if (removeFirst) {
             data.remove(0);
@@ -59,10 +77,5 @@ public class SlaveStreams extends MockStreams {
         }
         os.setData(data.get(0).request);
         is.setData(data.get(0).response, data.get(0).noResponseWaitTime);
-    }
-
-    @Override
-    protected Logger getLog() {
-        return log;
     }
 }

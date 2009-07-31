@@ -1,8 +1,20 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
 import java.util.HashMap;
@@ -10,9 +22,11 @@ import java.util.Map;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public enum VifeError implements Vife {
+
     NO_ERROR("No error"),
     TOO_MANY_DIFES("Too many DIFE's"),
     STORAGE_NUMBER_NOT_IMPLEMENTED("Storage number not implemented"),
@@ -45,33 +59,29 @@ public enum VifeError implements Vife {
     OTHER_ERROR_RESERVED_0X1D("Other Error Reserved 0x1D"),
     OTHER_ERROR_RESERVED_0X1E("Other Error Reserved 0x1E"),
     OTHER_ERROR_RESERVED_0X1F("Other Error Reserved 0x1F");
-
     private final String name;
     private static Map<Byte, VifeError> map;
 
+    public static VifeError valueOfTableIndex(byte ordinal) {
+        if (map == null) {
+            map = new HashMap<Byte, VifeError>(values().length);
+            for (VifeError val : values()) {
+                map.put((byte) val.ordinal(), val);
+            }
+        }
+        return map.get(ordinal);
+    }
+
     private VifeError(String name) {
         this.name = name;
+    }
+
+    public byte getTableIndex() {
+        return (byte) ordinal();
     }
 
     @Override
     public String toString() {
         return name;
     }
-
-        public static VifeError valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifeError>(values().length);
-            for (VifeError val : values()) {
-                map.put((byte)val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
-    }
-
-            public byte getTableIndex() {
-        return (byte)ordinal();
-    }
-
-
-
 }

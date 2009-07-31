@@ -1,6 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j;
 
@@ -9,17 +22,37 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 import junit.framework.Assert;
 import net.sf.mbus4j.decoder.PacketParser;
+
 import org.slf4j.Logger;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public abstract class MockStreams {
 
-    protected abstract Logger getLog();
+    class Data {
+
+        final String request;
+        final String response;
+        final long noResponseWaitTime;
+
+        Data(String request, long noResponseWaitTime) {
+            this.response = null;
+            this.request = request;
+            this.noResponseWaitTime = noResponseWaitTime;
+        }
+
+        Data(String request, String response) {
+            this.response = response;
+            this.request = request;
+            this.noResponseWaitTime = 0;
+        }
+    }
 
     public class MBusTestInputStream extends InputStream {
 
@@ -29,6 +62,19 @@ public abstract class MockStreams {
         private boolean closed;
         final Object readLock = new Object();
         boolean locked = true;
+
+        @Override
+        public void close() {
+            synchronized (readLock) {
+                closed = true;
+                locked = false;
+                readLock.notifyAll();
+            }
+        }
+
+        private boolean isOK() {
+            return readPtr == buffer.length;
+        }
 
         @Override
         public int read() throws IOException {
@@ -63,30 +109,6 @@ public abstract class MockStreams {
             }
         }
 
-        public synchronized void setData(String string, long endWaitTime) {
-            getLog().info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
-            buffer = string != null ? PacketParser.ascii2Bytes(string) : new byte[0];
-            readPtr = 0;
-            this.endWaitTime = endWaitTime;
-            synchronized (readLock) {
-                this.locked = true;
-                getLog().info("ReadLock set");
-            }
-        }
-
-        @Override
-        public void close() {
-                synchronized (readLock) {
-                    closed = true;
-                    locked = false;
-                    readLock.notifyAll();
-                }
-        }
-
-        private boolean isOK() {
-            return readPtr == buffer.length;
-        }
-
         protected void releaseReadLock() {
             synchronized (readLock) {
                 if (buffer.length == 0) {
@@ -98,12 +120,33 @@ public abstract class MockStreams {
                 getLog().info("ReadLock released");
             }
         }
+
+        public synchronized void setData(String string, long endWaitTime) {
+            getLog().info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
+            buffer = string != null ? PacketParser.ascii2Bytes(string) : new byte[0];
+            readPtr = 0;
+            this.endWaitTime = endWaitTime;
+            synchronized (readLock) {
+                this.locked = true;
+                getLog().info("ReadLock set");
+            }
+        }
     }
 
     public class MBusTestOutputStream extends OutputStream {
 
         private int ptr;
         private byte[] expected = new byte[0];
+
+        private boolean isOK() {
+            return ptr == expected.length;
+        }
+
+        public void setData(String data) {
+            getLog().info(String.format("Set OutputStream buffer: %s", data));
+            ptr = 0;
+            expected = data != null ? PacketParser.ascii2Bytes(data) : new byte[0];
+        }
 
         @Override
         public synchronized void write(int b) throws IOException {
@@ -123,60 +166,25 @@ public abstract class MockStreams {
                 dataWritten();
             }
         }
-
-        public void setData(String data) {
-            getLog().info(String.format("Set OutputStream buffer: %s", data));
-            ptr = 0;
-            expected = data != null ? PacketParser.ascii2Bytes(data) : new byte[0];
-        }
-
-        private boolean isOK() {
-            return ptr == expected.length;
-        }
     }
-
-    class Data {
-
-        final String request;
-        final String response;
-        final long noResponseWaitTime;
-
-        Data(String request, String response) {
-            this.response = response;
-            this.request = request;
-            this.noResponseWaitTime = 0;
-        }
-
-        Data(String request, long noResponseWaitTime) {
-            this.response = null;
-            this.request = request;
-            this.noResponseWaitTime = noResponseWaitTime;
-        }
-
-    }
-    
     List<Data> data = new ArrayList<Data>();
     MBusTestInputStream is = new MBusTestInputStream();
     MBusTestOutputStream os = new MBusTestOutputStream();
-
-    protected abstract void dataWritten();
-
-    protected abstract void dataReaded();
-
-    public void replay() {
-        setNextData(false);
-    }
-
-    protected abstract void setNextData(boolean removeFirst);
 
     public void close() throws IOException {
         os.close();
         is.close();
     }
 
+    protected abstract void dataReaded();
+
+    protected abstract void dataWritten();
+
     public InputStream getInputStream() {
         return is;
     }
+
+    protected abstract Logger getLog();
 
     public OutputStream getOutputStream() {
         return os;
@@ -185,4 +193,10 @@ public abstract class MockStreams {
     public boolean isOK() {
         return data.isEmpty() && is.isOK() && os.isOK();
     }
+
+    public void replay() {
+        setNextData(false);
+    }
+
+    protected abstract void setNextData(boolean removeFirst);
 }

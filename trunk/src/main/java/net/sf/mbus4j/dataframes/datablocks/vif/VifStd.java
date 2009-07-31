@@ -1,22 +1,62 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes.datablocks.vif;
+
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.KILO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MEGA;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MICRO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MILLI;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.ONE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.BAR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CUBIC_METER;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CUBIC_METER_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CUBIC_METER_PER_MINUTE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DATE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DEGREE_CELSIUS;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.GRAMM;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.GRAMM_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.KELVIN;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.LITRE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.LITRE_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.LITRE_PER_MINUTE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.LITRE_PER_SECOND;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TIME_AND_DATE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONNS;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONN_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOUR;
 
 import java.util.HashMap;
 import java.util.Map;
-import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.Vif.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.*;
-
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public enum VifStd implements Vif {
+
     ENERGY_MILLI_WH_E_0(0x00, ENERGY, MILLI, WATT_HOUR, 0),
     ENERGY_MILLI_WH_E_1(0x01, ENERGY, MILLI, WATT_HOUR, 1),
     ENERGY_MILLI_WH_E_2(0x02, ENERGY, MILLI, WATT_HOUR, 2),
@@ -145,12 +185,37 @@ public enum VifStd implements Vif {
     EXTENSION_OF_VIF_CODES_FD(0x7D, "true VIF is given in the first VIFE FD extention"),
     READOUT_SELECTION(0x7E, "Readout selection of all storage numbers, all tariffs and all VIF");
 
+    public static VifStd valueOfTableIndex(int vifCode) {
+        if (map == null) {
+            map = new HashMap<Integer, VifStd>(0xFE);
+            for (VifStd val : values()) {
+                map.put(val.vifCode, val);
+            }
+        }
+        return map.get(vifCode);
+    }
     private final String friendlyName;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final int vifCode;
     private final Integer exponent;
     private static Map<Integer, VifStd> map;
+
+    private VifStd(int vifCode) {
+        this.vifCode = vifCode;
+        this.friendlyName = String.format("Reserved 0x%02x", vifCode);
+        this.siPrefix = null;
+        this.unit = null;
+        this.exponent = null;
+    }
+
+    private VifStd(int vifCode, String friendlyName) {
+        this.vifCode = vifCode;
+        this.friendlyName = friendlyName;
+        this.siPrefix = null;
+        this.unit = null;
+        this.exponent = null;
+    }
 
     private VifStd(int vifCode, String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
         this.vifCode = vifCode;
@@ -168,63 +233,17 @@ public enum VifStd implements Vif {
         this.exponent = null;
     }
 
-    private VifStd(int vifCode, String friendlyName) {
-        this.vifCode = vifCode;
-        this.friendlyName = friendlyName;
-        this.siPrefix = null;
-        this.unit = null;
-        this.exponent = null;
-    }
-
-    private VifStd(int vifCode) {
-        this.vifCode = vifCode;
-        this.friendlyName = String.format("Reserved 0x%02x", vifCode);
-        this.siPrefix = null;
-        this.unit = null;
-        this.exponent = null;
-    }
-
-    @Override
-    public String toString() {
-        if (exponent != null) {
-            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        } else {
-            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        }
-    }
-
-    public static VifStd valueOfTableIndex(int vifCode) {
-        if (map == null) {
-            map = new HashMap<Integer, VifStd>(0xFE);
-            for (VifStd val : values()) {
-                map.put(val.vifCode, val);
-            }
-        }
-        return map.get(vifCode);
-    }
-
-    public int getVifCode() {
-        return vifCode; 
-    }
-
-    public byte getTableIndex() {
-        return (byte)ordinal();
-    }
-
-    /**
-     * @return the unit
-     */
-    @Override
-    public UnitOfMeasurement getUnitOfMeasurement() {
-        return unit;
-    }
-
     /**
      * @return the exponent
      */
     @Override
     public Integer getExponent() {
         return exponent;
+    }
+
+    @Override
+    public String getLabel() {
+        return friendlyName;
     }
 
     /**
@@ -235,9 +254,28 @@ public enum VifStd implements Vif {
         return siPrefix;
     }
 
-        @Override
-    public String getLabel() {
-        return friendlyName;
+    public byte getTableIndex() {
+        return (byte) ordinal();
     }
 
+    /**
+     * @return the unit
+     */
+    @Override
+    public UnitOfMeasurement getUnitOfMeasurement() {
+        return unit;
+    }
+
+    public int getVifCode() {
+        return vifCode;
+    }
+
+    @Override
+    public String toString() {
+        if (exponent != null) {
+            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        } else {
+            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        }
+    }
 }

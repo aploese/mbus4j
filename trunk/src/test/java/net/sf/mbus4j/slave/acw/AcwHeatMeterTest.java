@@ -1,31 +1,43 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.slave.acw;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class AcwHeatMeterTest {
-    private AcwHeatMeter instance;
-
-    public AcwHeatMeterTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -33,6 +45,10 @@ public class AcwHeatMeterTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private AcwHeatMeter instance;
+
+    public AcwHeatMeterTest() {
     }
 
     @Before
@@ -52,13 +68,12 @@ public class AcwHeatMeterTest {
     public void testHandleApplicationReset() {
         System.out.println("handleApplicationReset");
         ApplicationReset applicationReset = new ApplicationReset(ApplicationReset.TelegramType.ALL, 0x12);
-        applicationReset.setAddress((byte)0);
+        applicationReset.setAddress((byte) 0);
         assertFalse(instance.willHandleRequest(applicationReset));
-        applicationReset.setAddress((byte)1);
+        applicationReset.setAddress((byte) 1);
         assertTrue(instance.willHandleRequest(applicationReset));
         Frame result = instance.handleApplicationReset(applicationReset);
         assertEquals(SingleCharFrame.SINGLE_CHAR_FRAME, result);
         assertEquals(AcwHeatMeter.State.CF50, instance.getState());
     }
-
 }

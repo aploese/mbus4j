@@ -1,20 +1,47 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
-import net.sf.mbus4j.dataframes.datablocks.*;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.GIGA;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.KILO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MEGA;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MILLI;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.ONE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.AMERICAN_GALLON;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.AMERICAN_GALLON_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.AMERICAN_GALLON_PER_MINUTE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CUBIC_FEET;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CUBIC_METER;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DEGREE_CELSIUS;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DEGREE_FAHRENHEIT;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE_PER_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONNS;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOUR;
+
 import java.util.HashMap;
 import java.util.Map;
-import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.Vif.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.*;
 
 /**
  *
- *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public enum VifFB implements Vif {
 
@@ -69,7 +96,7 @@ public enum VifFB implements Vif {
     RESERVED_0X2F(),
     POWER_MEGA_JOULE_PER_HOUR_E_2(POWER, MEGA, JOULE_PER_HOUR, 2),
     POWER_GJ_PER_HOUR_E_0(POWER, GIGA, JOULE_PER_HOUR, 0),
-     RESERVED_0X32(),
+    RESERVED_0X32(),
     RESERVED_0X33(),
     RESERVED_0X34(),
     RESERVED_0X35(),
@@ -146,20 +173,21 @@ public enum VifFB implements Vif {
     CUMUL_COUNT_MAX_POWER_W_E_2(CUMUL_COUNT_MAX_POWER, ONE, WATT, 2),
     CUMUL_COUNT_MAX_POWER_KILO_W_E_0(CUMUL_COUNT_MAX_POWER, KILO, WATT, 0),
     CUMUL_COUNT_MAX_POWER_KILO_W_E_1(CUMUL_COUNT_MAX_POWER, KILO, WATT, 1);
-        
 
+    public static VifFB valueOfTableIndex(byte ordinal) {
+        if (map == null) {
+            map = new HashMap<Byte, VifFB>(0xFE);
+            for (VifFB val : values()) {
+                map.put((byte) val.ordinal(), val);
+            }
+        }
+        return map.get(ordinal);
+    }
     private final String friendlyName;
     private final UnitOfMeasurement unit;
     private final SiPrefix siPrefix;
     private final Integer exponent;
     private static Map<Byte, VifFB> map;
-
-    private VifFB(String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
-        this.friendlyName = friendlyName;
-        this.siPrefix = siPrefix;
-        this.unit = unit;
-        this.exponent = exponent;
-    }
 
     private VifFB() {
         this.friendlyName = String.format("Reserved 0x%02x", ordinal());
@@ -168,45 +196,13 @@ public enum VifFB implements Vif {
         this.exponent = null;
     }
 
-    @Override
-    public String toString() {
-        if (exponent != null) {
-            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        } else {
-            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        }
+    private VifFB(String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
+        this.friendlyName = friendlyName;
+        this.siPrefix = siPrefix;
+        this.unit = unit;
+        this.exponent = exponent;
     }
 
-    public static VifFB valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifFB>(0xFE);
-            for (VifFB val : values()) {
-                map.put((byte)val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
-    }
-
-        public byte getTableIndex() {
-        return (byte)ordinal();
-    }
-
-
-    /**
-     * @return the unit
-     */
-    @Override
-    public UnitOfMeasurement getUnitOfMeasurement() {
-        return unit;
-    }
-
-    /**
-     * @return the siPrefix
-     */
-    @Override
-    public SiPrefix getSiPrefix() {
-        return siPrefix;
-    }
     /**
      * @return the exponent
      */
@@ -220,4 +216,32 @@ public enum VifFB implements Vif {
         return friendlyName;
     }
 
+    /**
+     * @return the siPrefix
+     */
+    @Override
+    public SiPrefix getSiPrefix() {
+        return siPrefix;
+    }
+
+    public byte getTableIndex() {
+        return (byte) ordinal();
+    }
+
+    /**
+     * @return the unit
+     */
+    @Override
+    public UnitOfMeasurement getUnitOfMeasurement() {
+        return unit;
+    }
+
+    @Override
+    public String toString() {
+        if (exponent != null) {
+            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        } else {
+            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        }
+    }
 }

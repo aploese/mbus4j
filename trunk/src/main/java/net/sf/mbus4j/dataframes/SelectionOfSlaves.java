@@ -1,17 +1,32 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.dataframes;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class SelectionOfSlaves implements LongFrame {
 
@@ -22,17 +37,17 @@ public class SelectionOfSlaves implements LongFrame {
     private int maskedMedium;
     private List<DataBlock> datablocks = new ArrayList<DataBlock>();
 
-    public SelectionOfSlaves(SendUserData old) {
-        this.address = old.getAddress();
-    }
-
     public SelectionOfSlaves(byte address) {
         this.address = address;
     }
 
+    public SelectionOfSlaves(SendUserData old) {
+        this.address = old.getAddress();
+    }
+
     @Override
-    public ControlCode getControlCode() {
-        return ControlCode.SND_UD;
+    public boolean addDataBlock(DataBlock dataBlock) {
+        return datablocks.add(dataBlock);
     }
 
     @Override
@@ -41,23 +56,13 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     @Override
-    public void setAddress(byte address) {
-        this.address = address;
-    }
-
-    /**
-     * @return the fcb
-     */
-    public boolean isFcb() {
-        return false;
+    public ControlCode getControlCode() {
+        return ControlCode.SND_UD;
     }
 
     @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append(String.format("address = 0x%02X\n", address));
-        return sb.toString();
+    public DataBlock getLastDataBlock() {
+        return datablocks.get(datablocks.size() - 1);
     }
 
     /**
@@ -68,38 +73,10 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     /**
-     * @param maskedId the maskedId to set
-     */
-    public void setMaskedId(int maskedId) {
-        this.maskedId = maskedId;
-    }
-
-    /**
-     * @return the maskedVersion
-     */
-    public int getMaskedVersion() {
-        return maskedVersion;
-    }
-
-    /**
-     * @param maskedVersion the maskedVersion to set
-     */
-    public void setMaskedVersion(int maskedVersion) {
-        this.maskedVersion = maskedVersion;
-    }
-
-    /**
      * @return the maskedMan
      */
     public int getMaskedMan() {
         return maskedMan;
-    }
-
-    /**
-     * @param maskedMan the maskedMan to set
-     */
-    public void setMaskedMan(int maskedMan) {
-        this.maskedMan = maskedMan;
     }
 
     /**
@@ -110,10 +87,22 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     /**
-     * @param maskedMedium the maskedMedium to set
+     * @return the maskedVersion
      */
-    public void setMaskedMedium(int maskedMedium) {
-        this.maskedMedium = maskedMedium;
+    public int getMaskedVersion() {
+        return maskedVersion;
+    }
+
+    /**
+     * @return the fcb
+     */
+    public boolean isFcb() {
+        return false;
+    }
+
+    @Override
+    public Iterator<DataBlock> iterator() {
+        return datablocks.iterator();
     }
 
     @Override
@@ -124,8 +113,8 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     @Override
-    public boolean addDataBlock(DataBlock dataBlock) {
-        return datablocks.add(dataBlock);
+    public void setAddress(byte address) {
+        this.address = address;
     }
 
     @Override
@@ -133,14 +122,40 @@ public class SelectionOfSlaves implements LongFrame {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public DataBlock getLastDataBlock() {
-        return datablocks.get(datablocks.size() - 1);
+    /**
+     * @param maskedId the maskedId to set
+     */
+    public void setMaskedId(int maskedId) {
+        this.maskedId = maskedId;
+    }
+
+    /**
+     * @param maskedMan the maskedMan to set
+     */
+    public void setMaskedMan(int maskedMan) {
+        this.maskedMan = maskedMan;
+    }
+
+    /**
+     * @param maskedMedium the maskedMedium to set
+     */
+    public void setMaskedMedium(int maskedMedium) {
+        this.maskedMedium = maskedMedium;
+    }
+
+    /**
+     * @param maskedVersion the maskedVersion to set
+     */
+    public void setMaskedVersion(int maskedVersion) {
+        this.maskedVersion = maskedVersion;
     }
 
     @Override
-    public Iterator<DataBlock> iterator() {
-        return datablocks.iterator();
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("control code = ").append(getControlCode()).append('\n');
+        sb.append(String.format("address = 0x%02X\n", address));
+        return sb.toString();
     }
 
 }

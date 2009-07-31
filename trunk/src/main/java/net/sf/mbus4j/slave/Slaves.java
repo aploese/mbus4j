@@ -1,6 +1,24 @@
+/*
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sf.mbus4j.slave;
 
 import gnu.io.SerialPort;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,81 +32,56 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SendUserDataManSpec;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.decoder.PacketParser;
 import net.sf.mbus4j.encoder.Encoder;
 import net.sf.mbus4j.master.Master;
-import net.sf.mbus4j.slave.slb.Cyble;
+
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Hello world!
  *
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class Slaves {
 
-    private class StreamListener implements Runnable {
+    public static class LogInit {
 
-        ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 20, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
-//    List<Future<Frame>> l = new ArrayList<Future<Frame>>();
+        public static final String TRACE = "trace";
+        public static final String DEBUG = "debug";
+        public static final String INFO = "info";
+        public static final String WARN = "warn";
+        public static final String ERROR = "error";
+        public static final String FATAL = "fatal";
 
-        @Override
-        public void run() {
-            try {
-                int theData;
-                PacketParser parser = new PacketParser();
-                log.info("Wait for data to process");
-                try {
-                    while (!closed) {
-                        if ((theData = is.read()) == -1) {
-                            if (log.isTraceEnabled()) {
-                                log.trace("Thread interrupted or eof on waiting occured");
-                            }
-                        } else {
-                            if (log.isTraceEnabled()) {
-                                log.trace(String.format("Data received 0x%02x", theData));
-                            }
-                            try {
-                                Frame frame = parser.addByte((byte) theData);
-                                if (frame != null) {
-                                    if (log.isDebugEnabled()) {
-                                        log.info("Frame parsed ... will process: " + frame);
-                                    } else {
-                                        log.info("Frame parsed ... will process");
-                                    }
-                                    for (Slave slave : slaves) {
-                                        if (slave.willHandleRequest(frame)) {
-                                            log.debug(String.format("Frame will be handled by slave 0x%02x", slave.getAddress()));
-                                            tpe.submit(new RequestHandler(frame, slave));
-                                        }
-                                    }
-                                }
-                            } catch (Exception e) {
-                                log.error("Error during createPackage()", e);
-                            }
-                        }
-                    }
-                    log.info("closing down - finish waiting for new data");
-                } catch (IOException e) {
-                    log.error("run()", e);
-                } catch (Exception e) {
-                    log.info("finished waiting for packages", e);
+        public static synchronized void initLog(String level) {
+            Properties props = new Properties();
+            props.setProperty("log4j.appender.stdout",
+                    "org.apache.log4j.ConsoleAppender");
+            props.setProperty("log4j.appender.stdout.Target", "System.out");
+            //log4j.appender.stdout=org.apache.log4j.FileAppender
+            //log4j.appender.stdout.File=Easy.log
+            props.setProperty("log4j.appender.stdout.layout",
+                    "org.apache.log4j.PatternLayout");
+            props.setProperty("log4j.appender.stdout.layout.ConversionPattern",
+                    "%d{ABSOLUTE} %5p %c{1}: %m%n");
 
-                }
-            } finally {
-                tpe.shutdownNow();
-            }
+            //set log levels - for more verbose logging change 'info' to 'debug' ###
+            props.setProperty("log4j.rootLogger", level + ", stdout");
+            PropertyConfigurator.configure(props);
         }
     }
 
@@ -167,14 +160,61 @@ public class Slaves {
             }
         }
     }
+
+    private class StreamListener implements Runnable {
+
+        ThreadPoolExecutor tpe = new ThreadPoolExecutor(5, 20, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+//    List<Future<Frame>> l = new ArrayList<Future<Frame>>();
+
+        @Override
+        public void run() {
+            try {
+                int theData;
+                PacketParser parser = new PacketParser();
+                log.info("Wait for data to process");
+                try {
+                    while (!closed) {
+                        if ((theData = is.read()) == -1) {
+                            if (log.isTraceEnabled()) {
+                                log.trace("Thread interrupted or eof on waiting occured");
+                            }
+                        } else {
+                            if (log.isTraceEnabled()) {
+                                log.trace(String.format("Data received 0x%02x", theData));
+                            }
+                            try {
+                                Frame frame = parser.addByte((byte) theData);
+                                if (frame != null) {
+                                    if (log.isDebugEnabled()) {
+                                        log.info("Frame parsed ... will process: " + frame);
+                                    } else {
+                                        log.info("Frame parsed ... will process");
+                                    }
+                                    for (Slave slave : slaves) {
+                                        if (slave.willHandleRequest(frame)) {
+                                            log.debug(String.format("Frame will be handled by slave 0x%02x", slave.getAddress()));
+                                            tpe.submit(new RequestHandler(frame, slave));
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("Error during createPackage()", e);
+                            }
+                        }
+                    }
+                    log.info("closing down - finish waiting for new data");
+                } catch (IOException e) {
+                    log.error("run()", e);
+                } catch (Exception e) {
+                    log.info("finished waiting for packages", e);
+
+                }
+            } finally {
+                tpe.shutdownNow();
+            }
+        }
+    }
     private static Logger log;
-    private InputStream is;
-    private OutputStream os;
-    private boolean closed = true;
-    private List<Slave> slaves = new ArrayList<Slave>();
-    private Encoder encoder = new Encoder();
-    private Thread t;
-    private StreamListener streamListener = new StreamListener();
 
     public static void main(String[] args) throws Exception {
         LogInit.initLog(LogInit.DEBUG);
@@ -211,13 +251,25 @@ public class Slaves {
         }
         sPort.close();
     }
+    private InputStream is;
+    private OutputStream os;
+    private boolean closed = true;
+    private List<Slave> slaves = new ArrayList<Slave>();
+    private Encoder encoder = new Encoder();
+    private Thread t;
+    private StreamListener streamListener = new StreamListener();
+
+    public Slaves() {
+        super();
+        log = LoggerFactory.getLogger(Slaves.class);
+    }
 
     public boolean addSlave(Slave slave) {
         return slaves.add(slave);
     }
 
     public void close() throws InterruptedException {
-        if (closed)  {
+        if (closed) {
             return;
         }
         closed = true;
@@ -232,43 +284,9 @@ public class Slaves {
         os = null;
     }
 
-    public void start() {
-        closed = false;
-        t = new Thread(streamListener);
-        t.setDaemon(true);
-        t.start();
-    }
-
     private void send(Frame frame) throws IOException {
         os.write(encoder.encode(frame));
         os.flush();
-    }
-
-    public static class LogInit {
-
-        public static final String TRACE = "trace";
-        public static final String DEBUG = "debug";
-        public static final String INFO = "info";
-        public static final String WARN = "warn";
-        public static final String ERROR = "error";
-        public static final String FATAL = "fatal";
-
-        public static synchronized void initLog(String level) {
-            Properties props = new Properties();
-            props.setProperty("log4j.appender.stdout",
-                    "org.apache.log4j.ConsoleAppender");
-            props.setProperty("log4j.appender.stdout.Target", "System.out");
-            //log4j.appender.stdout=org.apache.log4j.FileAppender
-            //log4j.appender.stdout.File=Easy.log
-            props.setProperty("log4j.appender.stdout.layout",
-                    "org.apache.log4j.PatternLayout");
-            props.setProperty("log4j.appender.stdout.layout.ConversionPattern",
-                    "%d{ABSOLUTE} %5p %c{1}: %m%n");
-
-            //set log levels - for more verbose logging change 'info' to 'debug' ###
-            props.setProperty("log4j.rootLogger", level + ", stdout");
-            PropertyConfigurator.configure(props);
-        }
     }
 
     public void setStreams(InputStream is, OutputStream os) {
@@ -277,9 +295,10 @@ public class Slaves {
         start();
     }
 
-    public Slaves() {
-        super();
-        log = LoggerFactory.getLogger(Slaves.class);
+    public void start() {
+        closed = false;
+        t = new Thread(streamListener);
+        t.setDaemon(true);
+        t.start();
     }
-
 }

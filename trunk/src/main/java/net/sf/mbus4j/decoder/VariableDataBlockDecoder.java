@@ -1,88 +1,290 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.decoder;
 
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.BigDecimalDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.EmptyDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.EnhancedIdentificationDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.IntegerDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.RawDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ReadOutDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.VariableLengthDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
+import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
+import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class VariableDataBlockDecoder {
 
+    public enum DecodeState {
+
+        WAIT_FOR_INIT,
+        DIF, DIFE,
+        VIF, VIFE_FB, VIFE_FD, VIFE, ASCII_VIF_LENGTH, ASCII_VIF_COLLECT, COLLECT_MANUFACTURER_SPECIFIC_VIFE,
+        SET_VARIABLE_LENGTH,
+        COLLECTING_VALUE,
+        ERROR,
+        RESULT_AVAIL;
+    }
     private final static Logger log = LoggerFactory.getLogger(VariableDataBlockDecoder.class);
+    private DecodeState ds;
+    private int difePos;
+    private DataBlock db;
+    private LongFrame frame;
+    private Stack stack = new Stack();
+
     public VariableDataBlockDecoder() {
         super();
         setState(DecodeState.WAIT_FOR_INIT);
     }
 
-    public void setState(DecodeState ds) {
-       DecodeState oldState = this.ds;
-       this.ds = ds;
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("DecodeState change from: %20s => %s", oldState, ds));
+    public DecodeState addByte(byte b, int bytesLeft) {
+        switch (ds) {
+            case DIF:
+                decodeDIF(b, bytesLeft);
+                difePos = 0;
+                break;
+            case DIFE:
+                decodeDIFE(b, difePos++);
+                break;
+            case VIF:
+                decodeVIF(b);
+                break;
+            case ASCII_VIF_LENGTH:
+                stack.init(b & 0xFF);
+                setState(DecodeState.ASCII_VIF_COLLECT);
+                break;
+            case COLLECT_MANUFACTURER_SPECIFIC_VIFE:
+                ((ManufacturerSpecificVif) db.getVif()).addVIFE(b);
+                if ((b & PacketParser.EXTENTIONS_BIT) == 0x00) {
+                    startCollectingValue();
+                }
+                break;
+            case ASCII_VIF_COLLECT:
+                stack.push(b);
+                if (stack.isFull()) {
+                    ((AsciiVif) db.getVif()).setValue(stack.popString());
+                    startCollectingValue();
+                }
+                break;
+            case VIFE_FB:
+                decodeVifExtention_FB(b);
+                break;
+            case VIFE_FD:
+                decodeVifExtention_FD(b);
+                break;
+            case VIFE:
+                decodeVIFE(b);
+                break;
+            case COLLECTING_VALUE:
+                stack.push(b);
+                if (stack.isFull()) {
+                    decodeValueFromStack();
+                }
+                break;
+            case SET_VARIABLE_LENGTH:
+                if ((b & 0xFF) < 0xBF) {
+                    db = new StringDataBlock(db);
+                    startCollectingValue((b & 0xFF));
+                } else if ((b & 0xFF) < 0xCF) {
+                    db = new BigDecimalDataBlock(db);
+                    startCollectingValue((b & 0xFF) - 0xC0);
+                } else if ((b & 0xFF) < 0xDF) {
+                    db = new BigDecimalDataBlock(db);
+                    startCollectingValue((b & 0xFF) - 0xD0);
+                } else if ((b & 0xFF) < 0xEF) {
+                    throw new DecodeException("binary number ???? how to decode");
+                } else if ((b & 0xFF) < 0xFA) {
+                    throw new DecodeException("floating point to be defined");
+                } else {
+                    throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF));
+                }
+                break;
+            default:
+                log.error("Unknown state: " + ds);
+                setState(DecodeState.ERROR);
         }
-    }
-
-    public DataBlock getDataBlock() {
-        return db;
-    }
-
-    public void init(LongFrame frame) {
-        db = null;
-        ds = DecodeState.DIF;
-        this.frame = frame;
-        stack.clear();
-    }
-
-    public DecodeState getState() {
         return ds;
     }
 
-    private void goFromVifOrVife(final byte b) {
+    /**
+     *
+     * @param dataField lengt encoding see table 5 chapter 6.3
+     */
+    private void createDataBlock(final byte dataField) {
+        switch (dataField) {
+            case 0x00:
+                db = new EmptyDataBlock(DataFieldCode.NO_DATA);
+                break;
+            case 0x01:
+                db = new ByteDataBlock(DataFieldCode._8_BIT_INTEGER);
+                break;
+            case 0x02:
+                db = new ShortDataBlock(DataFieldCode._16_BIT_INTEGER);
+                break;
+            case 0x03:
+                db = new IntegerDataBlock(DataFieldCode._24_BIT_INTEGER);
+                break;
+            case 0x04:
+                db = new IntegerDataBlock(DataFieldCode._32_BIT_INTEGER);
+                break;
+            case 0x05:
+                db = new RealDataBlock(DataFieldCode._32_BIT_REAL);
+                break;
+            case 0x06:
+                db = new LongDataBlock(DataFieldCode._48_BIT_INTEGER);
+                break;
+            case 0x07:
+                db = new LongDataBlock(DataFieldCode._64_BIT_INTEGER);
+                break;
+            case 0x08:
+                db = new ReadOutDataBlock(DataFieldCode.SELECTION_FOR_READOUT);
+                break;
+            case 0x09:
+                db = new ByteDataBlock(DataFieldCode._2_DIGIT_BCD);
+                break;
+            case 0x0A:
+                db = new ShortDataBlock(DataFieldCode._4_DIGIT_BCD);
+                break;
+            case 0x0B:
+                db = new IntegerDataBlock(DataFieldCode._6_DIGIT_BCD);
+                break;
+            case 0x0C:
+                db = new IntegerDataBlock(DataFieldCode._8_DIGIT_BCD);
+                break;
+            case 0x0D:
+                db = new VariableLengthDataBlock(DataFieldCode.VARIABLE_LENGTH);
+                break;
+            case 0x0E:
+                db = new LongDataBlock(DataFieldCode._12_DIGIT_BCD);
+                break;
+            case 0x0F:
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException("data field 0x0f not supported");
+            default:
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format("data field 0x%02x not supported", dataField));
+        }
+    }
+
+    private void decodeDIF(final byte b, int bytesLeft) {
+        switch (b & 0xFF) {
+            case 0x0F:
+                db = new RawDataBlock(DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET);
+                startCollectingValue(bytesLeft);
+                return;
+            case 0x1F:
+                db = new RawDataBlock(DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS);
+                if (bytesLeft == 0) {
+                    setState(DecodeState.RESULT_AVAIL);
+                } else {
+                    startCollectingValue(bytesLeft);
+                }
+                frame.setLastPackage(false);
+                return;
+            case 0x2F:
+                // Skip idlefiller next byte is DIF
+                return;
+            case 0x3F:
+            case 0x4F:
+            case 0x5F:
+            case 0x6F:
+                setState(DecodeState.ERROR);
+                throw new DecodeException("reserved");  // Reserverd,
+            case 0x7F:
+                db = new ReadOutDataBlock(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
+                break;
+            default:
+                createDataBlock((byte) (b & 0x0F));
+                switch ((b >> 4) & 0x03) {
+                    case 0x00:
+                        db.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+                        break;
+                    case 0x01:
+                        db.setFunctionField(FunctionField.MAXIMUM_VALUE);
+                        break;
+                    case 0x02:
+                        db.setFunctionField(FunctionField.MINIMUM_VALUE);
+                        break;
+                    case 0x03:
+                        db.setFunctionField(FunctionField.VALUE_DURING_ERROR_STATE);
+                        break;
+                    default:
+                        throw new NotSupportedException("Function field");
+                }
+        }
+        if (!DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals(db.getDataFieldCode())) {
+            db.setStorageNumber((b >> 6) & 0x01);
+        }
         if ((b & PacketParser.EXTENTIONS_BIT) == PacketParser.EXTENTIONS_BIT) {
-            setState(DecodeState.VIFE);
+            setState(DecodeState.DIFE);
         } else {
-            if (db instanceof ReadOutDataBlock) {
+            if (bytesLeft == 0) {
                 setState(DecodeState.RESULT_AVAIL);
             } else {
-                startCollectingValue();
+                setState(DecodeState.VIF);
             }
         }
+
+    }
+
+    private void decodeDIFE(final byte b, int dFIEIndex) {
+        db.setStorageNumber(db.getStorageNumber() | ((long) (b & 0x0F) << (1 + dFIEIndex * 4)));
+        db.setTariff(db.getTariff() | (((b >> 4) & 0x03) << (dFIEIndex * 2)));
+        db.setSubUnit((short) (db.getSubUnit() | ((b >> 6) & 0x01) << dFIEIndex));
+        if ((b & PacketParser.EXTENTIONS_BIT) != PacketParser.EXTENTIONS_BIT) {
+            setState(DecodeState.VIF);
+        }
+    }
+
+    private void decodeEnhancedIdentificationDataBlock() {
+        final EnhancedIdentificationDataBlock b = (EnhancedIdentificationDataBlock) db;
+        b.setMedium(MBusMedium.StdMedium.valueOf(stack.popByte()));
+        b.setVersion(stack.popByte());
+        b.setMan(stack.popMan());
+        b.setId(stack.popBcdInteger(8));
     }
 
     private void decodeValueFromStack() {
@@ -169,226 +371,6 @@ public class VariableDataBlockDecoder {
         setState(DecodeState.RESULT_AVAIL);
     }
 
-    private void decodeEnhancedIdentificationDataBlock() {
-        final EnhancedIdentificationDataBlock b = (EnhancedIdentificationDataBlock) db;
-        b.setMedium(MBusMedium.StdMedium.valueOf(stack.popByte()));
-        b.setVersion(stack.popByte());
-        b.setMan(stack.popMan());
-        b.setId(stack.popBcdInteger(8));
-    }
-
-    public enum DecodeState {
-
-        WAIT_FOR_INIT,
-        DIF, DIFE,
-        VIF, VIFE_FB, VIFE_FD, VIFE, ASCII_VIF_LENGTH, ASCII_VIF_COLLECT, COLLECT_MANUFACTURER_SPECIFIC_VIFE,
-        SET_VARIABLE_LENGTH,
-        COLLECTING_VALUE,
-        ERROR,
-        RESULT_AVAIL;
-    }
-    private DecodeState ds;
-    private int difePos;
-    private DataBlock db;
-    private LongFrame frame;
-    private Stack stack = new Stack();
-
-    public DecodeState addByte(byte b, int bytesLeft) {
-        switch (ds) {
-            case DIF:
-                decodeDIF(b, bytesLeft);
-                difePos = 0;
-                break;
-            case DIFE:
-                decodeDIFE(b, difePos++);
-                break;
-            case VIF:
-                decodeVIF(b);
-                break;
-            case ASCII_VIF_LENGTH:
-                stack.init(b & 0xFF);
-                setState(DecodeState.ASCII_VIF_COLLECT);
-                break;
-            case COLLECT_MANUFACTURER_SPECIFIC_VIFE:
-                ((ManufacturerSpecificVif) db.getVif()).addVIFE(b);
-                if ((b & PacketParser.EXTENTIONS_BIT) == 0x00) {
-                    startCollectingValue();
-                }
-                break;
-            case ASCII_VIF_COLLECT:
-                stack.push(b);
-                if (stack.isFull()) {
-                    ((AsciiVif) db.getVif()).setValue(stack.popString());
-                    startCollectingValue();
-                }
-                break;
-            case VIFE_FB:
-                decodeVifExtention_FB(b);
-                break;
-            case VIFE_FD:
-                decodeVifExtention_FD(b);
-                break;
-            case VIFE:
-                decodeVIFE(b);
-                break;
-            case COLLECTING_VALUE:
-                stack.push(b);
-                if (stack.isFull()) {
-                    decodeValueFromStack();
-                }
-                break;
-            case SET_VARIABLE_LENGTH:
-                if ((b & 0xFF) < 0xBF) {
-                    db = new StringDataBlock(db);
-                    startCollectingValue((b & 0xFF));
-                } else if ((b & 0xFF) < 0xCF) {
-                    db = new BigDecimalDataBlock(db);
-                    startCollectingValue((b & 0xFF) - 0xC0);
-                } else if ((b & 0xFF) < 0xDF) {
-                    db = new BigDecimalDataBlock(db);
-                    startCollectingValue((b & 0xFF) - 0xD0);
-                } else if ((b & 0xFF) < 0xEF) {
-                    throw new DecodeException("binary number ???? how to decode");
-                } else if ((b & 0xFF) < 0xFA) {
-                    throw new DecodeException("floating point to be defined");
-                } else {
-                    throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF));
-                }
-                break;
-            default:
-                log.error("Unknown state: " + ds);
-                setState(DecodeState.ERROR);
-        }
-        return ds;
-    }
-
-    private void startCollectingValue(int bytesLeft) {
-        stack.init(bytesLeft);
-        setState(DecodeState.COLLECTING_VALUE);
-    }
-
-    private void startCollectingValue() {
-        switch (db.getDataFieldCode()) {
-            case NO_DATA:
-                stack.clear();
-                setState(DecodeState.RESULT_AVAIL);
-                return;
-            case _8_BIT_INTEGER:
-            case _2_DIGIT_BCD:
-                stack.init(1);
-                break;
-            case _16_BIT_INTEGER:
-            case _4_DIGIT_BCD:
-                stack.init(2);
-                break;
-            case _24_BIT_INTEGER:
-            case _6_DIGIT_BCD:
-                stack.init(3);
-                break;
-            case _32_BIT_INTEGER:
-            case _8_DIGIT_BCD:
-            case _32_BIT_REAL:
-                stack.init(4);
-                break;
-            case _48_BIT_INTEGER:
-            case _12_DIGIT_BCD:
-                stack.init(6);
-                break;
-            case _64_BIT_INTEGER:
-                stack.init(8);
-                break;
-            case VARIABLE_LENGTH:
-                setState(DecodeState.SET_VARIABLE_LENGTH);
-                return;
-            default:
-                throw new RuntimeException("START COLLECTING VALUE" + db.getDataFieldCode());
-        }
-
-        setState(DecodeState.COLLECTING_VALUE);
-
-    }
-
-    /**
-     *
-     * @param dataField lengt encoding see table 5 chapter 6.3
-     */
-    private void createDataBlock(final byte dataField) {
-        switch (dataField) {
-            case 0x00:
-                db = new EmptyDataBlock(DataFieldCode.NO_DATA);
-                break;
-            case 0x01:
-                db = new ByteDataBlock(DataFieldCode._8_BIT_INTEGER);
-                break;
-            case 0x02:
-                db = new ShortDataBlock(DataFieldCode._16_BIT_INTEGER);
-                break;
-            case 0x03:
-                db = new IntegerDataBlock(DataFieldCode._24_BIT_INTEGER);
-                break;
-            case 0x04:
-                db = new IntegerDataBlock(DataFieldCode._32_BIT_INTEGER);
-                break;
-            case 0x05:
-                db = new RealDataBlock(DataFieldCode._32_BIT_REAL);
-                break;
-            case 0x06:
-                db = new LongDataBlock(DataFieldCode._48_BIT_INTEGER);
-                break;
-            case 0x07:
-                db = new LongDataBlock(DataFieldCode._64_BIT_INTEGER);
-                break;
-            case 0x08:
-                db = new ReadOutDataBlock(DataFieldCode.SELECTION_FOR_READOUT);
-                break;
-            case 0x09:
-                db = new ByteDataBlock(DataFieldCode._2_DIGIT_BCD);
-                break;
-            case 0x0A:
-                db = new ShortDataBlock(DataFieldCode._4_DIGIT_BCD);
-                break;
-            case 0x0B:
-                db = new IntegerDataBlock(DataFieldCode._6_DIGIT_BCD);
-                break;
-            case 0x0C:
-                db = new IntegerDataBlock(DataFieldCode._8_DIGIT_BCD);
-                break;
-            case 0x0D:
-                db = new VariableLengthDataBlock(DataFieldCode.VARIABLE_LENGTH);
-                break;
-            case 0x0E:
-                db = new LongDataBlock(DataFieldCode._12_DIGIT_BCD);
-                break;
-            case 0x0F:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException("data field 0x0f not supported");
-            default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format("data field 0x%02x not supported", dataField));
-        }
-    }
-
-    private void decodeDIFE(final byte b, int dFIEIndex) {
-        db.setStorageNumber(db.getStorageNumber() | ((long) (b & 0x0F) << (1 + dFIEIndex * 4)));
-        db.setTariff(db.getTariff() | (((b >> 4) & 0x03) << (dFIEIndex * 2)));
-        db.setSubUnit((short) (db.getSubUnit() | ((b >> 6) & 0x01) << dFIEIndex));
-        if ((b & PacketParser.EXTENTIONS_BIT) != PacketParser.EXTENTIONS_BIT) {
-            setState(DecodeState.VIF);
-        }
-    }
-
-    private void decodeVifExtention_FB(final byte b) {
-        // Extended VID chapter 8.4.4 table b
-        db.setVif(VifFB.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
-        goFromVifOrVife(b);
-    }
-
-    private void decodeVifExtention_FD(final byte b) {
-        // Extended VID chapter 8.4.4 table a
-        db.setVif(VifFD.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
-        goFromVifOrVife(b);
-    }
-
     /**
      * see chapter 8.4.3
      * @param b
@@ -441,7 +423,7 @@ public class VariableDataBlockDecoder {
                 if (vife == null) {
                     vife = VifeError.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK));
                 }
-                //TODO Throw unknown ... 
+                //TODO Throw unknown ...
                 if (vife instanceof VifeStd) {
                     switch ((VifeStd) vife) {
                         case START_DATE_TIME_OF:
@@ -526,64 +508,96 @@ public class VariableDataBlockDecoder {
         goFromVifOrVife(b);
     }
 
-    private void decodeDIF(final byte b, int bytesLeft) {
-        switch (b & 0xFF) {
-            case 0x0F:
-                db = new RawDataBlock(DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET);
-                startCollectingValue(bytesLeft);
-                return;
-            case 0x1F:
-                db = new RawDataBlock(DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS);
-                if (bytesLeft == 0) {
-                    setState(DecodeState.RESULT_AVAIL);
-                } else {
-                    startCollectingValue(bytesLeft);
-                }
-                frame.setLastPackage(false);
-                return;
-            case 0x2F:
-                // Skip idlefiller next byte is DIF
-                return;
-            case 0x3F:
-            case 0x4F:
-            case 0x5F:
-            case 0x6F:
-                setState(DecodeState.ERROR);
-                throw new DecodeException("reserved");  // Reserverd,
-            case 0x7F:
-                db = new ReadOutDataBlock(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
-                break;
-            default:
-                createDataBlock((byte) (b & 0x0F));
-                switch ((b >> 4) & 0x03) {
-                    case 0x00:
-                        db.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-                        break;
-                    case 0x01:
-                        db.setFunctionField(FunctionField.MAXIMUM_VALUE);
-                        break;
-                    case 0x02:
-                        db.setFunctionField(FunctionField.MINIMUM_VALUE);
-                        break;
-                    case 0x03:
-                        db.setFunctionField(FunctionField.VALUE_DURING_ERROR_STATE);
-                        break;
-                    default:
-                        throw new NotSupportedException("Function field");
-                }
-        }
-        if (!DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals(db.getDataFieldCode())) {
-            db.setStorageNumber((b >> 6) & 0x01);
-        }
+    private void decodeVifExtention_FB(final byte b) {
+        // Extended VID chapter 8.4.4 table b
+        db.setVif(VifFB.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
+        goFromVifOrVife(b);
+    }
+
+    private void decodeVifExtention_FD(final byte b) {
+        // Extended VID chapter 8.4.4 table a
+        db.setVif(VifFD.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
+        goFromVifOrVife(b);
+    }
+
+    public DataBlock getDataBlock() {
+        return db;
+    }
+
+    public DecodeState getState() {
+        return ds;
+    }
+
+    private void goFromVifOrVife(final byte b) {
         if ((b & PacketParser.EXTENTIONS_BIT) == PacketParser.EXTENTIONS_BIT) {
-            setState(DecodeState.DIFE);
+            setState(DecodeState.VIFE);
         } else {
-            if (bytesLeft == 0) {
+            if (db instanceof ReadOutDataBlock) {
                 setState(DecodeState.RESULT_AVAIL);
             } else {
-                setState(DecodeState.VIF);
+                startCollectingValue();
             }
         }
+    }
 
+    public void init(LongFrame frame) {
+        db = null;
+        ds = DecodeState.DIF;
+        this.frame = frame;
+        stack.clear();
+    }
+
+    public void setState(DecodeState ds) {
+        DecodeState oldState = this.ds;
+        this.ds = ds;
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("DecodeState change from: %20s => %s", oldState, ds));
+        }
+    }
+
+    private void startCollectingValue() {
+        switch (db.getDataFieldCode()) {
+            case NO_DATA:
+                stack.clear();
+                setState(DecodeState.RESULT_AVAIL);
+                return;
+            case _8_BIT_INTEGER:
+            case _2_DIGIT_BCD:
+                stack.init(1);
+                break;
+            case _16_BIT_INTEGER:
+            case _4_DIGIT_BCD:
+                stack.init(2);
+                break;
+            case _24_BIT_INTEGER:
+            case _6_DIGIT_BCD:
+                stack.init(3);
+                break;
+            case _32_BIT_INTEGER:
+            case _8_DIGIT_BCD:
+            case _32_BIT_REAL:
+                stack.init(4);
+                break;
+            case _48_BIT_INTEGER:
+            case _12_DIGIT_BCD:
+                stack.init(6);
+                break;
+            case _64_BIT_INTEGER:
+                stack.init(8);
+                break;
+            case VARIABLE_LENGTH:
+                setState(DecodeState.SET_VARIABLE_LENGTH);
+                return;
+            default:
+                throw new RuntimeException("START COLLECTING VALUE" + db.getDataFieldCode());
+        }
+
+        setState(DecodeState.COLLECTING_VALUE);
+
+    }
+
+    private void startCollectingValue(int bytesLeft) {
+        stack.init(bytesLeft);
+        setState(DecodeState.COLLECTING_VALUE);
     }
 }
