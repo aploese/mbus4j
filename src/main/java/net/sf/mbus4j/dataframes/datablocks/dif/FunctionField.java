@@ -20,7 +20,7 @@ package net.sf.mbus4j.dataframes.datablocks.dif;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public enum FunctionField {
 

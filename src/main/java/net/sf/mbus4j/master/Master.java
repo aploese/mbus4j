@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * Handles the MBus devices connected via inputStream/OutputStream.
  * 
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class Master implements Iterable<MBusDevice> {
 

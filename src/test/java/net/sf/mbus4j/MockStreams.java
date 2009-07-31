@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public abstract class MockStreams {
 

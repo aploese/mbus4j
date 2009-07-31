@@ -32,7 +32,7 @@ import net.sf.mbus4j.master.Master;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class Slave {
 

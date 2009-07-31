@@ -22,7 +22,7 @@ import java.util.Arrays;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class ManufacturerSpecificVif implements Vif {
 

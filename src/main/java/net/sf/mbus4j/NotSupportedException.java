@@ -20,7 +20,7 @@ package net.sf.mbus4j;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class NotSupportedException extends RuntimeException {
 

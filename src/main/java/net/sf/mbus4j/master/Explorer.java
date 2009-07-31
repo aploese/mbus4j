@@ -34,7 +34,7 @@ import net.sf.mbus4j.slave.acw.AcwHeatMeter;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class Explorer {
 

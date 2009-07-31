@@ -22,7 +22,7 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public interface LongFrame extends Frame, PrimaryAddress, Iterable<DataBlock>  {
 

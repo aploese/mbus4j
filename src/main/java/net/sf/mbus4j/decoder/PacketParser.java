@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class PacketParser {
 
