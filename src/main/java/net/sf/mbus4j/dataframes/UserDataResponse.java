@@ -1,126 +1,39 @@
 /*
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
  *
- * $Id: UserDataResponse.java 407 2009-03-19 08:38:27Z aploese $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * @author aploese
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.dataframes;
 
-import net.sf.mbus4j.dataframes.datablocks.*;
-import net.sf.mbus4j.dataframes.*;
-import java.util.Iterator;
-import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import net.sf.mbus4j.dataframes.Frame.ControlCode;
+
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
-
-    private boolean lastPackage = true;
-    private boolean acd;
-    private boolean dfc;
-
-    public UserDataResponse() {
-        super();
-    }
-
-    public UserDataResponse(boolean acd, boolean dfc) {
-        this.acd = acd;
-        this.dfc = dfc;
-    }
-
-    @Override
-    public DataBlock getLastDataBlock() {
-        return dataBlocks.get(dataBlocks.size() - 1);
-    }
-
-    @Override
-    public void replaceDataBlock(DataBlock oldDataBlock, DataBlock newDataBlock) {
-        final int pos = dataBlocks.indexOf(oldDataBlock);
-        dataBlocks.remove(pos);
-        dataBlocks.add(pos, newDataBlock);
-    }
-
-    public void setMedium(MBusMedium medium) {
-        this.medium = medium;
-    }
-
-    @Override
-    public UserDataResponse clone() throws CloneNotSupportedException {
-        UserDataResponse result = (UserDataResponse) super.clone();
-        result.dataBlocks = new ArrayList<DataBlock>();
-        result.dataBlocks.addAll(dataBlocks);
-        return result;
-    }
-
-    /**
-     * @param i
-     * @return the dataBlocks
-     */
-    public DataBlock getDataBlock(int i) {
-        return dataBlocks.get(i);
-    }
-
-    public int getDataBlockCount() {
-        return dataBlocks.size();
-    }
-
-    @Override
-    public ControlCode getControlCode() {
-        return ControlCode.RSP_UD;
-    }
-
-    /**
-     * @return the acd
-     */
-    public boolean isAcd() {
-        return acd;
-    }
-
-    /**
-     * @param acd the acd to set
-     */
-    public void setAcd(boolean acd) {
-        this.acd = acd;
-    }
-
-    /**
-     * @return the dfc
-     */
-    public boolean isDfc() {
-        return dfc;
-    }
-
-    /**
-     * @param dcf the dfc to set
-     */
-    public void setDfc(boolean dfc) {
-        this.dfc = dfc;
-    }
-
-    @Override
-    public boolean  addDataBlock(DataBlock dataBlock) {
-        return dataBlocks.add(dataBlock);
-    }
-
-    @Override
-    public Iterator<DataBlock> iterator() {
-        return dataBlocks.iterator();
-    }
-
-    public void clearDataBlocks() {
-        dataBlocks.clear();
-    }
 
     public enum StatusCode {
         // Taken from Chapter 6.6 Fig 27
@@ -137,20 +50,6 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         MAN_SPEC_0X40(0x40, "Specific to manufacturer 0x40"),
         MAN_SPEC_0X80(0x80, "Specific to manufacturer 0x80");
 
-
-        public final byte id;
-        private final String description;
-
-        private StatusCode(int id, String description) {
-            this.id = (byte)id;
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-
         public static byte toId(StatusCode[] values) {
             byte result = 0;
             for (StatusCode sc : values) {
@@ -158,8 +57,22 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
             }
             return result;
         }
-    }
+        public final byte id;
+        private final String description;
 
+        private StatusCode(int id, String description) {
+            this.id = (byte) id;
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
+    }
+    private boolean lastPackage = true;
+    private boolean acd;
+    private boolean dfc;
     private byte version;
     private short accessNumber;
     private StatusCode[] status;
@@ -170,12 +83,142 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
     private List<DataBlock> dataBlocks = new ArrayList<DataBlock>();
     private byte address;
 
+    public UserDataResponse() {
+        super();
+    }
+
+    public UserDataResponse(boolean acd, boolean dfc) {
+        this.acd = acd;
+        this.dfc = dfc;
+    }
+
+    @Override
+    public boolean addDataBlock(DataBlock dataBlock) {
+        return dataBlocks.add(dataBlock);
+    }
+
+    public void addStatus(StatusCode status) {
+        if (this.status == null) {
+            this.status = new StatusCode[]{status};
+        } else {
+            this.status = Arrays.copyOf(this.status, this.status.length + 1);
+            this.status[this.status.length - 1] = status;
+        }
+    }
+
+    public void clearDataBlocks() {
+        dataBlocks.clear();
+    }
+
+    @Override
+    public UserDataResponse clone() throws CloneNotSupportedException {
+        UserDataResponse result = (UserDataResponse) super.clone();
+        result.dataBlocks = new ArrayList<DataBlock>();
+        result.dataBlocks.addAll(dataBlocks);
+        return result;
+    }
+
+    public short getAccessNumber() {
+        return accessNumber;
+    }
+
     /**
      * @return the address
      */
     @Override
     public byte getAddress() {
         return address;
+    }
+
+    @Override
+    public ControlCode getControlCode() {
+        return ControlCode.RSP_UD;
+    }
+
+    /**
+     * @param i
+     * @return the dataBlocks
+     */
+    public DataBlock getDataBlock(int i) {
+        return dataBlocks.get(i);
+    }
+
+    public int getDataBlockCount() {
+        return dataBlocks.size();
+    }
+
+    public int getIdentNumber() {
+        return identNumber;
+    }
+
+    @Override
+    public DataBlock getLastDataBlock() {
+        return dataBlocks.get(dataBlocks.size() - 1);
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public MBusMedium getMedium() {
+        return medium;
+    }
+
+    public short getSignature() {
+        return signature;
+    }
+
+    public StatusCode[] getStatus() {
+        return status;
+    }
+
+    public byte getVersion() {
+        return version;
+    }
+
+    /**
+     * @return the acd
+     */
+    public boolean isAcd() {
+        return acd;
+    }
+
+    /**
+     * @return the dfc
+     */
+    public boolean isDfc() {
+        return dfc;
+    }
+
+    /**
+     * Indicates wheter there are more Packages to follow or no.
+     * @return
+     */
+    public boolean isLastPackage() {
+        return lastPackage;
+    }
+
+    @Override
+    public Iterator<DataBlock> iterator() {
+        return dataBlocks.iterator();
+    }
+
+    @Override
+    public void replaceDataBlock(DataBlock oldDataBlock, DataBlock newDataBlock) {
+        final int pos = dataBlocks.indexOf(oldDataBlock);
+        dataBlocks.remove(pos);
+        dataBlocks.add(pos, newDataBlock);
+    }
+
+    public void setAccessNumber(short accessNumber) {
+        this.accessNumber = accessNumber;
+    }
+
+    /**
+     * @param acd the acd to set
+     */
+    public void setAcd(boolean acd) {
+        this.acd = acd;
     }
 
     /**
@@ -186,61 +229,15 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         this.address = address;
     }
 
+    /**
+     * @param dcf the dfc to set
+     */
+    public void setDfc(boolean dfc) {
+        this.dfc = dfc;
+    }
+
     public void setIdentNumber(int identNumber) {
         this.identNumber = identNumber;
-    }
-
-    public int getIdentNumber() {
-        return identNumber;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    public byte getVersion() {
-        return version;
-    }
-
-    public short getAccessNumber() {
-        return accessNumber;
-    }
-
-    public void setAccessNumber(short accessNumber) {
-        this.accessNumber = accessNumber;
-    }
-
-    public StatusCode[] getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusCode[] status) {
-        this.status = status;
-    }
-
-    public void addStatus(StatusCode status) {
-        if (this.status == null) {
-            this.status = new StatusCode[]{status};
-        } else {
-        this.status = Arrays.copyOf(this.status, this.status.length + 1);
-        this.status[this.status.length - 1] = status;
-        }
-    }
-
-    public short getSignature() {
-        return signature;
-    }
-
-    public void setSignature(short signature) {
-        this.signature = signature;
-    }
-
-    public MBusMedium getMedium() {
-        return medium;
     }
 
     @Override
@@ -248,12 +245,24 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         this.lastPackage = lastPackage;
     }
 
-    /**
-     * Indicates wheter there are more Packages to follow or no.
-     * @return
-     */
-    public boolean isLastPackage() {
-        return lastPackage;
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public void setMedium(MBusMedium medium) {
+        this.medium = medium;
+    }
+
+    public void setSignature(short signature) {
+        this.signature = signature;
+    }
+
+    public void setStatus(StatusCode[] status) {
+        this.status = status;
+    }
+
+    public void setVersion(byte version) {
+        this.version = version;
     }
 
     public String toJavaClassString() throws IOException {
@@ -322,16 +331,12 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         sb.append("accessnumber = ").append(accessNumber).append('\n');
         sb.append(String.format("status = %s\n", Arrays.toString(status)));
         sb.append(String.format("signature = 0x%04X\n", signature));
-            sb.append("medium = ").append(medium.toString()).append('\n');
-            sb.append("lastPackage = ").append(isLastPackage()).append('\n');
-            for (int i = 0; i < dataBlocks.size(); i++) {
-                sb.append(String.format("datablock[%d]:\n", i));
-                dataBlocks.get(i).toString(sb, "  ");
-            }
+        sb.append("medium = ").append(medium.toString()).append('\n');
+        sb.append("lastPackage = ").append(isLastPackage()).append('\n');
+        for (int i = 0; i < dataBlocks.size(); i++) {
+            sb.append(String.format("datablock[%d]:\n", i));
+            dataBlocks.get(i).toString(sb, "  ");
+        }
         return sb.toString();
-    }
-
-    public void setVersion(byte version) {
-        this.version = version;
     }
 }

@@ -1,10 +1,24 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.slave.slb;
 
 import java.util.Date;
+
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.RequestClassXData;
@@ -27,7 +41,8 @@ import net.sf.mbus4j.slave.Slave;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class Cyble extends Slave {
 
@@ -86,9 +101,9 @@ public class Cyble extends Slave {
     public Frame handleSendUserData(SendUserData sendUserData) {
         for (DataBlock db : sendUserData) {
             if (VifStd.BUS_ADDRESS.equals(db.getVif())) {
-                setAddress(((ByteDataBlock)db).getValue());
+                setAddress(((ByteDataBlock) db).getValue());
             } else if (VifStd.ENHANCED_IDENTIFICATION_RECORD.equals(db.getVif())) {
-                final EnhancedIdentificationDataBlock edb = (EnhancedIdentificationDataBlock)db;
+                final EnhancedIdentificationDataBlock edb = (EnhancedIdentificationDataBlock) db;
                 setId(edb.getId());
                 setMan(edb.getMan());
                 setMedium(edb.getMedium());
@@ -105,5 +120,4 @@ public class Cyble extends Slave {
             return super.handleSendUserDataManSpec(sendUserDataManSpec);
         }
     }
-
 }

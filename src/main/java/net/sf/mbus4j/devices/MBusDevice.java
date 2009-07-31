@@ -1,18 +1,33 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.devices;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public abstract class MBusDevice implements Iterable<Response> {
 
@@ -57,18 +72,18 @@ public abstract class MBusDevice implements Iterable<Response> {
         return version;
     }
 
-    protected void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
-
     public boolean isInitialized() {
         return initialized;
     }
 
-    public abstract void readValues(Map<DataTag, DataBlock> map);
-
     @Override
     public Iterator<Response> iterator() {
         return resonses.iterator();
+    }
+
+    public abstract void readValues(Map<DataTag, DataBlock> map);
+
+    protected void setInitialized(boolean initialized) {
+        this.initialized = initialized;
     }
 }

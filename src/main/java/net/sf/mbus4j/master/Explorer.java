@@ -1,6 +1,19 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.master;
 
@@ -8,8 +21,10 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
+
 import java.io.IOException;
 import java.util.logging.Level;
+
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.devices.MBusDevice;
@@ -18,16 +33,10 @@ import net.sf.mbus4j.slave.acw.AcwHeatMeter;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class Explorer {
-
-    public Explorer() {
-        master = new Master();
-        slaves = new Slaves();
-    }
-    private Master master;
-    private Slaves slaves;
 
     public static void main(String[] args) throws IOException {
         Slaves.LogInit.initLog(Slaves.LogInit.INFO);
@@ -80,12 +89,30 @@ public class Explorer {
         }
 
     }
+    private Master master;
+    private Slaves slaves;
+
+    public Explorer() {
+        master = new Master();
+        slaves = new Slaves();
+    }
 
     /**
      * @return the master
      */
     public Master getMaster() {
         return master;
+    }
+
+    /**
+     * @return the slaves
+     */
+    public Slaves getSlaves() {
+        return slaves;
+    }
+
+    private MBusDevice[] searchDevicesByPrimaryAddress() throws IOException, InterruptedException {
+        return master.searchDevicesByPrimaryAddress();
     }
 
     /**
@@ -96,20 +123,9 @@ public class Explorer {
     }
 
     /**
-     * @return the slaves
-     */
-    public Slaves getSlaves() {
-        return slaves;
-    }
-
-    /**
      * @param slaves the slaves to set
      */
     public void setSlaves(Slaves slaves) {
         this.slaves = slaves;
-    }
-
-    private MBusDevice[] searchDevicesByPrimaryAddress() throws IOException, InterruptedException {
-        return master.searchDevicesByPrimaryAddress();
     }
 }

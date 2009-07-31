@@ -1,13 +1,29 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.master;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.devices.MBusDevice;
 import net.sf.mbus4j.slave.Slaves.LogInit;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,20 +32,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.junit.Assert.*;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class MasterTest {
-
-    Logger log = LoggerFactory.getLogger(MasterTest.class);
-    private SlaveStreams slaves;
-    private Master master;
-
-    public MasterTest() {
-    }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -38,6 +47,12 @@ public class MasterTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    Logger log = LoggerFactory.getLogger(MasterTest.class);
+    private SlaveStreams slaves;
+    private Master master;
+
+    public MasterTest() {
     }
 
     @Before
@@ -54,6 +69,30 @@ public class MasterTest {
         master.releaseStreams();
         master = null;
         slaves.close();
+    }
+
+    /**
+     * Test of deselectBySecondaryAddress method, of class Master.
+     */
+    @Test
+    @Ignore
+    public void testDeselectBySecondaryAddress() {
+        System.out.println("deselectBySecondaryAddress");
+        master.deselectBySecondaryAddress();
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
+    }
+
+    /**
+     * Test of selectBySecondaryAddress method, of class Master.
+     */
+    @Test
+    @Ignore
+    public void testSelectBySecondaryAddress() {
+        System.out.println("selectBySecondaryAddress");
+        master.selectBySecondaryAddress();
+        // TODO review the generated test code and remove the default call to fail.
+        fail("The test case is a prototype.");
     }
 
     /**
@@ -172,29 +211,5 @@ public class MasterTest {
         assertEquals(master.getDevice(3).getMan(), "H@P");
         assertEquals(master.getDevice(3).getMedium(), MBusMedium.StdMedium.GAS);
         assertEquals(master.getDevice(3).getVersion(), 1);
-    }
-
-    /**
-     * Test of selectBySecondaryAddress method, of class Master.
-     */
-    @Test
-    @Ignore
-    public void testSelectBySecondaryAddress() {
-        System.out.println("selectBySecondaryAddress");
-        master.selectBySecondaryAddress();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of deselectBySecondaryAddress method, of class Master.
-     */
-    @Test
-    @Ignore
-    public void testDeselectBySecondaryAddress() {
-        System.out.println("deselectBySecondaryAddress");
-        master.deselectBySecondaryAddress();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 }

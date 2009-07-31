@@ -1,15 +1,31 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.decoder;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+
 import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -18,20 +34,19 @@ import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class MBusDocumentationExamplesTest {
-        private PacketParser instance;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -40,6 +55,36 @@ public class MBusDocumentationExamplesTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+    private PacketParser instance;
+
+    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
+        System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
+        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+
+        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
+        for (byte b : data) {
+            instance.addByte(b);
+        }
+        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, instance.getState());
+        assertNotNull("DataValue not available", instance.getFrame());
+        assertEquals(clazz, instance.getFrame().getClass());
+//        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
+        BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
+        int line = 1;
+        String dataLine = br.readLine();
+        String parsedLine = resultStr.readLine();
+        while (parsedLine != null && dataLine != null) {
+            line++;
+            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
+            dataLine = br.readLine();
+            parsedLine = resultStr.readLine();
+        }
+        br.close();
+        resultStr.close();
+
+        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
     }
 
     @Before
@@ -51,7 +96,6 @@ public class MBusDocumentationExamplesTest {
     public void tearDown() {
         instance = null;
     }
-
 
     @Test
     public void testExample_6_1__0() throws Exception {
@@ -141,38 +185,8 @@ public class MBusDocumentationExamplesTest {
     public void testRequestClass2Data() throws Exception {
         Frame dv = null;
         for (byte b : PacketParser.ascii2Bytes("107BFE7916")) {
-            dv = instance.addByte((byte) b);
+            dv = instance.addByte(b);
         }
         assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());
     }
-
-    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
-        System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
-        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
-        for (byte b : data) {
-            instance.addByte(b);
-        }
-        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, instance.getState());
-        assertNotNull("DataValue not available", instance.getFrame());
-        assertEquals(clazz, instance.getFrame().getClass());
-//        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
-        BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
-        int line = 1;
-        String dataLine = br.readLine();
-        String parsedLine = resultStr.readLine();
-        while (parsedLine != null && dataLine != null) {
-            line++;
-            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
-            dataLine = br.readLine();
-            parsedLine = resultStr.readLine();
-        }
-        br.close();
-        resultStr.close();
-
-        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
-    }
-
 }

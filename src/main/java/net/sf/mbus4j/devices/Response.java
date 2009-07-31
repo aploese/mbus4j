@@ -1,13 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.devices;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
@@ -16,24 +29,34 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class Response implements Cloneable, Iterable<DataTag> {
 
     List<DataTag> tags = new ArrayList<DataTag>();
     Frame[] initFrames;
 
-
-    public DataTag addTag(DataFieldCode difCode, Vif vif, Vife ... vife) {
-        return addTag(difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif, vife);
+    public DataTag addOptionalTag(DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
+        return addOptionalTag(vif.getLabel(), difCode, functionField, deviceUnit, tariff, storageNumber, vif, vifes);
     }
 
-    public DataTag addTag(String label, DataFieldCode difCode, Vif vif, Vife ... vife) {
-        return addTag(label, difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif, vife);
+    public DataTag addOptionalTag(DataFieldCode difCode, Vif vif) {
+        return addOptionalTag(difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif);
+    }
+
+    public DataTag addOptionalTag(String label, DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
+        final DataTag d = addTag(label, difCode, functionField, deviceUnit, tariff, storageNumber, vif, vifes);
+        d.setOptional(true);
+        return d;
     }
 
     public DataTag addTag(DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
         return addTag(vif.getLabel(), difCode, functionField, deviceUnit, tariff, storageNumber, vif, vifes);
+    }
+
+    public DataTag addTag(DataFieldCode difCode, Vif vif, Vife... vife) {
+        return addTag(difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif, vife);
     }
 
     public DataTag addTag(String label, DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
@@ -46,43 +69,8 @@ public class Response implements Cloneable, Iterable<DataTag> {
         return d;
     }
 
-    public DataTag addOptionalTag(DataFieldCode difCode, Vif vif) {
-        return addOptionalTag(difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif);
-    }
-
-    public DataTag addOptionalTag(DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
-        return addOptionalTag(vif.getLabel(), difCode, functionField, deviceUnit, tariff, storageNumber, vif, vifes);
-    }
-
-    public DataTag addOptionalTag(String label, DataFieldCode difCode, FunctionField functionField, int deviceUnit, int tariff, int storageNumber, Vif vif, Vife... vifes) {
-        final DataTag d = addTag(label, difCode, functionField, deviceUnit, tariff, storageNumber, vif, vifes);
-        d.setOptional(true);
-        return d;
-    }
-
-    public void setInitFrames(Frame ... initFrames) {
-        this.initFrames = initFrames;
-    }
-
-    public Frame[] getinitFrames() {
-        return initFrames;
-    }
-
-    /**
-     * Make a deep copy of datatags
-     * @return
-     * @throws CloneNotSupportedException
-     */
-    @Override
-    public Response clone() throws CloneNotSupportedException {
-        Response result = (Response)super.clone();
-        result.tags = new ArrayList<DataTag>();
-        result.tags.addAll(tags);
-        return result;
-    }
-
-    public DataTag getTag(int i) {
-        return tags.get(i);
+    public DataTag addTag(String label, DataFieldCode difCode, Vif vif, Vife... vife) {
+        return addTag(label, difCode, FunctionField.INSTANTANEOUS_VALUE, 0, 0, 0, vif, vife);
     }
 
     public void chooseAlternative(int i, Vif vif) {
@@ -97,8 +85,21 @@ public class Response implements Cloneable, Iterable<DataTag> {
                 tags.set(i, dt);
                 dt.setAlternative(null);
                 return;
+            }
         }
-        }
+    }
+
+    /**
+     * Make a deep copy of datatags
+     * @return
+     * @throws CloneNotSupportedException
+     */
+    @Override
+    public Response clone() throws CloneNotSupportedException {
+        Response result = (Response) super.clone();
+        result.tags = new ArrayList<DataTag>();
+        result.tags.addAll(tags);
+        return result;
     }
 
     public void deleteOptionaltag(int i) {
@@ -109,16 +110,28 @@ public class Response implements Cloneable, Iterable<DataTag> {
         }
     }
 
+    public Iterable<DataTag> getDataTagsIterable() {
+        return tags;
+    }
+
     public int getDataTagSize() {
         return tags.size();
     }
 
-    public Iterable<DataTag> getDataTagsIterable() {
-        return tags;
+    public Frame[] getinitFrames() {
+        return initFrames;
+    }
+
+    public DataTag getTag(int i) {
+        return tags.get(i);
     }
 
     @Override
     public Iterator<DataTag> iterator() {
         return tags.iterator();
+    }
+
+    public void setInitFrames(Frame... initFrames) {
+        this.initFrames = initFrames;
     }
 }

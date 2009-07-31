@@ -1,20 +1,47 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
-import net.sf.mbus4j.dataframes.datablocks.*;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.KILO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MEGA;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MICRO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.MILLI;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.NANO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.ONE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.PICO;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.AMPERE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.CURRENCY;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MONTH;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TIME_AND_DATE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VOLT;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.YEAR;
+
 import java.util.HashMap;
 import java.util.Map;
-import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.Vif.*;
-import static net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix.*;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public enum VifFD implements Vif {
 
@@ -147,12 +174,35 @@ public enum VifFD implements Vif {
     RESERVED_0X7E(),
     RESERVED_0X7F();
 
-
+    public static VifFD valueOfTableIndex(byte ordinal) {
+        if (map == null) {
+            map = new HashMap<Byte, VifFD>(0xFE);
+            for (VifFD val : values()) {
+                map.put((byte) val.ordinal(), val);
+                //             System.out.println(String.format("0x%02x %s\t%s\t%s", val.ordinal(), val, val.getUnitOfMeasurement(), val.getExponent()));
+            }
+        }
+        return map.get(ordinal);
+    }
     private final String friendlyName;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final Integer exponent;
     private static Map<Byte, VifFD> map;
+
+    private VifFD() {
+        this.friendlyName = String.format("Reserved 0x%02x", ordinal());
+        this.siPrefix = null;
+        this.unit = null;
+        this.exponent = null;
+    }
+
+    private VifFD(String friendlyName) {
+        this.friendlyName = friendlyName;
+        this.siPrefix = null;
+        this.unit = null;
+        this.exponent = null;
+    }
 
     private VifFD(String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
         this.friendlyName = friendlyName;
@@ -168,62 +218,6 @@ public enum VifFD implements Vif {
         this.exponent = null;
     }
 
-    private VifFD(String friendlyName) {
-        this.friendlyName = friendlyName;
-        this.siPrefix = null;
-        this.unit = null;
-        this.exponent = null;
-    }
-
-    private VifFD() {
-        this.friendlyName = String.format("Reserved 0x%02x", ordinal());
-        this.siPrefix = null;
-        this.unit = null;
-        this.exponent = null;
-    }
-
-    @Override
-    public String toString() {
-        if (exponent != null) {
-            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        } else {
-            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        }
-    }
-
-    public static VifFD valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifFD>(0xFE);
-            for (VifFD val : values()) {
-                map.put((byte)val.ordinal(), val);
-   //             System.out.println(String.format("0x%02x %s\t%s\t%s", val.ordinal(), val, val.getUnitOfMeasurement(), val.getExponent()));
-            }
-        }
-        return map.get(ordinal);
-    }
-
-        public byte getTableIndex() {
-        return (byte)ordinal();
-    }
-
-
-
-    /**
-     * @return the unit
-     */
-    @Override
-    public UnitOfMeasurement getUnitOfMeasurement() {
-        return unit;
-    }
-
-        /**
-     * @return the siPrefix
-     */
-    @Override
-    public SiPrefix getSiPrefix() {
-        return siPrefix;
-    }
-
     /**
      * @return the exponent
      */
@@ -235,5 +229,34 @@ public enum VifFD implements Vif {
     @Override
     public String getLabel() {
         return friendlyName;
+    }
+
+    /**
+     * @return the siPrefix
+     */
+    @Override
+    public SiPrefix getSiPrefix() {
+        return siPrefix;
+    }
+
+    public byte getTableIndex() {
+        return (byte) ordinal();
+    }
+
+    /**
+     * @return the unit
+     */
+    @Override
+    public UnitOfMeasurement getUnitOfMeasurement() {
+        return unit;
+    }
+
+    @Override
+    public String toString() {
+        if (exponent != null) {
+            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        } else {
+            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
+        }
     }
 }

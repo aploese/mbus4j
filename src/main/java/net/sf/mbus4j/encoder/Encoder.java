@@ -1,11 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.encoder;
 
 import java.util.Arrays;
 import java.util.Calendar;
+
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.ControlFrame;
 import net.sf.mbus4j.dataframes.Frame;
@@ -23,29 +37,31 @@ import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.UserDataResponse.StatusCode;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.DateDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.EnhancedIdentificationDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.IntegerDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.RawDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.DateDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.EnhancedIdentificationDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
-import net.sf.mbus4j.dataframes.datablocks.RawDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
 import net.sf.mbus4j.decoder.PacketParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class Encoder {
 
@@ -53,8 +69,26 @@ public class Encoder {
     private int currentPos;
     private static Logger log = LoggerFactory.getLogger(Encoder.class);
 
-    public byte[] encodeFrame(SingleCharFrame frame) {
+    public byte[] encode(Frame frame) {
+        if (frame instanceof SingleCharFrame) {
+            return encodeFrame((SingleCharFrame) frame);
+        } else if (frame instanceof ShortFrame) {
+            return encodeFrame((ShortFrame) frame);
+        } else if (frame instanceof ControlFrame) {
+            return encodeFrame((ControlFrame) frame);
+        } else if (frame instanceof LongFrame) {
+            return encodeFrame((LongFrame) frame);
+        } else {
+            return null;
+        }
+    }
+
+    public byte[] encodeFrame(ControlFrame frame) {
         initFrame(frame);
+        pushCField(frame);
+        pushAField(frame);
+        pushCIField(frame);
+        writeChecksumAndStop(4, 7);
         return data;
     }
 
@@ -70,7 +104,7 @@ public class Encoder {
         } else if (frame instanceof UserDataResponse) {
             pushVariableDataStructure((UserDataResponse) frame);
         } else if (frame instanceof SelectionOfSlaves) {
-            pushSelectionOfSlavesDataHeader((SelectionOfSlaves)frame);
+            pushSelectionOfSlavesDataHeader((SelectionOfSlaves) frame);
             pushVariableDataBlocks(frame);
         } else if (frame instanceof SendUserData) {
             pushVariableDataBlocks(frame);
@@ -82,53 +116,17 @@ public class Encoder {
         return data;
     }
 
-    public byte[] encodeFrame(ControlFrame frame) {
+    public byte[] encodeFrame(ShortFrame frame) {
         initFrame(frame);
         pushCField(frame);
         pushAField(frame);
-        pushCIField(frame);
-        writeChecksumAndStop(4, 7);
+        writeChecksumAndStop(1, 3);
         return data;
     }
 
-    private void pushDataInformationBlock(DataBlock db) {
-        pushDIF(db);
-        for (int i = 0; i < 10; i++) {
-            if (!needDIFE(db, i)) {
-                break;
-            }
-            pushDIFE(db, i);
-        }
-    }
-
-    private void pushValueInformationBlock(DataBlock db) {
-        pushVIF(db);
-        if (db.getAction() != null) {
-            pushObjectAction(db);
-        } else {
-            for (int i = 0; i < 10; i++) {
-                if (!needVIFE(db, i)) {
-                    break;
-                }
-                pushVIFE(db, i);
-            }
-        }
-    }
-
-    private void pushDataRecordHeader(DataBlock db) {
-        pushDataInformationBlock(db);
-        pushValueInformationBlock(db);
-    }
-
-    private void pushVariableDataBlock(DataBlock db) {
-        pushDataRecordHeader(db);
-        pushData(db);
-    }
-
-    private void pushVariableDataBlocks(LongFrame frame) {
-        for (DataBlock db : frame) {
-            pushVariableDataBlock(db);
-        }
+    public byte[] encodeFrame(SingleCharFrame frame) {
+        initFrame(frame);
+        return data;
     }
 
     private void initFrame(Frame frame) {
@@ -156,35 +154,43 @@ public class Encoder {
         }
     }
 
-    public byte[] encode(Frame frame) {
-        if (frame instanceof SingleCharFrame) {
-            return encodeFrame((SingleCharFrame) frame);
-        } else if (frame instanceof ShortFrame) {
-            return encodeFrame((ShortFrame) frame);
-        } else if (frame instanceof ControlFrame) {
-            return encodeFrame((ControlFrame) frame);
-        } else if (frame instanceof LongFrame) {
-            return encodeFrame((LongFrame) frame);
+    private boolean needDIFE(DataBlock db, int index) {
+        return ((db.getStorageNumber() >> (1 + index * 4)) > 0x00) ||
+                (((db.getTariff() >> (index * 2)) << 0x04) > 0x00) ||
+                ((db.getSubUnit() >> index) > 0x00);
+    }
+
+    private boolean needVIFE(DataBlock db, int index) {
+        if (db.getVifes() == null) {
+            return db.getAction() == null ? false : index == 0;
         } else {
-            return null;
+            return db.getVifes().size() > index;
         }
     }
 
-    public byte[] encodeFrame(ShortFrame frame) {
-        initFrame(frame);
-        pushCField(frame);
-        pushAField(frame);
-        writeChecksumAndStop(1, 3);
-        return data;
+    private void pushAField(PrimaryAddress address) {
+        data[currentPos++] = address.getAddress();
     }
 
-    private void writeChecksumAndStop(int start, int chIndex) {
-        data[chIndex] = 0;
-        for (int i = start; i < chIndex; i++) {
-            data[chIndex] += data[i];
+    private void pushApplicationResetData(ApplicationReset applicationReset) {
+        data[currentPos++] = (byte) (applicationReset.getTelegramType().id | applicationReset.getSubTelegram());
+    }
+
+    private void pushBcd(long value, int bcdDigits) {
+        for (int i = bcdDigits / 2; i > 0; i--) {
+            data[currentPos] = (byte) (value % 10);
+            value /= 10;
+            data[currentPos++] |= (byte) ((value % 10) << 4);
+            value /= 10;
         }
-        data[chIndex + 1] = 0x16;
-        data = Arrays.copyOf(data, chIndex + 2);
+    }
+
+    private void pushBytes(byte[] value) {
+        if (value != null) {
+            for (byte b : value) {
+                pushInteger(b, 1);
+            }
+        }
     }
 
     private void pushCField(Frame frame) {
@@ -229,25 +235,6 @@ public class Encoder {
         currentPos++;
     }
 
-    private void pushAField(PrimaryAddress address) {
-        data[currentPos++] = address.getAddress();
-    }
-
-    private void pushCIField(LongFrame frame) {
-        if (frame instanceof ApplicationReset) {
-            data[currentPos] = 0x50;
-        } else if (frame instanceof SendUserData) {
-            data[currentPos] = 0x51;
-        } else if (frame instanceof SelectionOfSlaves) {
-            data[currentPos] = 0x52;
-        } else if (frame instanceof GeneralApplicationError) {
-            data[currentPos] = 0x70;
-        } else if (frame instanceof UserDataResponse) {
-            data[currentPos] = 0x72;
-        }
-        currentPos++;
-    }
-
     private void pushCIField(ControlFrame frame) {
         if (frame instanceof SetBaudrate) {
             final SetBaudrate sb = (SetBaudrate) frame;
@@ -285,59 +272,19 @@ public class Encoder {
         currentPos++;
     }
 
-    private void pushApplicationResetData(ApplicationReset applicationReset) {
-        data[currentPos++] = (byte)(applicationReset.getTelegramType().id | applicationReset.getSubTelegram());
-    }
-
-    private void writeLenght(byte i) {
-        data[1] = i;
-        data[2] = i;
-    }
-
-    private void pushGeneralApplicationError(GeneralApplicationError generalApplicationError) {
-        data[currentPos++] = generalApplicationError.getError().id;
-    }
-
-    private void pushDIF(DataBlock db) {
-        data[currentPos] = db.getDataFieldCode().code;
-        switch (db.getDataFieldCode()) {
-            case SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET:
-                data[currentPos++] = 0x0F;
-                break;
-            case SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS:
-                data[currentPos++] = 0x1F;
-                break;
-            case SPECIAL_FUNCTION_IDLE_FILLER:
-                data[currentPos++] = 0x2F;
-                break;
-            case SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST:
-                data[currentPos++] = 0x7F;
-                return;
-            default:
-                data[currentPos] |= needDIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
-                if (db.getFunctionField() != null) {
-                    data[currentPos] |= db.getFunctionField().code;
-                }
-                data[currentPos++] |= (db.getStorageNumber() & 0x01) << 6;
+    private void pushCIField(LongFrame frame) {
+        if (frame instanceof ApplicationReset) {
+            data[currentPos] = 0x50;
+        } else if (frame instanceof SendUserData) {
+            data[currentPos] = 0x51;
+        } else if (frame instanceof SelectionOfSlaves) {
+            data[currentPos] = 0x52;
+        } else if (frame instanceof GeneralApplicationError) {
+            data[currentPos] = 0x70;
+        } else if (frame instanceof UserDataResponse) {
+            data[currentPos] = 0x72;
         }
-    }
-
-    private void pushDIFE(DataBlock db, int index) {
-        data[currentPos] = needDIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
-        data[currentPos] |= (db.getStorageNumber() >> (1 + index * 4)) & 0x0F;
-        data[currentPos] |= ((db.getTariff() >> (index * 2)) << 0x04) & 0x30;
-        data[currentPos++] |= ((db.getSubUnit() >> index) << 0x06) & 0x40;
-    }
-
-    private void pushVIFE(DataBlock db, int index) {
-        data[currentPos] = needVIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
-        if (db.getVifes().get(index) instanceof VifeStd) {
-            data[currentPos++] |= ((VifeStd) db.getVifes().get(index)).getTableIndex();
-        } else if (db.getVifes().get(index) instanceof VifeError) {
-            data[currentPos++] |= ((VifeError) db.getVifes().get(index)).getTableIndex();
-//        } else if (db.getVifes().get(index) instanceof VifeObjectAction) {
-            //TODO
-        }
+        currentPos++;
     }
 
     private void pushData(DataBlock db) {
@@ -419,92 +366,60 @@ public class Encoder {
         }
     }
 
-    private void pushVIF(DataBlock db) {
-        if (db.getVif() == null) {
-
-        } else if (db.getVif() instanceof VifStd) {
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
-            data[currentPos++] |= ((VifStd) db.getVif()).getTableIndex();
-        } else if (db.getVif() instanceof VifFB) {
-            data[currentPos++] = (byte) 0xFB;
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
-            data[currentPos++] |= ((VifFB) db.getVif()).getTableIndex();
-        } else if (db.getVif() instanceof VifFD) {
-            data[currentPos++] = (byte) 0xFD;
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
-            data[currentPos++] |= ((VifFD) db.getVif()).getTableIndex();
-        } else if (db.getVif() instanceof AsciiVif) {
-            data[currentPos++] = (byte) (needVIFE(db, 0) ? 0xFC : 0x7C);
-            pushString(((AsciiVif)db.getVif()).getValue());
-        } else if (db.getVif() instanceof ManufacturerSpecificVif) {
-            data[currentPos++] = (byte)0xFF;
-            pushBytes(((ManufacturerSpecificVif)db.getVif()).getVifes());
-        } else {
-            throw new RuntimeException("Unknown vif " + db.getVif());
+    private void pushDataInformationBlock(DataBlock db) {
+        pushDIF(db);
+        for (int i = 0; i < 10; i++) {
+            if (!needDIFE(db, i)) {
+                break;
+            }
+            pushDIFE(db, i);
         }
     }
 
-    private boolean needDIFE(DataBlock db, int index) {
-        return ((db.getStorageNumber() >> (1 + index * 4)) > 0x00) ||
-                (((db.getTariff() >> (index * 2)) << 0x04) > 0x00) ||
-                ((db.getSubUnit() >> index) > 0x00);
+    private void pushDataRecordHeader(DataBlock db) {
+        pushDataInformationBlock(db);
+        pushValueInformationBlock(db);
     }
 
-    private boolean needVIFE(DataBlock db, int index) {
-        if (db.getVifes() == null) {
-            return db.getAction() == null ? false : index == 0;
-        } else {
-            return db.getVifes().size() > index;
+    private void pushDate(DateDataBlock dateDataBlock) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateDataBlock.getValue());
+        int val = cal.get(Calendar.DAY_OF_MONTH);
+        val |= (((cal.get(Calendar.YEAR) - 2000) & 0x07) << 5);
+        val |= (((cal.get(Calendar.YEAR) - 2000) & 0x78) << 9);
+        val |= ((cal.get(Calendar.MONTH) + 1) << 8);
+        pushInteger(val, 2);
+    }
+
+    private void pushDIF(DataBlock db) {
+        data[currentPos] = db.getDataFieldCode().code;
+        switch (db.getDataFieldCode()) {
+            case SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET:
+                data[currentPos++] = 0x0F;
+                break;
+            case SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS:
+                data[currentPos++] = 0x1F;
+                break;
+            case SPECIAL_FUNCTION_IDLE_FILLER:
+                data[currentPos++] = 0x2F;
+                break;
+            case SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST:
+                data[currentPos++] = 0x7F;
+                return;
+            default:
+                data[currentPos] |= needDIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+                if (db.getFunctionField() != null) {
+                    data[currentPos] |= db.getFunctionField().code;
+                }
+                data[currentPos++] |= (db.getStorageNumber() & 0x01) << 6;
         }
     }
 
-    private void pushVariableDataStructure(UserDataResponse frame) {
-        pushFixedDataHeader(frame);
-        pushVariableDataBlocks(frame);
-    }
-
-    private void pushFixedDataHeader(UserDataResponse frame) {
-        pushBcd(frame.getIdentNumber(), 8);
-        pushManufacturer(frame.getManufacturer());
-        data[currentPos++] = (byte) frame.getVersion();
-        data[currentPos++] = (byte) frame.getMedium().getId();
-        data[currentPos++] = (byte) frame.getAccessNumber();
-        data[currentPos++] = (byte) StatusCode.toId(frame.getStatus());
-        pushInteger(frame.getSignature(), 2);
-    }
-
-    private void pushSelectionOfSlavesDataHeader(SelectionOfSlaves frame) {
-        pushInteger(frame.getMaskedId(), 4);
-        pushInteger(frame.getMaskedMan(), 2);
-        data[currentPos++] = (byte) frame.getMaskedVersion();
-        data[currentPos++] = (byte) frame.getMaskedMedium();
-    }
-
-    private void pushManufacturer(String man) {
-        int v;
-        if (man == null) {
-            v = -1;
-        } else {
-        byte[] bytes = man.getBytes();
-        v = bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024;
-        }
-        pushInteger(v, 2);
-    }
-
-    private void pushBcd(long value, int bcdDigits) {
-        for (int i = bcdDigits / 2; i > 0; i--) {
-            data[currentPos] = (byte) (value % 10);
-            value /= 10;
-            data[currentPos++] |= (byte) ((value % 10) << 4);
-            value /= 10;
-        }
-    }
-
-    private void pushInteger(long value, int bytes) {
-        for (int i = bytes - 1; i >= 0; i--) {
-            data[currentPos++] = (byte) (value & 0xFF);
-            value >>= 8;
-        }
+    private void pushDIFE(DataBlock db, int index) {
+        data[currentPos] = needDIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
+        data[currentPos] |= (db.getStorageNumber() >> (1 + index * 4)) & 0x0F;
+        data[currentPos] |= ((db.getTariff() >> (index * 2)) << 0x04) & 0x30;
+        data[currentPos++] |= ((db.getSubUnit() >> index) << 0x06) & 0x40;
     }
 
     private void pushEnhancedIdentificationDataBlockLong(EnhancedIdentificationDataBlock db, int currentPos) {
@@ -518,8 +433,54 @@ public class Encoder {
         pushBcd(db.getId(), 8);
     }
 
+    private void pushFixedDataHeader(UserDataResponse frame) {
+        pushBcd(frame.getIdentNumber(), 8);
+        pushManufacturer(frame.getManufacturer());
+        data[currentPos++] = frame.getVersion();
+        data[currentPos++] = (byte) frame.getMedium().getId();
+        data[currentPos++] = (byte) frame.getAccessNumber();
+        data[currentPos++] = StatusCode.toId(frame.getStatus());
+        pushInteger(frame.getSignature(), 2);
+    }
+
+    private void pushGeneralApplicationError(GeneralApplicationError generalApplicationError) {
+        data[currentPos++] = generalApplicationError.getError().id;
+    }
+
+    private void pushInteger(long value, int bytes) {
+        for (int i = bytes - 1; i >= 0; i--) {
+            data[currentPos++] = (byte) (value & 0xFF);
+            value >>= 8;
+        }
+    }
+
+    private void pushManufacturer(String man) {
+        int v;
+        if (man == null) {
+            v = -1;
+        } else {
+            byte[] bytes = man.getBytes();
+            v = bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024;
+        }
+        pushInteger(v, 2);
+    }
+
     private void pushObjectAction(DataBlock db) {
         pushInteger(db.getAction().id, 1);
+    }
+
+    private void pushSelectionOfSlavesDataHeader(SelectionOfSlaves frame) {
+        pushInteger(frame.getMaskedId(), 4);
+        pushInteger(frame.getMaskedMan(), 2);
+        data[currentPos++] = (byte) frame.getMaskedVersion();
+        data[currentPos++] = (byte) frame.getMaskedMedium();
+    }
+
+    private void pushString(String value) {
+        pushInteger(value.length(), 1);
+        for (int i = value.length() - 1; i >= 0; i--) {
+            pushInteger((byte) value.charAt(i), 1);
+        }
     }
 
     private void pushTimeStamp(DateAndTimeDataBlock dateAndTimeDataBlock) {
@@ -538,30 +499,82 @@ public class Encoder {
         pushInteger(val, 4);
     }
 
-    private void pushDate(DateDataBlock dateDataBlock) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dateDataBlock.getValue());
-        int val = cal.get(Calendar.DAY_OF_MONTH);
-        val |= (((cal.get(Calendar.YEAR) - 2000) & 0x07) << 5);
-        val |= (((cal.get(Calendar.YEAR) - 2000) & 0x78) << 9);
-        val |= ((cal.get(Calendar.MONTH) + 1) << 8);
-        pushInteger(val, 2);
-    }
-
-    private void pushString(String value) {
-        pushInteger(value.length(), 1);
-            for (int i = value.length() -1; i >= 0; i--) {
-                pushInteger((byte)value.charAt(i), 1);
-            }
-        }
-    
-
-    private void pushBytes(byte[] value) {
-        if (value != null) {
-            for (byte b : value)                   {
-                pushInteger(b, 1);
+    private void pushValueInformationBlock(DataBlock db) {
+        pushVIF(db);
+        if (db.getAction() != null) {
+            pushObjectAction(db);
+        } else {
+            for (int i = 0; i < 10; i++) {
+                if (!needVIFE(db, i)) {
+                    break;
+                }
+                pushVIFE(db, i);
             }
         }
     }
 
+    private void pushVariableDataBlock(DataBlock db) {
+        pushDataRecordHeader(db);
+        pushData(db);
+    }
+
+    private void pushVariableDataBlocks(LongFrame frame) {
+        for (DataBlock db : frame) {
+            pushVariableDataBlock(db);
+        }
+    }
+
+    private void pushVariableDataStructure(UserDataResponse frame) {
+        pushFixedDataHeader(frame);
+        pushVariableDataBlocks(frame);
+    }
+
+    private void pushVIF(DataBlock db) {
+        if (db.getVif() == null) {
+        } else if (db.getVif() instanceof VifStd) {
+            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos++] |= ((VifStd) db.getVif()).getTableIndex();
+        } else if (db.getVif() instanceof VifFB) {
+            data[currentPos++] = (byte) 0xFB;
+            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos++] |= ((VifFB) db.getVif()).getTableIndex();
+        } else if (db.getVif() instanceof VifFD) {
+            data[currentPos++] = (byte) 0xFD;
+            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos++] |= ((VifFD) db.getVif()).getTableIndex();
+        } else if (db.getVif() instanceof AsciiVif) {
+            data[currentPos++] = (byte) (needVIFE(db, 0) ? 0xFC : 0x7C);
+            pushString(((AsciiVif) db.getVif()).getValue());
+        } else if (db.getVif() instanceof ManufacturerSpecificVif) {
+            data[currentPos++] = (byte) 0xFF;
+            pushBytes(((ManufacturerSpecificVif) db.getVif()).getVifes());
+        } else {
+            throw new RuntimeException("Unknown vif " + db.getVif());
+        }
+    }
+
+    private void pushVIFE(DataBlock db, int index) {
+        data[currentPos] = needVIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
+        if (db.getVifes().get(index) instanceof VifeStd) {
+            data[currentPos++] |= ((VifeStd) db.getVifes().get(index)).getTableIndex();
+        } else if (db.getVifes().get(index) instanceof VifeError) {
+            data[currentPos++] |= ((VifeError) db.getVifes().get(index)).getTableIndex();
+//        } else if (db.getVifes().get(index) instanceof VifeObjectAction) {
+            //TODO
+        }
+    }
+
+    private void writeChecksumAndStop(int start, int chIndex) {
+        data[chIndex] = 0;
+        for (int i = start; i < chIndex; i++) {
+            data[chIndex] += data[i];
+        }
+        data[chIndex + 1] = 0x16;
+        data = Arrays.copyOf(data, chIndex + 2);
+    }
+
+    private void writeLenght(byte i) {
+        data[1] = i;
+        data[2] = i;
+    }
 }

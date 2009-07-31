@@ -1,15 +1,26 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.sf.mbus4j.dataframes;
-
-import net.sf.mbus4j.dataframes.Frame.ControlCode;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class SendUserDataManSpec implements ControlFrame {
 
@@ -24,18 +35,30 @@ public class SendUserDataManSpec implements ControlFrame {
     }
 
     /**
+     * @return the address
+     */
+    @Override
+    public byte getAddress() {
+        return address;
+    }
+
+    /**
      * @return the ciField
      */
     public int getCiField() {
         return ciField;
     }
 
-    /**
-     * @return the address
-     */
     @Override
-    public byte getAddress() {
-        return address;
+    public ControlCode getControlCode() {
+        return ControlCode.SND_UD;
+    }
+
+    /**
+     * @return the fcb
+     */
+    public boolean isFcb() {
+        return fcb;
     }
 
     /**
@@ -47,10 +70,10 @@ public class SendUserDataManSpec implements ControlFrame {
     }
 
     /**
-     * @return the fcb
+     * @param ciField the ciField to set
      */
-    public boolean isFcb() {
-        return fcb;
+    public void setCiField(int ciField) {
+        this.ciField = ciField;
     }
 
     /**
@@ -59,17 +82,4 @@ public class SendUserDataManSpec implements ControlFrame {
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
     }
-
-    /**
-     * @param ciField the ciField to set
-     */
-    public void setCiField(int ciField) {
-        this.ciField = ciField;
-    }
-
-    @Override
-    public ControlCode getControlCode() {
-        return ControlCode.SND_UD;
-    }
-
 }

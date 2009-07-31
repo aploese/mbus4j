@@ -1,51 +1,80 @@
 /*
+ * mbus4j - Open source drivers for mbus protocol (www.mbus.com) - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009  Arne Plöse
  *
- * $Id: PacketParser.java 407 2009-03-19 08:38:27Z aploese $
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * @author aploese
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sf.mbus4j.decoder;
 
-import net.sf.mbus4j.dataframes.SelectionOfSlaves;
-import net.sf.mbus4j.NotSupportedException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Properties;
+
+import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.GeneralApplicationError;
 import net.sf.mbus4j.dataframes.LongFrame;
-import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SendUserDataManSpec;
 import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
+import net.sf.mbus4j.dataframes.UserDataResponse;
+
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author aploese
+ * @author arnep@users.sourceforge.net
+ * $Id$
  */
 public class PacketParser {
 
+    public enum DecodeState {
+
+        EXPECT_START,
+        LONG_LENGTH_1,
+        LONG_LENGTH_2,
+        START_LONG_PACK,
+        C_FIELD,
+        A_FIELD,
+        CI_FIELD,
+        APPLICATION_RESET_SUBCODE,
+        GENERAL_APPLICATION_ERRORCODE,
+        IDENT_NUMBER,
+        MANUFACTURER,
+        VERSION,
+        MEDIUM,
+        ACCESS_NUMBER,
+        STATUS,
+        SIGNATURE,
+        VARIABLE_DATA_BLOCK,
+        CHECKSUM,
+        END_SIGN,
+        ERROR;
+    }
     private final static Logger log = LoggerFactory.getLogger(PacketParser.class);
     public static final byte EXTENTIONS_BIT = (byte) 0x80;
     public static final byte EXTENTIONS_BIT_MASK = 0x7F;
-    private int expectedLengt;
-    private byte checksum;
-    private Frame parsingFrame;
-    private Stack stack = new Stack();
-    private int dataPos;
-    private byte start;
-    private VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
 
     public static byte[] ascii2Bytes(String s) {
         byte[] result = new byte[s.length() / 2];
@@ -115,154 +144,16 @@ public class PacketParser {
         System.out.println("<<<< Package Data");
 
     }
+    private int expectedLengt;
+    private byte checksum;
+    private Frame parsingFrame;
+    private Stack stack = new Stack();
+    private int dataPos;
+    private byte start;
+    private VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
+    private DecodeState state = DecodeState.EXPECT_START;
 
-    public Frame getFrame() {
-        return parsingFrame;
-    }
-
-    private int bcd2Int(byte[] data) {
-        int result = 0;
-        for (int i = data.length - 1; i >= 0; i--) {
-            result *= 10;
-            result += ((data[i] >> 4) & 0x0F);
-            result *= 10;
-            result += (data[i] & 0x0F);
-        }
-        return result;
-    }
-
-    private void setState(DecodeState state) {
-        DecodeState oldState = this.state;
-        this.state = state;
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("DecodeState change from: %20s => %s", oldState, state));
-        }
-    }
-
-    private LongFrame getLongFrame() {
-        return (LongFrame) parsingFrame;
-    }
-
-    private UserDataResponse getUserDataResponse() {
-        return (UserDataResponse) parsingFrame;
-    }
-
-    private void decodeCiSendUserData(int b) {
-        switch (b) {
-            case 0x50:
-                parsingFrame = new ApplicationReset((SendUserData) parsingFrame);
-                setState(DecodeState.APPLICATION_RESET_SUBCODE);
-                break;
-            case 0x51:
-                setState(DecodeState.VARIABLE_DATA_BLOCK);
-                break;
-            case 0x52:
-                parsingFrame = new SelectionOfSlaves((SendUserData) parsingFrame);
-                setState(DecodeState.VARIABLE_DATA_BLOCK);
-                break;
-            case 0x54:
-                parsingFrame = new SynchronizeAction((SendUserData) parsingFrame);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xB8:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 300);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xB9:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 600);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBA:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 1200);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBB:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 2400);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBC:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 4800);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBD:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 9600);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBE:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 19200);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xBF:
-                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 38400);
-                setState(DecodeState.CHECKSUM);
-                break;
-            case 0xA0:
-            case 0xA1:
-            case 0xA2:
-            case 0xA3:
-            case 0xA4:
-            case 0xA5:
-            case 0xA6:
-            case 0xA7:
-            case 0xA8:
-            case 0xA9:
-            case 0xAA:
-            case 0xAB:
-            case 0xAC:
-            case 0xAD:
-            case 0xAE:
-            case 0xAF:
-                parsingFrame = new SendUserDataManSpec((SendUserData) parsingFrame, b);
-                setState(DecodeState.CHECKSUM);
-                break;
-            default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format("CI field of SND_UD: 0x%02x | %s", b, parsingFrame.getClass().getName()));
-        }
-    }
-
-    private void decodeCiUserDataResponse(int b) {
-        switch (b) {
-            case 0x70:
-                parsingFrame = new GeneralApplicationError((UserDataResponse) parsingFrame);
-                setState(DecodeState.GENERAL_APPLICATION_ERRORCODE);
-                break;
-            case 0x72:
-                stack.init(4);
-                setState(DecodeState.IDENT_NUMBER);
-                break;
-            default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format("CI field of UD_RESP: 0x%02x | %s", b, parsingFrame.getClass().getName()));
-        }
-    }
-
-    public enum DecodeState {
-
-        EXPECT_START,
-        LONG_LENGTH_1,
-        LONG_LENGTH_2,
-        START_LONG_PACK,
-        C_FIELD,
-        A_FIELD,
-        CI_FIELD,
-        APPLICATION_RESET_SUBCODE,
-        GENERAL_APPLICATION_ERRORCODE,
-        IDENT_NUMBER,
-        MANUFACTURER,
-        VERSION,
-        MEDIUM,
-        ACCESS_NUMBER,
-        STATUS,
-        SIGNATURE,
-        VARIABLE_DATA_BLOCK,
-        CHECKSUM,
-        END_SIGN,
-        ERROR;
-    }
-
-    public DecodeState getState() {
-        return state;
+    public PacketParser() {
     }
 
     public Frame addByte(final byte b) {
@@ -366,8 +257,8 @@ public class PacketParser {
                 } else if (parsingFrame instanceof UserDataResponse) {
                     decodeCiUserDataResponse(b & 0xFF);
                 } else {
-                        setState(DecodeState.ERROR);
-                        throw new NotSupportedException(String.format("CI Field expected: 0x51 | 0x72, but found: 0x%02x | %s", b, parsingFrame.getClass().getName()));
+                    setState(DecodeState.ERROR);
+                    throw new NotSupportedException(String.format("CI Field expected: 0x51 | 0x72, but found: 0x%02x | %s", b, parsingFrame.getClass().getName()));
                 }
                 break;
             case GENERAL_APPLICATION_ERRORCODE:
@@ -504,8 +395,129 @@ public class PacketParser {
         }
         return null;
     }
-    private DecodeState state = DecodeState.EXPECT_START;
 
-    public PacketParser() {
+    private int bcd2Int(byte[] data) {
+        int result = 0;
+        for (int i = data.length - 1; i >= 0; i--) {
+            result *= 10;
+            result += ((data[i] >> 4) & 0x0F);
+            result *= 10;
+            result += (data[i] & 0x0F);
+        }
+        return result;
+    }
+
+    private void decodeCiSendUserData(int b) {
+        switch (b) {
+            case 0x50:
+                parsingFrame = new ApplicationReset((SendUserData) parsingFrame);
+                setState(DecodeState.APPLICATION_RESET_SUBCODE);
+                break;
+            case 0x51:
+                setState(DecodeState.VARIABLE_DATA_BLOCK);
+                break;
+            case 0x52:
+                parsingFrame = new SelectionOfSlaves((SendUserData) parsingFrame);
+                setState(DecodeState.VARIABLE_DATA_BLOCK);
+                break;
+            case 0x54:
+                parsingFrame = new SynchronizeAction((SendUserData) parsingFrame);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xB8:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 300);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xB9:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 600);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBA:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 1200);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBB:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 2400);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBC:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 4800);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBD:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 9600);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBE:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 19200);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xBF:
+                parsingFrame = new SetBaudrate((SendUserData) parsingFrame, 38400);
+                setState(DecodeState.CHECKSUM);
+                break;
+            case 0xA0:
+            case 0xA1:
+            case 0xA2:
+            case 0xA3:
+            case 0xA4:
+            case 0xA5:
+            case 0xA6:
+            case 0xA7:
+            case 0xA8:
+            case 0xA9:
+            case 0xAA:
+            case 0xAB:
+            case 0xAC:
+            case 0xAD:
+            case 0xAE:
+            case 0xAF:
+                parsingFrame = new SendUserDataManSpec((SendUserData) parsingFrame, b);
+                setState(DecodeState.CHECKSUM);
+                break;
+            default:
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format("CI field of SND_UD: 0x%02x | %s", b, parsingFrame.getClass().getName()));
+        }
+    }
+
+    private void decodeCiUserDataResponse(int b) {
+        switch (b) {
+            case 0x70:
+                parsingFrame = new GeneralApplicationError((UserDataResponse) parsingFrame);
+                setState(DecodeState.GENERAL_APPLICATION_ERRORCODE);
+                break;
+            case 0x72:
+                stack.init(4);
+                setState(DecodeState.IDENT_NUMBER);
+                break;
+            default:
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format("CI field of UD_RESP: 0x%02x | %s", b, parsingFrame.getClass().getName()));
+        }
+    }
+
+    public Frame getFrame() {
+        return parsingFrame;
+    }
+
+    private LongFrame getLongFrame() {
+        return (LongFrame) parsingFrame;
+    }
+
+    public DecodeState getState() {
+        return state;
+    }
+
+    private UserDataResponse getUserDataResponse() {
+        return (UserDataResponse) parsingFrame;
+    }
+
+    private void setState(DecodeState state) {
+        DecodeState oldState = this.state;
+        this.state = state;
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("DecodeState change from: %20s => %s", oldState, state));
+        }
     }
 }
