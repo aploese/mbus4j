@@ -20,7 +20,7 @@ package net.sf.mbus4j.decoder;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class DecodeException extends RuntimeException {
 

@@ -20,7 +20,7 @@ package net.sf.mbus4j.master;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public interface MasterEventListener {
 }

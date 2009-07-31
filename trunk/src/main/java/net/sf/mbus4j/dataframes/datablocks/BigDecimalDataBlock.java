@@ -24,7 +24,7 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class BigDecimalDataBlock extends DataBlock {
 

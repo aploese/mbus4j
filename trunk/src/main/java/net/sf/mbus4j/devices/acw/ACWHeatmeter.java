@@ -67,7 +67,7 @@ import net.sf.mbus4j.devices.Response;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class ACWHeatmeter extends MBusDevice {
 

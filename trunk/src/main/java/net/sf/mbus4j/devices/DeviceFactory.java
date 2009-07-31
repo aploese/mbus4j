@@ -23,7 +23,7 @@ import net.sf.mbus4j.devices.acw.AcwDeviceFactory;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class DeviceFactory {
 

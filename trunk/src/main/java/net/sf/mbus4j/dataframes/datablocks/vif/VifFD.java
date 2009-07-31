@@ -41,7 +41,7 @@ import java.util.Map;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public enum VifFD implements Vif {
 

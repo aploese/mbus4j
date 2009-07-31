@@ -30,7 +30,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class DataTag implements Cloneable {
 

@@ -22,7 +22,7 @@ import net.sf.mbus4j.dataframes.MBusMedium;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class EnhancedIdentificationDataBlock extends DataBlock {
 

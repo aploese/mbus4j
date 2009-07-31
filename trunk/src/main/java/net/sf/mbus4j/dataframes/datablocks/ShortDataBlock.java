@@ -23,7 +23,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class ShortDataBlock extends DataBlock {
 

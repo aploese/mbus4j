@@ -20,7 +20,7 @@ package net.sf.mbus4j.devices.generic;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public interface Heatmeter<ENERGY extends Number, POWER extends Number, VOLUME extends Number, FLOW extends Number, FLOWTEMP extends Number, RETURNTEMP extends Number, TEMPDIFF extends Number> {
 

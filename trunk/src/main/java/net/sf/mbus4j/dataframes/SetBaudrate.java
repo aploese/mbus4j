@@ -20,7 +20,7 @@ package net.sf.mbus4j.dataframes;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class SetBaudrate implements ControlFrame {
 

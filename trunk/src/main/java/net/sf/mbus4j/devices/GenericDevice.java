@@ -25,7 +25,7 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 class GenericDevice extends MBusDevice {
 

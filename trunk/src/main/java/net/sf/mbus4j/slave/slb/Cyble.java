@@ -42,7 +42,7 @@ import net.sf.mbus4j.slave.Slave;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class Cyble extends Slave {
 

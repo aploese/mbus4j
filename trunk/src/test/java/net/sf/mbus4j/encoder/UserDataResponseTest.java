@@ -39,7 +39,7 @@ import org.junit.Test;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class UserDataResponseTest {
 

@@ -31,7 +31,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public abstract class DataBlock {
 

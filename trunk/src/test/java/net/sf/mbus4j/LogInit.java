@@ -24,7 +24,7 @@ import org.apache.log4j.PropertyConfigurator;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class LogInit {
 

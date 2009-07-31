@@ -25,7 +25,7 @@ import net.sf.mbus4j.devices.MBusDevice;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class AcwDeviceFactory extends DeviceFactory {
 

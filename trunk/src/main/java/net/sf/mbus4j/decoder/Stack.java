@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public class Stack {
 

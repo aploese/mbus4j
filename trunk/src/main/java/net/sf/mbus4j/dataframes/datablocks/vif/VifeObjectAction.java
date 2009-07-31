@@ -20,7 +20,7 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
 /**
  *
  * @author arnep@users.sourceforge.net
- * $Id$
+ * @version $Id$
  */
 public enum VifeObjectAction {
 }
