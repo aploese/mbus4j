@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,14 +13,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.devices.acw;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.devices.DeviceFactory;
-import net.sf.mbus4j.devices.MBusDevice;
+import net.sf.mbus4j.devices.MBusResponseFramesContainer;
+import net.sf.mbus4j.slave.acw.AcwHeatMeter;
 
 /**
  *
@@ -31,10 +32,10 @@ public class AcwDeviceFactory extends DeviceFactory {
 
     public static final String ACW = "ACW";
 
-    public static MBusDevice createDevice(UserDataResponse udResp) {
+    public static MBusResponseFramesContainer createDevice(UserDataResponse udResp) {
         if (MBusMedium.StdMedium.HEAT_OUTLET.equals(udResp.getMedium()) || MBusMedium.StdMedium.HEAT_INLET.equals(udResp.getMedium()) || MBusMedium.StdMedium.HEAT_COOLING_LOAD_METER.equals(udResp.getMedium())) {
             if (udResp.getVersion() == 0x09 || udResp.getVersion() == 0x0A || udResp.getVersion() == 0x0B || udResp.getVersion() == 0x0F) {
-                ACWHeatmeter m = new ACWHeatmeter(udResp);
+                AcwHeatMeter m = new AcwHeatMeter(udResp);
                 return m;
             }
         }

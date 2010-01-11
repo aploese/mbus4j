@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes;
 
@@ -24,7 +24,7 @@ package net.sf.mbus4j.dataframes;
  */
 public interface Frame {
 
-    public enum ControlCode {
+    public static enum ControlCode {
 
         SND_NKE,
         SND_UD,

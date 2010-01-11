@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes;
 
@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.encoder.Encoder;
 
 /**
  *
@@ -31,10 +32,10 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 public class SelectionOfSlaves implements LongFrame {
 
     private byte address;
-    private int maskedId;
-    private int maskedVersion;
-    private int maskedMan;
-    private int maskedMedium;
+    private int bcdId;
+    private byte bcdVersion;
+    private short bcdMan;
+    private byte bcdMedium;
     private List<DataBlock> datablocks = new ArrayList<DataBlock>();
 
     public SelectionOfSlaves(byte address) {
@@ -66,31 +67,31 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     /**
-     * @return the maskedId
+     * @return the bcdId
      */
-    public int getMaskedId() {
-        return maskedId;
+    public int getBcdId() {
+        return bcdId;
     }
 
     /**
-     * @return the maskedMan
+     * @return the bcdMan
      */
-    public int getMaskedMan() {
-        return maskedMan;
+    public short getBcdMan() {
+        return bcdMan;
     }
 
     /**
-     * @return the maskedMedium
+     * @return the bcdMedium
      */
-    public int getMaskedMedium() {
-        return maskedMedium;
+    public int getBcdMedium() {
+        return bcdMedium;
     }
 
     /**
-     * @return the maskedVersion
+     * @return the bcdVersion
      */
-    public int getMaskedVersion() {
-        return maskedVersion;
+    public int getBcdVersion() {
+        return bcdVersion;
     }
 
     /**
@@ -123,31 +124,31 @@ public class SelectionOfSlaves implements LongFrame {
     }
 
     /**
-     * @param maskedId the maskedId to set
+     * @param bcdId the maskedId to set
      */
-    public void setMaskedId(int maskedId) {
-        this.maskedId = maskedId;
+    public void setBcdId(int bcdId) {
+        this.bcdId = bcdId;
     }
 
     /**
-     * @param maskedMan the maskedMan to set
+     * @param bcdMan the bcdMan to set
      */
-    public void setMaskedMan(int maskedMan) {
-        this.maskedMan = maskedMan;
+    public void setBcdMan(short bcdMan) {
+        this.bcdMan = bcdMan;
     }
 
     /**
-     * @param maskedMedium the maskedMedium to set
+     * @param maskedMedium the bcdMedium to set
      */
-    public void setMaskedMedium(int maskedMedium) {
-        this.maskedMedium = maskedMedium;
+    public void setBcdMedium(byte bcdMedium) {
+        this.bcdMedium = bcdMedium;
     }
 
     /**
-     * @param maskedVersion the maskedVersion to set
+     * @param maskedVersion the bcdVersion to set
      */
-    public void setMaskedVersion(int maskedVersion) {
-        this.maskedVersion = maskedVersion;
+    public void setBcdVersion(byte bcdVersion) {
+        this.bcdVersion = bcdVersion;
     }
 
     @Override
@@ -155,7 +156,79 @@ public class SelectionOfSlaves implements LongFrame {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
+        sb.append(String.format("bcdId = 0x%08X\n", bcdId));
+        sb.append(String.format("bcdMan = 0x%04X\n", bcdMan));
+        sb.append(String.format("bcdVersion = 0x%02X\n", bcdVersion));
+        sb.append(String.format("bcdMedium = 0x%02X\n", bcdMedium));
         return sb.toString();
+    }
+
+    public boolean matchId(int id) {
+        int hexBcdId = (int)toBcd(id, 8);
+        int hexMask = bcdId;
+        for (int i = 0; i < 8; i++) {
+            if (((hexMask & 0x0F) == 0x0F) || ((hexMask & 0x0F) == (hexBcdId & 0x0F))) {
+              hexMask >>= 4;
+              hexBcdId >>= 4;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static long toBcd(long value, int bcdDigits) {
+        long result = 0;
+        for (int i = bcdDigits; i > 0; i -= 2) {
+            result |= (value % 10) << 4 * (bcdDigits - i);
+            value /= 10;
+            result |= (value % 10) << (4 + 4 * (bcdDigits - i));
+            value /= 10;
+        }
+        return result;
+    }
+
+    public boolean matchAll(int id, String man, MBusMedium medium, int version) {
+        return matchId(id) && matchMan(man) && matchMedium(medium) && matchVersion(version);
+    }
+
+    private boolean matchMan(String man) {
+        int hexBcdMan = (int)toBcd(Encoder.man2Short(man), 4);
+        int hexMask = bcdMan;
+        for (int i = 0; i < 8; i++) {
+            if (((hexMask & 0x0F) != 0x0F) && ((hexMask & 0x0F) != (hexBcdMan & 0x0F))) {
+                return false;
+            }
+            hexMask >>= 4;
+            hexBcdMan >>= 4;
+        }
+        return true;
+    }
+
+    private boolean matchMedium(MBusMedium medium) {
+        int hexBcdMedium = (int)toBcd(medium.getId(), 2);
+        int hexMask = bcdMedium;
+        for (int i = 0; i < 8; i++) {
+            if (((hexMask & 0x0F) != 0x0F) && ((hexMask & 0x0F) != (hexBcdMedium & 0x0F))) {
+                return false;
+            }
+            hexMask >>= 4;
+            hexBcdMedium >>= 4;
+        }
+        return true;
+    }
+
+    private boolean matchVersion(int version) {
+        int hexBcdVersion = (int)toBcd(version, 2);
+        int hexMask = bcdVersion;
+        for (int i = 0; i < 8; i++) {
+            if (((hexMask & 0x0F) != 0x0F) && ((hexMask & 0x0F) != (hexBcdVersion & 0x0F))) {
+                return false;
+            }
+            hexMask >>= 4;
+            hexBcdVersion >>= 4;
+        }
+        return true;
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,16 +13,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
+import java.util.Arrays;
+import java.util.Collection;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -142,15 +145,29 @@ public enum VifeStd implements Vife {
         }
         return map.get(ordinal);
     }
-    private final String friendlyName;
+
+    public static boolean isTimestampVife(Collection<Vife> vifes) {
+        if (vifes == null) {
+            return false;
+        }
+        Collection<Vife> timeVifes = Arrays.asList(new Vife[]{TIMESTAMP_OF_BEGIN_FIRST_LOWER, TIMESTAMP_OF_END_FIRST_LOWER, TIMESTAMP_BEGIN_LAST_LOWER, TIMESTAMP_END_LAST_LOWER, TIMESTAMP_BEGIN_FIRST_UPPER, TIMESTAMP_END_FIRST_UPPER, TIMESTAMP_BEGIN_LAST_UPPER, TIMESTAMP_END_LAST_UPPER, TIMESTAMP_BEGIN_OF_FIRST, TIMESTAMP_END_OF_FIRST, TIMESTAMP_BEGIN_OF_LAST, TIMESTAMP_END_OF_LAST});
+        int result = 0;
+        for (Vife vife : vifes) {
+            if (timeVifes.contains(vife)) {
+                result++;
+            }
+        }
+        return result == 1;
+    }
+    private final String label;
     private static Map<Byte, VifeStd> map;
 
     private VifeStd() {
-        this.friendlyName = String.format("Reserved 0x%02x", ordinal() + 0x20);
+        this.label = String.format("Reserved 0x%02x", ordinal() + 0x20);
     }
 
     private VifeStd(String friendlyName) {
-        this.friendlyName = friendlyName;
+        this.label = friendlyName;
     }
 
     public byte getTableIndex() {
@@ -159,6 +176,11 @@ public enum VifeStd implements Vife {
 
     @Override
     public String toString() {
-        return friendlyName;
+        return label;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 }

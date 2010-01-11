@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.slave;
 
@@ -40,12 +40,13 @@ import javax.script.ScriptEngineManager;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SendUserDataManSpec;
-import net.sf.mbus4j.decoder.PacketParser;
+import net.sf.mbus4j.decoder.Decoder;
 import net.sf.mbus4j.encoder.Encoder;
-import net.sf.mbus4j.master.Master;
+import net.sf.mbus4j.master.MBusMaster;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
@@ -98,8 +99,8 @@ public class Slaves {
         @Override
         public Frame call() throws Exception {
             try {
-                if (log.isDebugEnabled()) {
-                    log.debug("req dispatching: " + request);
+                if (log.isTraceEnabled()) {
+                    log.trace("req dispatching: " + request);
                 }
                 Frame result;
                 switch (request.getControlCode()) {
@@ -135,6 +136,8 @@ public class Slaves {
                             result = slave.handleApplicationReset((ApplicationReset) request);
                         } else if (request instanceof SendUserDataManSpec) {
                             result = slave.handleSendUserDataManSpec((SendUserDataManSpec) request);
+                        } else if (request instanceof SelectionOfSlaves) {
+                            result = slave.handleSelectionOfSlaves((SelectionOfSlaves) request);
                         } else {
                             result = null;
                         }
@@ -170,13 +173,13 @@ public class Slaves {
         public void run() {
             try {
                 int theData;
-                PacketParser parser = new PacketParser();
+                Decoder parser = new Decoder();
                 log.info("Wait for data to process");
                 try {
                     while (!closed) {
                         if ((theData = is.read()) == -1) {
                             if (log.isTraceEnabled()) {
-                                log.trace("Thread interrupted or eof on waiting occured");
+                                log.trace("Thread interrupted or EOF on waiting occured");
                             }
                         } else {
                             if (log.isTraceEnabled()) {
@@ -185,14 +188,14 @@ public class Slaves {
                             try {
                                 Frame frame = parser.addByte((byte) theData);
                                 if (frame != null) {
-                                    if (log.isDebugEnabled()) {
-                                        log.info("Frame parsed ... will process: " + frame);
+                                    if (log.isTraceEnabled()) {
+                                        log.trace("Frame parsed ... will process: " + frame);
                                     } else {
-                                        log.info("Frame parsed ... will process");
+                                        log.debug("Frame parsed ... will process");
                                     }
                                     for (Slave slave : slaves) {
                                         if (slave.willHandleRequest(frame)) {
-                                            log.debug(String.format("Frame will be handled by slave 0x%02x", slave.getAddress()));
+                                            log.debug(String.format("Frame will be handled by slave %s", slave.slaveIdToString()));
                                             tpe.submit(new RequestHandler(frame, slave));
                                         }
                                     }
@@ -217,7 +220,7 @@ public class Slaves {
     private static Logger log;
 
     public static void main(String[] args) throws Exception {
-        LogInit.initLog(LogInit.DEBUG);
+        LogInit.initLog(LogInit.TRACE);
         Slaves app = new Slaves();
         SerialPort sPort = null;
         int timeout = 0;
@@ -230,7 +233,7 @@ public class Slaves {
         Reader in = new InputStreamReader(is);
         Boolean result = (Boolean) js.eval(in, bindings);
 
-        sPort = Master.openPort(args[0]);
+        sPort = MBusMaster.openPort(args[0]);
         app.setStreams(sPort.getInputStream(), sPort.getOutputStream());
         if (args.length > 1) {
             timeout = Integer.parseInt(args[1]);

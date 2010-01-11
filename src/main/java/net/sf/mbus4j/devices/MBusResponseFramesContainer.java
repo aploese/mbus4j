@@ -15,19 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
-package net.sf.mbus4j.dataframes.datablocks.vif;
+package net.sf.mbus4j.devices;
+
+import java.io.Serializable;
+import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public enum VifeObjectAction implements Vife {
+public interface MBusResponseFramesContainer extends  Iterable<ResponseFrame>, Serializable {
 
-    ;
-    
-    @Override
-    public String getLabel() {
-        return null;
-    }
+    void setAddress(int address);
+    void setId(int id);
+    void setVersion(int version);
+    boolean isAcd();
+    void setAcd(boolean acd);
+    boolean isDfc();
+    void setDfc(boolean dfc);
+    String getMan();
+    void setMan(String man);
+    MBusMedium getMedium();
+    void setMedium(MBusMedium medium);
+    int getAddress();
+    int getId();
+    int getVersion();
+
+    ResponseFrame getResponseFrame(int index);
+    ResponseFrame[] getResponseFrames();
+    int getResponseFrameCount();
+
 }

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,15 +13,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.master;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
+import net.sf.mbus4j.devices.MBusResponseFramesContainer;
+import net.sf.mbus4j.devices.ResponseFrame;
 import net.sf.mbus4j.slave.Slaves.LogInit;
 
 import org.junit.After;
@@ -43,14 +50,15 @@ public class MasterTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         LogInit.initLog(LogInit.DEBUG);
+        log =  LoggerFactory.getLogger(MasterTest.class);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    Logger log = LoggerFactory.getLogger(MasterTest.class);
+    private static Logger log;
     private SlaveStreams slaves;
-    private Master master;
+    private MBusMaster master;
 
     public MasterTest() {
     }
@@ -59,8 +67,8 @@ public class MasterTest {
     public void setUp() throws Exception {
         System.out.println("setUp");
         slaves = new SlaveStreams();
-        master = new Master();
-        master.setStreams(slaves.getInputStream(), slaves.getOutputStream(), 115200 * 3); // speedup things
+        master = new MBusMaster();
+        master.setStreams(slaves.getInputStream(), slaves.getOutputStream(), 115200 / 4); // speedup things
     }
 
     @After
@@ -72,7 +80,7 @@ public class MasterTest {
     }
 
     /**
-     * Test of deselectBySecondaryAddress method, of class Master.
+     * Test of deselectBySecondaryAddress method, of class MBusMaster.
      */
     @Test
     @Ignore
@@ -84,7 +92,7 @@ public class MasterTest {
     }
 
     /**
-     * Test of selectBySecondaryAddress method, of class Master.
+     * Test of selectBySecondaryAddress method, of class MBusMaster.
      */
     @Test
     @Ignore
@@ -96,16 +104,17 @@ public class MasterTest {
     }
 
     /**
-     * Test of widcardSearch method, of class Master.
+     * Test of widcardSearch method, of class MBusMaster.
      */
     @Test(timeout = 60000)
+    @Ignore
     public void testWidcardSearch() throws Exception {
         System.out.println("widcardSearch");
         int leadingBcdDigitsId = 0;
         int maskLength = 7;
-        int maskedMan = 0xFFFF;
-        int maskedVersion = 0xFF;
-        int maskedMedium = 0xFF;
+        short maskedMan = (short)0xFFFF;
+        byte maskedVersion = (byte)0xFF;
+        byte maskedMedium = (byte)0xFF;
         slaves.respondToRequest("680B0B6853FD52FFFFFF0FFFFFFFFFAA16", 3);
         slaves.respondToRequest("680B0B6853FD52FFFFFF1FFFFFFFFFBA16", "E5E5");
         slaves.respondToRequest("680B0B6853FD52FFFFFF10FFFFFFFFAB16", 3);
@@ -194,22 +203,68 @@ public class MasterTest {
         master.widcardSearch(leadingBcdDigitsId, maskLength, maskedMan, maskedVersion, maskedMedium);
         assertTrue(slaves.isOK());
         log.info("widcardSearch finished");
-        assertEquals(master.deviceCount(), 4);
-        assertEquals(master.getDevice(0).getSecondaryAddress(), 14491001);
-        assertEquals(master.getDevice(0).getMan(), "DBW");
-        assertEquals(master.getDevice(0).getMedium(), MBusMedium.StdMedium.HOT_WATER);
-        assertEquals(master.getDevice(0).getVersion(), 1);
-        assertEquals(master.getDevice(1).getSecondaryAddress(), 14491008);
-        assertEquals(master.getDevice(1).getMan(), "QKG");
-        assertEquals(master.getDevice(1).getMedium(), MBusMedium.StdMedium.HOT_WATER);
-        assertEquals(master.getDevice(1).getVersion(), 1);
-        assertEquals(master.getDevice(2).getSecondaryAddress(), 32104833);
-        assertEquals(master.getDevice(2).getMan(), "H@P");
-        assertEquals(master.getDevice(2).getMedium(), MBusMedium.StdMedium.ELECTRICITY);
-        assertEquals(master.getDevice(2).getVersion(), 1);
-        assertEquals(master.getDevice(3).getSecondaryAddress(), 76543210);
-        assertEquals(master.getDevice(3).getMan(), "H@P");
-        assertEquals(master.getDevice(3).getMedium(), MBusMedium.StdMedium.GAS);
-        assertEquals(master.getDevice(3).getVersion(), 1);
+        assertEquals(4, master.deviceCount());
+        assertEquals(1, master.getDevice(0).getAddress());
+        assertEquals(14491001, master.getDevice(0).getId());
+        assertEquals("DBW", master.getDevice(0).getMan());
+        assertEquals(MBusMedium.StdMedium.HOT_WATER, master.getDevice(0).getMedium());
+        assertEquals(1, master.getDevice(0).getVersion());
+        assertEquals(1, master.getDevice(1).getAddress());
+        assertEquals(14491008, master.getDevice(1).getId());
+        assertEquals("QKG", master.getDevice(1).getMan());
+        assertEquals(MBusMedium.StdMedium.HOT_WATER, master.getDevice(1).getMedium());
+        assertEquals(1, master.getDevice(1).getVersion());
+        assertEquals(1, master.getDevice(2).getAddress());
+        assertEquals(32104833, master.getDevice(2).getId());
+        assertEquals("H@P", master.getDevice(2).getMan());
+        assertEquals(MBusMedium.StdMedium.ELECTRICITY, master.getDevice(2).getMedium());
+        assertEquals(1, master.getDevice(2).getVersion());
+        assertEquals(1, master.getDevice(3).getAddress());
+        assertEquals(76543210, master.getDevice(3).getId());
+        assertEquals("H@P", master.getDevice(3).getMan());
+        assertEquals(MBusMedium.StdMedium.GAS, master.getDevice(3).getMedium());
+        assertEquals(1, master.getDevice(3).getVersion());
+    }
+
+    @Test
+    @Ignore
+    public void testStdResp() throws Exception {
+        /*
+        System.out.println("testStdResp");
+        slaves.respondToRequest("105B005B16", "6847476808007225543699824D0316B03800000C78255436990D7C084449202E747375630A36373031303741543939046D160F3C080413B601000004937F1F0000004413B50100000F1C0CF016");
+        slaves.respondToRequest("105B005B16", "6847476808007225543699824D0316B03800000C78255436990D7C084449202E747375630A36373031303741543939046D160F3C080413B601000004937F1F0000004413B50100000F1C0CF016");
+        slaves.replay();
+        master.searchDevicesByPrimaryAddress(0, 0);
+        MBusResponseFramesContainer device = master.getDevice(0);
+        Map<ResponseFrame, Map<DataTag, DataBlock>> map = device.readValues(master);
+        assertTrue(slaves.isOK());
+        assertEquals(1, device.getResponseFrameCount());
+        ResponseFrame resp = device.getResponseFrame(0);
+        Map<DataTag, DataBlock> valueMap = map.get(resp);
+        assertEquals(7, resp.getDataBlockCount());
+        for (DataTag dt : resp) {
+            DataBlock db = valueMap.get(dt);
+            log.info("DATATAG: " + dt.toString());
+            log.info("DATABLOCK: " + db.toString());
+          
+            assertEquals(dt.getVif(), db.getVif());
+            assertEquals(dt.getDeviceUnit(), db.getSubUnit());
+            assertEquals(dt.getDifCode(), db.getDataFieldCode());
+            assertEquals(dt.getFunctionField(), db.getFunctionField());
+            assertEquals(dt.getStorageNumber(), db.getStorageNumber());
+            assertEquals(dt.getTariff(), db.getTariff());
+            if ((dt.getVifes() != null) && (db.getVifes() != null)){
+                org.junit.Assert.assertArrayEquals(dt.getVifes(), db.getVifes().toArray(new Vife[0]));
+            } else {
+                assertEquals(dt.getVifes(), db.getVifes());
+            }
+           
+        }
+        Set<DataBlock> result =  new HashSet<DataBlock>(valueMap.values());
+        for (DataBlock db : result) {
+            log.info("RESULT: " + db.toString());
+        }
+        assertEquals("RESULT SIZE", 7, result.size());
+        */
     }
 }

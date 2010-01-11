@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j;
 
@@ -23,8 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-import net.sf.mbus4j.decoder.PacketParser;
+import net.sf.mbus4j.decoder.Decoder;
 
 import org.slf4j.Logger;
 
@@ -94,15 +93,9 @@ public abstract class MockStreams {
                 }
                 result = buffer[readPtr++] & 0xFF;
                 if ((readPtr == buffer.length) && (buffer.length > 0)) {
-                    // last byte readed
-                    try {
-                        Thread.sleep(endWaitTime);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    getLog().info(String.format("Readed from InputStream: %s", PacketParser.bytes2Ascii(buffer)));
+                    getLog().info(String.format("Readed from InputStream: %s", Decoder.bytes2Ascii(buffer)));
                     this.locked = true;
-                    dataReaded();
+                    lastByteReading(endWaitTime);
                 }
                 getLog().debug(String.format("Return from is.read 0x%08X", result));
                 return result;
@@ -123,7 +116,7 @@ public abstract class MockStreams {
 
         public synchronized void setData(String string, long endWaitTime) {
             getLog().info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
-            buffer = string != null ? PacketParser.ascii2Bytes(string) : new byte[0];
+            buffer = string != null ? Decoder.ascii2Bytes(string) : new byte[0];
             readPtr = 0;
             this.endWaitTime = endWaitTime;
             synchronized (readLock) {
@@ -145,25 +138,25 @@ public abstract class MockStreams {
         public void setData(String data) {
             getLog().info(String.format("Set OutputStream buffer: %s", data));
             ptr = 0;
-            expected = data != null ? PacketParser.ascii2Bytes(data) : new byte[0];
+            expected = data != null ? Decoder.ascii2Bytes(data) : new byte[0];
         }
 
         @Override
         public synchronized void write(int b) throws IOException {
-            getLog().trace(String.format("Write to OutputStream: 0x%02X", b & 0xFF));
+            getLog().debug(String.format("Write to OutputStream: 0x%02X", b & 0xFF));
             if (ptr > expected.length - 1) {
                 ptr++;
-                Assert.fail(String.format("%s at outside pos: %d was: 0x%02x ", PacketParser.bytes2Ascii(expected), ptr - 1, b & 0xFF));
+                throw new IOException(String.format("%s at outside pos: %d was: 0x%02x ", Decoder.bytes2Ascii(expected), ptr - 1, b & 0xFF));
             }
             if ((b & 0xFF) != (expected[ptr] & 0xFF)) {
                 ptr++;
-                String exp = PacketParser.bytes2Ascii(expected);
-                Assert.fail(String.format("%s[%s]%s at pos: %d expected: 0x%02x but was: 0x%02x ", exp.substring(0, ptr * 2 - 2), exp.substring(ptr * 2 - 2, ptr * 2), exp.substring(ptr * 2, exp.length()), ptr - 1, expected[ptr - 1] & 0xFF, b & 0xFF));
+                String exp = Decoder.bytes2Ascii(expected);
+                throw new IOException(String.format("%s[%s]%s at pos: %d expected: 0x%02x but was: 0x%02x ", exp.substring(0, ptr * 2 - 2), exp.substring(ptr * 2 - 2, ptr * 2), exp.substring(ptr * 2, exp.length()), ptr - 1, expected[ptr - 1] & 0xFF, b & 0xFF));
             }
             ptr++;
             if (expected.length == ptr) {
-                getLog().info(String.format("Written to OutputStream: %s", PacketParser.bytes2Ascii(expected)));
-                dataWritten();
+                getLog().info(String.format("Written to OutputStream: %s", Decoder.bytes2Ascii(expected)));
+                lastByteWriting();
             }
         }
     }
@@ -176,9 +169,9 @@ public abstract class MockStreams {
         is.close();
     }
 
-    protected abstract void dataReaded();
+    protected abstract void lastByteReading(long endWaitTime) throws IOException;
 
-    protected abstract void dataWritten();
+    protected abstract void lastByteWriting() throws IOException;
 
     public InputStream getInputStream() {
         return is;
@@ -199,4 +192,5 @@ public abstract class MockStreams {
     }
 
     protected abstract void setNextData(boolean removeFirst);
+
 }

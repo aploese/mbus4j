@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.encoder;
 
@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 
 import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.decoder.PacketParser;
+import net.sf.mbus4j.decoder.Decoder;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -51,7 +51,7 @@ public class UserDataResponseTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    private PacketParser parser;
+    private Decoder parser;
     private Encoder instance;
 
     public UserDataResponseTest() {
@@ -59,7 +59,7 @@ public class UserDataResponseTest {
 
     @Before
     public void setUp() {
-        parser = new PacketParser();
+        parser = new Decoder();
         instance = new Encoder();
     }
 
@@ -114,11 +114,11 @@ public class UserDataResponseTest {
         InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../byMAN/%s/%s.txt", man, deviceName));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
-        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
+        final byte[] data = Decoder.ascii2Bytes(br.readLine());
         for (byte b : data) {
             parser.addByte(b);
         }
-        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, parser.getState());
+        assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, parser.getState());
         assertNotNull("DataValue not available", parser.getFrame());
         byte[] result = instance.encode(parser.getFrame());
         assertArrayEquals(data, result);

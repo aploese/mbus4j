@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.decoder;
 
@@ -98,7 +98,7 @@ public class VariableDataBlockDecoder {
                 break;
             case COLLECT_MANUFACTURER_SPECIFIC_VIFE:
                 ((ManufacturerSpecificVif) db.getVif()).addVIFE(b);
-                if ((b & PacketParser.EXTENTIONS_BIT) == 0x00) {
+                if ((b & Decoder.EXTENTIONS_BIT) == 0x00) {
                     startCollectingValue();
                 }
                 break;
@@ -237,7 +237,12 @@ public class VariableDataBlockDecoder {
                 db = new ReadOutDataBlock(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
                 break;
             default:
+                try {
                 createDataBlock((byte) (b & 0x0F));
+                } catch (Exception e) {
+                    log.error("HALLO: " + b);
+                    throw new RuntimeException(e);
+                }
                 switch ((b >> 4) & 0x03) {
                     case 0x00:
                         db.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
@@ -258,7 +263,7 @@ public class VariableDataBlockDecoder {
         if (!DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals(db.getDataFieldCode())) {
             db.setStorageNumber((b >> 6) & 0x01);
         }
-        if ((b & PacketParser.EXTENTIONS_BIT) == PacketParser.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
             setState(DecodeState.DIFE);
         } else {
             if (bytesLeft == 0) {
@@ -274,7 +279,7 @@ public class VariableDataBlockDecoder {
         db.setStorageNumber(db.getStorageNumber() | ((long) (b & 0x0F) << (1 + dFIEIndex * 4)));
         db.setTariff(db.getTariff() | (((b >> 4) & 0x03) << (dFIEIndex * 2)));
         db.setSubUnit((short) (db.getSubUnit() | ((b >> 6) & 0x01) << dFIEIndex));
-        if ((b & PacketParser.EXTENTIONS_BIT) != PacketParser.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTIONS_BIT) != Decoder.EXTENTIONS_BIT) {
             setState(DecodeState.VIF);
         }
     }
@@ -377,7 +382,7 @@ public class VariableDataBlockDecoder {
      * b will be expanded to int, so clear the sign, wich will be nagative in the case extention bit is set
      */
     private void decodeVIF(final byte b) {
-        switch (b & PacketParser.EXTENTIONS_BIT_MASK) {
+        switch (b & Decoder.EXTENTIONS_BIT_MASK) {
             case 0x7B:
                 // decode vife table 8.4.4 b
                 setState(DecodeState.VIFE_FB);
@@ -396,13 +401,13 @@ public class VariableDataBlockDecoder {
                 break;
             case 0x7F:
                 db.setVif(new ManufacturerSpecificVif(b));
-                if ((b & PacketParser.EXTENTIONS_BIT) == PacketParser.EXTENTIONS_BIT) {
+                if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
                     setState(DecodeState.COLLECT_MANUFACTURER_SPECIFIC_VIFE);
                     return;
                 }
                 break;
             default:
-                db.setVif(VifStd.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
+                db.setVif(VifStd.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
                 if (UnitOfMeasurement.DATE.equals(db.getUnitOfMeasurement())) {
                     db = new DateDataBlock(db);
                 } else if (UnitOfMeasurement.TIME_AND_DATE.equals(db.getUnitOfMeasurement())) {
@@ -419,9 +424,9 @@ public class VariableDataBlockDecoder {
         switch (frame.getControlCode()) {
             case RSP_UD:
                 // Error Codes  Table 7 Chapter 6.6 0x00 to
-                Vife vife = VifeStd.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK));
+                Vife vife = VifeStd.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK));
                 if (vife == null) {
-                    vife = VifeError.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK));
+                    vife = VifeError.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK));
                 }
                 //TODO Throw unknown ...
                 if (vife instanceof VifeStd) {
@@ -510,13 +515,13 @@ public class VariableDataBlockDecoder {
 
     private void decodeVifExtention_FB(final byte b) {
         // Extended VID chapter 8.4.4 table b
-        db.setVif(VifFB.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
+        db.setVif(VifFB.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
         goFromVifOrVife(b);
     }
 
     private void decodeVifExtention_FD(final byte b) {
         // Extended VID chapter 8.4.4 table a
-        db.setVif(VifFD.valueOfTableIndex((byte) (b & PacketParser.EXTENTIONS_BIT_MASK)));
+        db.setVif(VifFD.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
         goFromVifOrVife(b);
     }
 
@@ -529,7 +534,7 @@ public class VariableDataBlockDecoder {
     }
 
     private void goFromVifOrVife(final byte b) {
-        if ((b & PacketParser.EXTENTIONS_BIT) == PacketParser.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
             setState(DecodeState.VIFE);
         } else {
             if (db instanceof ReadOutDataBlock) {
@@ -542,7 +547,7 @@ public class VariableDataBlockDecoder {
 
     public void init(LongFrame frame) {
         db = null;
-        ds = DecodeState.DIF;
+        setState(DecodeState.DIF);
         this.frame = frame;
         stack.clear();
     }

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes;
 
@@ -62,11 +62,11 @@ public interface MBusMedium {
             return new UnknownMBusMedium(id);
         }
         final public int id;
-        final public String mname;
+        final public String label;
 
-        StdMedium(int id, String mname) {
+        StdMedium(int id, String label) {
             this.id = id;
-            this.mname = mname;
+            this.label = label;
         }
 
         @Override
@@ -76,7 +76,12 @@ public interface MBusMedium {
 
         @Override
         public String toString() {
-            return mname;
+            return label;
+        }
+
+        @Override
+        public String getLabel() {
+            return label;
         }
     }
 
@@ -85,6 +90,10 @@ public interface MBusMedium {
      */
     public static class UnknownMBusMedium implements MBusMedium {
 
+        public static UnknownMBusMedium fromString(String label) {
+            String[] splitted = label.split("0x");
+            return new UnknownMBusMedium(Integer.parseInt(splitted[1].substring(0, 2), 16));
+        }
         final public int id;
 
         public UnknownMBusMedium(int id) {
@@ -103,11 +112,27 @@ public interface MBusMedium {
 
         @Override
         public String toString() {
+            return getLabel();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof UnknownMBusMedium)) {
+                return false;
+            }
+            UnknownMBusMedium o = (UnknownMBusMedium) other;
+            return id == o.id;
+        }
+
+        @Override
+        public String getLabel() {
             return String.format("Unknown ID (0x%02X)", id);
         }
     }
 
     int getId();
+
+    String getLabel();
 
     String name();
 }

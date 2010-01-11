@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,40 +13,30 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.slave.acw;
 
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._16_BIT_INTEGER;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._2_DIGIT_BCD;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._32_BIT_INTEGER;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._32_BIT_REAL;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._4_DIGIT_BCD;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._6_DIGIT_BCD;
-import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode._8_DIGIT_BCD;
-import static net.sf.mbus4j.dataframes.datablocks.dif.FunctionField.INSTANTANEOUS_VALUE;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FABRICATION_NO;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FLOW_TEMPERATURE_C_E_0;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.FLOW_TEMPERATURE_C_E__1;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.OPERATING_TIME_D;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.POWER_KILO_W_E_0;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.RETURN_TEMPERATURE_C_E__1;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TEMPERATURE_DIFFERENCE_K_E__2;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TIMEPOINT_DATE;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.TIMEPOINT_TIME_AND_DATE;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.VOLUME_FLOW_CBM_PER_H_E_0;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.VOLUME_FLOW_L_PER_H_E_0;
-import static net.sf.mbus4j.dataframes.datablocks.vif.VifeStd.TIMESTAMP_END_LAST_UPPER;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import static net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode.*;
+import static net.sf.mbus4j.dataframes.datablocks.dif.FunctionField.*;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifStd.*;
+import static net.sf.mbus4j.dataframes.datablocks.vif.VifeStd.*;
 
 import java.util.Date;
 
+import java.util.List;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.IntegerDataBlock;
@@ -56,6 +46,10 @@ import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+import net.sf.mbus4j.devices.MBusResponseFramesContainer;
+import net.sf.mbus4j.devices.ProxyDevice;
+import net.sf.mbus4j.devices.ResponseFrame;
+import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.slave.Slave;
 
 /**
@@ -63,9 +57,100 @@ import net.sf.mbus4j.slave.Slave;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class AcwHeatMeter extends Slave {
+public class AcwHeatMeter extends Slave implements MBusResponseFramesContainer, ProxyDevice {
 
-    public enum State {
+    //TODO isACF from MBusResponseFramesContainer ???
+    @Override
+    public void setDfc(boolean dfc) {
+        super.setDfc(dfc);
+    }
+
+    private class AcwHeatMeterResponseFrame extends ResponseFrame {
+
+        private State myState;
+
+        @Override
+        public Iterable<DataBlock> getDataBlocksIterable() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public int getDataBlockCount() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Frame[] getinitFrames() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public DataBlock getDataBlock(int i) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public Iterator<DataBlock> iterator() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+    }
+
+    public AcwHeatMeter(UserDataResponse udResp) {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    @Override
+    public void setAddress(int address) {
+        super.setAddress(address);
+    }
+
+    @Override
+    public void setVersion(int version) {
+        super.setVersion(version);
+    }
+
+    @Override
+    public boolean isDfc() {
+        return super.isDfc();
+    }
+
+    @Override
+    public int getAddress() {
+        return super.getAddress();
+    }
+
+    @Override
+    public int getVersion() {
+        return super.getVersion();
+    }
+
+    @Override
+    public ResponseFrame getResponseFrame(int index) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ResponseFrame[] getResponseFrames() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getResponseFrameCount() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Iterator<ResponseFrame> iterator() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Map<ResponseFrame, Collection<DataBlock>> readValues(Sender sender, ResponseFrame... responseFrames) throws IOException, InterruptedException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public static enum State {
 
         STANDARD,
         ERROR,
@@ -87,76 +172,75 @@ public class AcwHeatMeter extends Slave {
         EMPTY;
     }
     private final static int EFFECTIVE_DAY_COUNT = 13;
-    private final boolean isCF50Mode;
-    private State state = State.STANDARD;
-    private final IntegerDataBlock fabNo;
-    private final IntegerDataBlock storageInterval;
-    private final IntegerDataBlock[] energy;
-    private final IntegerDataBlock[] volume;
-    private final IntegerDataBlock[] water1;
-    private final IntegerDataBlock[] water2;
-    private final IntegerDataBlock[] coolingEnergy;
-    private final DateDataBlock[] effectiveDayTimeStamp;
-    private final IntegerDataBlock power;
-    private final DateAndTimeDataBlock[] maxPowerTimeStamp;
-    private final RealDataBlock[] maxPower;
-    private final IntegerDataBlock flow;
-    private final DateAndTimeDataBlock[] maxFlowTimeStamp;
-    private final RealDataBlock[] maxFlow;
-    private final ShortDataBlock flowTemp;
-    private final DateAndTimeDataBlock[] maxFlowTempTimeStamp;
-    private final RealDataBlock[] maxFlowTemp;
-    private final ShortDataBlock returnTemp;
-    private final IntegerDataBlock tempDiff;
-    private final DateAndTimeDataBlock currentTime;
-    private final ShortDataBlock operatingTime;
-    private final ByteDataBlock firmwareVer;
-    private final ByteDataBlock softwareVer;
-    private final RawDataBlock manSpecData;
+    private boolean isCF50Mode;
+    private State state;
+    private transient IntegerDataBlock fabNo;
+    private transient IntegerDataBlock storageInterval;
+    private transient IntegerDataBlock[] energy;
+    private transient IntegerDataBlock[] volume;
+    private transient IntegerDataBlock[] water1;
+    private transient IntegerDataBlock[] water2;
+    private transient IntegerDataBlock[] coolingEnergy;
+    private transient DateDataBlock[] effectiveDayTimeStamp;
+    private transient IntegerDataBlock power;
+    private transient DateAndTimeDataBlock[] maxPowerTimeStamp;
+    private transient RealDataBlock[] maxPower;
+    private transient IntegerDataBlock flow;
+    private transient DateAndTimeDataBlock[] maxFlowTimeStamp;
+    private transient RealDataBlock[] maxFlow;
+    private transient ShortDataBlock flowTemp;
+    private transient DateAndTimeDataBlock[] maxFlowTempTimeStamp;
+    private transient RealDataBlock[] maxFlowTemp;
+    private transient ShortDataBlock returnTemp;
+    private transient IntegerDataBlock tempDiff;
+    private transient DateAndTimeDataBlock currentTime;
+    private transient ShortDataBlock operatingTime;
+    private transient ByteDataBlock firmwareVer;
+    private transient ByteDataBlock softwareVer;
+    private transient RawDataBlock manSpecData;
+    private transient AcwHeatMeterResponseFrame responseFrames;
 //TODO cf50 std changed
+
+    public AcwHeatMeter() {
+        super();
+        init();
+    }
 
     public AcwHeatMeter(int address, int id, int version, MBusMedium medium, Vif energyVif, Vif volumeVif, Vif powerVif, Vif water1Vif, Vif water2Vif, Vif coolingEnergyVif, State state, boolean isCF50Mode, int fabNo, int softwareVer, int firmwareVer) {
         super(address, id, "ACW", version, medium);
-        this.state = state;
+        init();
         this.isCF50Mode = isCF50Mode;
-        this.fabNo = new IntegerDataBlock(_8_DIGIT_BCD, FABRICATION_NO);
-        this.fabNo.setValue(fabNo);
+        setFabNo(fabNo);
+        setPowerVif(powerVif);
+        setFirmwareVersion(firmwareVer);
+        setSoftwareVersion(softwareVer);
+        if (water1Vif != null) {
+            setWater1Vif(water1Vif);
+        }
+        if (water2Vif != null) {
+            setWater2Vif(water2Vif);
+        }
+        if (coolingEnergyVif != null) {
+            setCoolingEnergyVif(coolingEnergyVif);
+        }
+        setEnergyVif(energyVif);
+        setVolumeVif(volumeVif);
+    }
+
+    public Vif getCoolingEnergyVif() {
+        return coolingEnergy[0].getVif();
+    }
+
+    public void init() {
         storageInterval = new IntegerDataBlock(_16_BIT_INTEGER, VifFD.STORAGE_INTERVAL_MIN);
-        power = new IntegerDataBlock(_6_DIGIT_BCD, powerVif);
         flow = new IntegerDataBlock(_6_DIGIT_BCD, VOLUME_FLOW_L_PER_H_E_0);
         flowTemp = new ShortDataBlock(_4_DIGIT_BCD, FLOW_TEMPERATURE_C_E__1);
         returnTemp = new ShortDataBlock(_4_DIGIT_BCD, RETURN_TEMPERATURE_C_E__1);
         tempDiff = new IntegerDataBlock(_6_DIGIT_BCD, TEMPERATURE_DIFFERENCE_K_E__2);
         currentTime = new DateAndTimeDataBlock(TIMEPOINT_TIME_AND_DATE);
         operatingTime = new ShortDataBlock(_16_BIT_INTEGER, OPERATING_TIME_D);
-        this.firmwareVer = new ByteDataBlock(_2_DIGIT_BCD, VifFD.FIRMWARE_VERSION);
-        this.firmwareVer.setValue((byte) firmwareVer);
-        this.softwareVer = new ByteDataBlock(_2_DIGIT_BCD, VifFD.SOFTWARE_VERSION);
-        this.softwareVer.setValue((byte) softwareVer);
-        if (water1Vif != null) {
-            water1 = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
-            water1[0] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 1, 0, 0, water1Vif);
-        } else {
-            water1 = null;
-        }
-        if (water2Vif != null) {
-            water2 = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
-            water2[0] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 2, 0, 0, water2Vif);
-        } else {
-            water2 = null;
-        }
-        if (coolingEnergyVif != null) {
-            coolingEnergy = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
-            coolingEnergy[0] = new IntegerDataBlock(_32_BIT_INTEGER, INSTANTANEOUS_VALUE, (short) 0, 0, 0, coolingEnergyVif, VifeStd.ACCUMULATION_ABS_NEGATIVE);
-        } else {
-            coolingEnergy = null;
-        }
         manSpecData = new RawDataBlock(SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET);
         manSpecData.setValue(0x00, 0x00);
-
-        // effective Day
-        energy = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
-        volume = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
         effectiveDayTimeStamp = new DateDataBlock[EFFECTIVE_DAY_COUNT + 1];
         maxPowerTimeStamp = new DateAndTimeDataBlock[EFFECTIVE_DAY_COUNT + 1];
         maxPower = new RealDataBlock[EFFECTIVE_DAY_COUNT + 1];
@@ -169,10 +253,6 @@ public class AcwHeatMeter extends Slave {
                 effectiveDayTimeStamp[storagenumber] = new DateDataBlock(TIMEPOINT_DATE);
                 effectiveDayTimeStamp[storagenumber].setStorageNumber(storagenumber);
             }
-            energy[storagenumber] = new IntegerDataBlock(_32_BIT_INTEGER, energyVif);
-            energy[storagenumber].setStorageNumber(storagenumber);
-            volume[storagenumber] = new IntegerDataBlock(_32_BIT_INTEGER, volumeVif);
-            volume[storagenumber].setStorageNumber(storagenumber);
             maxPowerTimeStamp[storagenumber] = new DateAndTimeDataBlock(POWER_KILO_W_E_0, TIMESTAMP_END_LAST_UPPER);
             maxPowerTimeStamp[storagenumber].setStorageNumber(storagenumber);
             maxPower[storagenumber] = new RealDataBlock(_32_BIT_REAL, POWER_KILO_W_E_0);
@@ -185,86 +265,145 @@ public class AcwHeatMeter extends Slave {
             maxFlowTempTimeStamp[storagenumber].setStorageNumber(storagenumber);
             maxFlowTemp[storagenumber] = new RealDataBlock(_32_BIT_REAL, FLOW_TEMPERATURE_C_E_0);
             maxFlowTemp[storagenumber].setStorageNumber(storagenumber);
-            if (water1Vif != null) {
-                water1[storagenumber] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 1, 0, storagenumber, water1Vif);
-            }
-            if (water2Vif != null) {
-                water2[storagenumber] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 2, 0, storagenumber, water1Vif);
-            }
-            if (coolingEnergyVif != null) {
-                coolingEnergy[storagenumber] = new IntegerDataBlock(_32_BIT_INTEGER, INSTANTANEOUS_VALUE, (short) 0, 0, storagenumber, coolingEnergyVif, VifeStd.ACCUMULATION_ABS_NEGATIVE);
-            }
-
         }
-
     }
 
-    private void addDataBlocks(UserDataResponse result) {
-        switch (getState()) {
+    public void setCoolingEnergyVif(Vif coolingEnergyVif) {
+        coolingEnergy = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
+        for (int storageNumber = 0; storageNumber <= EFFECTIVE_DAY_COUNT; storageNumber++) {
+            coolingEnergy[storageNumber] = new IntegerDataBlock(_32_BIT_INTEGER, INSTANTANEOUS_VALUE, (short) 0, 0, storageNumber, coolingEnergyVif, VifeStd.ACCUMULATION_ABS_NEGATIVE);
+        }
+    }
+
+    public Vif getEnergyVif() {
+        return energy[0].getVif();
+    }
+
+    public void setEnergyVif(Vif energyVif) {
+        energy = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
+        for (int storageNumber = 0; storageNumber <= EFFECTIVE_DAY_COUNT; storageNumber++) {
+            energy[storageNumber] = new IntegerDataBlock(_32_BIT_INTEGER, energyVif);
+            energy[storageNumber].setStorageNumber(storageNumber);
+        }
+    }
+
+    public Vif getVolumeVif() {
+        return volume[0].getVif();
+    }
+
+    public Vif getPowerVif() {
+        return power.getVif();
+    }
+
+    public void setVolumeVif(Vif volumeVif) {
+        volume = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
+        for (int storageNumber = 0; storageNumber <= EFFECTIVE_DAY_COUNT; storageNumber++) {
+            volume[storageNumber] = new IntegerDataBlock(_32_BIT_INTEGER, volumeVif);
+            volume[storageNumber].setStorageNumber(storageNumber);
+        }
+    }
+
+    public int getFabNo() {
+        return fabNo.getValue();
+    }
+
+    public void setFabNo(int fabNo) {
+        this.fabNo = new IntegerDataBlock(_8_DIGIT_BCD, FABRICATION_NO);
+        this.fabNo.setValue(fabNo);
+    }
+
+    public int getFirmwareVersion() {
+        return firmwareVer.getValue();
+    }
+
+    public void setFirmwareVersion(int firmwareVer) {
+        this.firmwareVer = new ByteDataBlock(_2_DIGIT_BCD, VifFD.FIRMWARE_VERSION);
+        this.firmwareVer.setValue((byte) firmwareVer);
+    }
+
+    public void setPowerVif(Vif powerVif) {
+        power = new IntegerDataBlock(_6_DIGIT_BCD, powerVif);
+    }
+
+    public int getSoftwareVersion() {
+        return softwareVer.getValue();
+    }
+
+    public void setSoftwareVersion(int softwareVer) {
+        this.softwareVer = new ByteDataBlock(_2_DIGIT_BCD, VifFD.SOFTWARE_VERSION);
+        this.softwareVer.setValue((byte) softwareVer);
+    }
+
+    public Vif getWater1Vif() {
+        return water1[0].getVif();
+    }
+
+    public void setWater1Vif(Vif water1Vif) {
+        water1 = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
+        for (int storageNumber = 0; storageNumber <= EFFECTIVE_DAY_COUNT; storageNumber++) {
+            water1[storageNumber] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 1, 0, storageNumber, water1Vif);
+        }
+    }
+
+    public Vif getWater2Vif() {
+        return water2[0].getVif();
+    }
+
+    public void setWater2Vif(Vif water2Vif) {
+        water2 = new IntegerDataBlock[EFFECTIVE_DAY_COUNT + 1];
+        for (int storageNumber = 0; storageNumber <= EFFECTIVE_DAY_COUNT; storageNumber++) {
+            water2[storageNumber] = new IntegerDataBlock(_8_DIGIT_BCD, INSTANTANEOUS_VALUE, (short) 2, 0, storageNumber, water2Vif);
+        }
+    }
+
+    private List<DataBlock> getDataBlocks(State s) {
+        switch (s) {
             case STANDARD:
                 if (isCF50Mode) {
-                    getCF50Resp(result);
+                    return getCF50Resp();
                 } else {
-                    getStdResp(result);
+                    return getStdResp();
                 }
-                break;
             case CF50:
                 if (isCF50Mode) {
-                    getStdResp(result);
+                    return getStdResp();
                 } else {
-                    getCF50Resp(result);
+                    return getCF50Resp();
                 }
-                break;
             case EFFECTIVE_DAY_1:
-                getEffectiveDayResp(result, 1);
-                break;
+                return getEffectiveDayResp(1);
             case EFFECTIVE_DAY_2:
-                getEffectiveDayResp(result, 2);
-                break;
+                return getEffectiveDayResp(2);
             case EFFECTIVE_DAY_3:
-                getEffectiveDayResp(result, 3);
-                break;
+                return getEffectiveDayResp(3);
             case EFFECTIVE_DAY_4:
-                getEffectiveDayResp(result, 4);
-                break;
+                return getEffectiveDayResp(4);
             case EFFECTIVE_DAY_5:
-                getEffectiveDayResp(result, 5);
-                break;
+                return getEffectiveDayResp(5);
             case EFFECTIVE_DAY_6:
-                getEffectiveDayResp(result, 6);
-                break;
+                return getEffectiveDayResp(6);
             case EFFECTIVE_DAY_7:
-                getEffectiveDayResp(result, 7);
-                break;
+                return getEffectiveDayResp(7);
             case EFFECTIVE_DAY_8:
-                getEffectiveDayResp(result, 8);
-                break;
+                return getEffectiveDayResp(8);
             case EFFECTIVE_DAY_9:
-                getEffectiveDayResp(result, 9);
-                break;
+                return getEffectiveDayResp(9);
             case EFFECTIVE_DAY_10:
-                getEffectiveDayResp(result, 10);
-                break;
+                return getEffectiveDayResp(10);
             case EFFECTIVE_DAY_11:
-                getEffectiveDayResp(result, 11);
-                break;
+                return getEffectiveDayResp(11);
             case EFFECTIVE_DAY_12:
-                getEffectiveDayResp(result, 12);
-                break;
+                return getEffectiveDayResp(12);
             case EFFECTIVE_DAY_13:
-                getEffectiveDayResp(result, 13);
-                break;
+                return getEffectiveDayResp(13);
             case MAX:
-                getMaxResponse(result);
-                break;
+                return getMaxResponse();
             case ERROR:
-                getErrorResponse(result);
-                break;
+                return getErrorResponse();
             case EMPTY:
-                getEmptyResponse(result);
-                break;
+                return getEmptyResponse();
             default:
-
+                return null;
         }
     }
 
@@ -272,58 +411,69 @@ public class AcwHeatMeter extends Slave {
         tempDiff.setValue(flowTemp.getValue() - returnTemp.getValue());
     }
 
-    private void getCF50Resp(UserDataResponse result) {
-        result.addDataBlock(energy[0]);
-        result.addDataBlock(volume[0]);
-        result.addDataBlock(power);
-        result.addDataBlock(flow);
-        result.addDataBlock(flowTemp);
-        result.addDataBlock(returnTemp);
-        result.addDataBlock(tempDiff);
-        result.addDataBlock(currentTime);
-        result.addDataBlock(operatingTime);
-        result.addDataBlock(manSpecData);
+    private List<DataBlock> getCF50Resp() {
+        List<DataBlock> result = new ArrayList<DataBlock>(10);
+        result.add(energy[0]);
+        result.add(volume[0]);
+        result.add(power);
+        result.add(flow);
+        result.add(flowTemp);
+        result.add(returnTemp);
+        result.add(tempDiff);
+        result.add(currentTime);
+        result.add(operatingTime);
+        result.add(manSpecData);
+        return result;
     }
 
-    private void getEffectiveDayResp(UserDataResponse result, int storagenumber) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(effectiveDayTimeStamp[storagenumber]);
-        result.addDataBlock(energy[storagenumber]);
-        result.addDataBlock(volume[storagenumber]);
-        result.addDataBlock(maxPowerTimeStamp[storagenumber]);
-        result.addDataBlock(maxPower[storagenumber]);
-        result.addDataBlock(maxFlowTimeStamp[storagenumber]);
-        result.addDataBlock(maxFlow[storagenumber]);
-        result.addDataBlock(maxFlowTempTimeStamp[storagenumber]);
-        result.addDataBlock(maxFlowTemp[storagenumber]);
+    private List<DataBlock> getEffectiveDayResp(int storagenumber) {
+        List<DataBlock> result = new ArrayList<DataBlock>(12);
+        result.add(fabNo);
+        result.add(effectiveDayTimeStamp[storagenumber]);
+        result.add(energy[storagenumber]);
+        result.add(volume[storagenumber]);
+        result.add(maxPowerTimeStamp[storagenumber]);
+        result.add(maxPower[storagenumber]);
+        result.add(maxFlowTimeStamp[storagenumber]);
+        result.add(maxFlow[storagenumber]);
+        result.add(maxFlowTempTimeStamp[storagenumber]);
+        result.add(maxFlowTemp[storagenumber]);
         if (water1 != null) {
-            result.addDataBlock(water1[storagenumber]);
+            result.add(water1[storagenumber]);
         }
         if (water2 != null) {
-            result.addDataBlock(water2[storagenumber]);
+            result.add(water2[storagenumber]);
         }
         if (coolingEnergy != null) {
-            result.addDataBlock(energy[storagenumber]);
+            result.add(energy[storagenumber]);
         }
+        return result;
     }
 
-    private void getEmptyResponse(UserDataResponse result) {
-        result.addDataBlock(fabNo);
+    private List<DataBlock> getEmptyResponse() {
+        List<DataBlock> result = new ArrayList<DataBlock>(1);
+        result.add(fabNo);
+        return result;
     }
 
-    private void getErrorResponse(UserDataResponse result) {
-        throw new UnsupportedOperationException("Not yet implemented");
+    private List<DataBlock> getErrorResponse() {
+                List<DataBlock> result = new ArrayList<DataBlock>(0);
+
+        //TODO implement no docs from itron/actaris
+                return result;
     }
 
-    private void getMaxResponse(UserDataResponse result) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(storageInterval);
-        result.addDataBlock(maxPowerTimeStamp[0]);
-        result.addDataBlock(maxPower[0]);
-        result.addDataBlock(maxFlowTimeStamp[0]);
-        result.addDataBlock(maxFlow[0]);
-        result.addDataBlock(maxFlowTempTimeStamp[0]);
-        result.addDataBlock(maxFlowTemp[0]);
+    private List<DataBlock> getMaxResponse() {
+        List<DataBlock> result = new ArrayList<DataBlock>(12);
+        result.add(fabNo);
+        result.add(storageInterval);
+        result.add(maxPowerTimeStamp[0]);
+        result.add(maxPower[0]);
+        result.add(maxFlowTimeStamp[0]);
+        result.add(maxFlow[0]);
+        result.add(maxFlowTempTimeStamp[0]);
+        result.add(maxFlowTemp[0]);
+        return result;
     }
 
     /**
@@ -333,29 +483,35 @@ public class AcwHeatMeter extends Slave {
         return state;
     }
 
-    private void getStdResp(UserDataResponse result) {
-        result.addDataBlock(fabNo);
-        result.addDataBlock(energy[0]);
-        result.addDataBlock(volume[0]);
-        result.addDataBlock(power);
-        result.addDataBlock(flow);
-        result.addDataBlock(flowTemp);
-        result.addDataBlock(returnTemp);
-        result.addDataBlock(tempDiff);
-        result.addDataBlock(currentTime);
-        result.addDataBlock(operatingTime);
-        result.addDataBlock(firmwareVer);
-        result.addDataBlock(softwareVer);
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    private List<DataBlock> getStdResp() {
+        List<DataBlock> result = new ArrayList<DataBlock>(16);
+        result.add(fabNo);
+        result.add(energy[0]);
+        result.add(volume[0]);
+        result.add(power);
+        result.add(flow);
+        result.add(flowTemp);
+        result.add(returnTemp);
+        result.add(tempDiff);
+        result.add(currentTime);
+        result.add(operatingTime);
+        result.add(firmwareVer);
+        result.add(softwareVer);
         if (water1 != null) {
-            result.addDataBlock(water1[0]);
+            result.add(water1[0]);
         }
         if (water2 != null) {
-            result.addDataBlock(water2[0]);
+            result.add(water2[0]);
         }
         if (coolingEnergy != null) {
-            result.addDataBlock(coolingEnergy[0]);
+            result.add(coolingEnergy[0]);
         }
-        result.addDataBlock(manSpecData);
+        result.add(manSpecData);
+        return result;
     }
 
     @Override
@@ -432,7 +588,7 @@ public class AcwHeatMeter extends Slave {
         Frame result = super.handleReqUd2(request);
         if (result instanceof UserDataResponse) {
             currentTime.setValue(new Date());
-            addDataBlocks((UserDataResponse) result);
+            ((UserDataResponse)result).addAllDataBlocks(getDataBlocks(getState()));
         }
         return result;
     }
@@ -450,5 +606,85 @@ public class AcwHeatMeter extends Slave {
     public void setReturnTemp(float temp) {
         returnTemp.setValue((short) Math.round(temp * 10));
         calc();
+    }
+    /**
+     * track the version of self saved data !!!
+     */
+    private final static int MY_SERIAL_VERSION = 0;
+
+    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+        stream.defaultWriteObject();
+        stream.writeInt(MY_SERIAL_VERSION);
+        stream.writeInt(getFabNo());
+        stream.writeObject(getEnergyVif());
+        stream.writeObject(getVolumeVif());
+        stream.writeObject(getPowerVif());
+        stream.writeObject(getWater1Vif());
+        stream.writeObject(getWater2Vif());
+        stream.writeObject(getCoolingEnergyVif());
+        stream.writeObject(getState());
+        stream.writeInt(getFirmwareVersion());
+        stream.writeInt(getSoftwareVersion());
+        stream.writeBoolean(isCF50Mode);
+    }
+
+    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        switch (stream.readInt()) {
+            case MY_SERIAL_VERSION:
+                setFabNo(stream.readInt());
+                setEnergyVif((Vif) stream.readObject());
+                setVolumeVif((Vif) stream.readObject());
+                setPowerVif((Vif) stream.readObject());
+                setWater1Vif((Vif) stream.readObject());
+                setWater2Vif((Vif) stream.readObject());
+                setCoolingEnergyVif((Vif) stream.readObject());
+                setState((State) stream.readObject());
+                setFirmwareVersion(stream.readInt());
+                setSoftwareVersion(stream.readInt());
+                isCF50Mode = stream.readBoolean();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        if (o instanceof AcwHeatMeter) {
+            AcwHeatMeter other = (AcwHeatMeter) o;
+            return getFabNo() == other.getFabNo() &&
+                    getSoftwareVersion() == other.getSoftwareVersion() &&
+                    getFirmwareVersion() == other.getFirmwareVersion() &&
+                    getEnergyVif().equals(other.getEnergyVif()) &&
+                    getPowerVif().equals(other.getPowerVif()) &&
+                    getVolumeVif().equals(other.getVolumeVif()) &&
+                    getState().equals(other.getState()) &&
+                    isCF50Mode == other.isCF50Mode &&
+                    getWater1Vif() == null ? other.getWater1Vif() == null : getWater1Vif().equals(other.getWater1Vif()) &&
+                    getWater2Vif() == null ? other.getWater2Vif() == null : getWater2Vif().equals(other.getWater2Vif()) &&
+                    getCoolingEnergyVif() == null ? other.getCoolingEnergyVif() == null : getCoolingEnergyVif().equals(other.getCoolingEnergyVif());
+        } else {
+            return false;
+        }
+    }
+
+    public String getName() {
+        switch (getVersion()) {
+            case 0x09:
+                return "CF-ECHO II";
+            case 0x0A:
+                return "CF-51";
+            case 0x0B:
+                return "CF-55";
+            case 0x0F:
+                return "CF-800";
+            default:
+                return "Unknown device";
+        }
     }
 }

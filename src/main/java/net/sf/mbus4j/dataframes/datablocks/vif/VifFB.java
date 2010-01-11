@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
@@ -183,21 +183,21 @@ public enum VifFB implements Vif {
         }
         return map.get(ordinal);
     }
-    private final String friendlyName;
+    private final String label;
     private final UnitOfMeasurement unit;
     private final SiPrefix siPrefix;
     private final Integer exponent;
     private static Map<Byte, VifFB> map;
 
     private VifFB() {
-        this.friendlyName = String.format("Reserved 0x%02x", ordinal());
+        this.label = String.format("VifFB Reserved 0x%02x", ordinal());
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
     }
 
-    private VifFB(String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
-        this.friendlyName = friendlyName;
+    private VifFB(String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
+        this.label = label;
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
@@ -213,7 +213,7 @@ public enum VifFB implements Vif {
 
     @Override
     public String getLabel() {
-        return friendlyName;
+        return label;
     }
 
     /**
