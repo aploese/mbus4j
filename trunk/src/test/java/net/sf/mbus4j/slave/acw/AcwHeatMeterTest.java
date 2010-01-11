@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,10 +13,14 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.slave.acw;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -30,6 +34,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -65,7 +70,7 @@ public class AcwHeatMeterTest {
      * Test of handleApplicationReset method, of class AcwHeatMeter.
      */
     @Test
-    public void testHandleApplicationReset() {
+    public void testHandleApplicationReset() throws Exception {
         System.out.println("handleApplicationReset");
         ApplicationReset applicationReset = new ApplicationReset(ApplicationReset.TelegramType.ALL, 0x12);
         applicationReset.setAddress((byte) 0);
@@ -76,4 +81,25 @@ public class AcwHeatMeterTest {
         assertEquals(SingleCharFrame.SINGLE_CHAR_FRAME, result);
         assertEquals(AcwHeatMeter.State.CF50, instance.getState());
     }
+
+    @Test
+    @Ignore
+    public void testSerialize() throws Exception {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream objOut = new ObjectOutputStream(bos);
+        objOut.writeObject(instance);
+        objOut.close();
+        ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        System.out.println(String.format("Serialized AcwHeatmeter: (size: %s) %s", bos.size(), bos.toString()));
+        AcwHeatMeter result = (AcwHeatMeter) new ObjectInputStream(bis).readObject();
+        assertEquals(instance, result);
+        System.out.println(instance.toString());
+        System.out.println(result.toString());
+        assertEquals(instance.isAcd(), result.isAcd());
+        assertEquals(instance.isDfc(), result.isDfc());
+    }
+
+
+
+
 }

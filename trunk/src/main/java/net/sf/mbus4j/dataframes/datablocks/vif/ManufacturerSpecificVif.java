@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
@@ -25,6 +25,23 @@ import java.util.Arrays;
  * @version $Id$
  */
 public class ManufacturerSpecificVif implements Vif {
+
+    public static boolean isManufacturerSecific(String label) {
+        return label.startsWith("Manufacturer specific coding including VIFE's (VIF == 0x");
+    }
+
+    public static ManufacturerSpecificVif fromString(String label) {
+        if (!isManufacturerSecific(label)) {
+            throw new IllegalArgumentException("label is no man. spec. data !");
+        }
+
+        String[] splitted = label.split("0x");
+        ManufacturerSpecificVif result = new ManufacturerSpecificVif(Byte.parseByte(splitted[1].substring(0, 2), 16));
+        for (int i = 2; i < splitted.length; i++) {
+            result.addVIFE(Byte.parseByte(splitted[i].substring(0, 2)));
+        }
+        return result;
+    }
 
     private byte[] vifes;
     final byte vife;
@@ -75,5 +92,14 @@ public class ManufacturerSpecificVif implements Vif {
         }
         sb.append("]");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof ManufacturerSpecificVif)) {
+            return false;
+        }
+        ManufacturerSpecificVif o = (ManufacturerSpecificVif)other;
+        return vife == o.vife && Arrays.equals(vifes, o.vifes);
     }
 }

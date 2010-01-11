@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
@@ -184,35 +184,35 @@ public enum VifFD implements Vif {
         }
         return map.get(ordinal);
     }
-    private final String friendlyName;
+    private final String label;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final Integer exponent;
     private static Map<Byte, VifFD> map;
 
     private VifFD() {
-        this.friendlyName = String.format("Reserved 0x%02x", ordinal());
+        this.label = String.format("VifFD Reserved 0x%02x", ordinal());
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
     }
 
-    private VifFD(String friendlyName) {
-        this.friendlyName = friendlyName;
+    private VifFD(String label) {
+        this.label = label;
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
     }
 
-    private VifFD(String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
-        this.friendlyName = friendlyName;
+    private VifFD(String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
+        this.label = label;
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
     }
 
-    private VifFD(String friendlyName, UnitOfMeasurement unit) {
-        this.friendlyName = friendlyName;
+    private VifFD(String label, UnitOfMeasurement unit) {
+        this.label = label;
         this.siPrefix = null;
         this.unit = unit;
         this.exponent = null;
@@ -228,7 +228,7 @@ public enum VifFD implements Vif {
 
     @Override
     public String getLabel() {
-        return friendlyName;
+        return label;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,41 +13,51 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.slave;
 
+import java.io.IOException;
+import java.io.Serializable;
+import javax.management.RuntimeErrorException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SendUserDataManSpec;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
-import net.sf.mbus4j.master.Master;
+import net.sf.mbus4j.master.MBusMaster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class Slave {
+public class Slave implements Serializable {
+
+    private final static Logger log = LoggerFactory.getLogger(Slave.class);
 
     /**
      * Template for creating a valid udr - no datablocks.
      */
-    private UserDataResponse udrTemplate;
+    private transient UserDataResponse udrTemplate;
+    private boolean networkSelected;
 
     public Slave() {
         super();
+        udrTemplate = new UserDataResponse();
     }
 
     public Slave(int primaryAddress, int id, String man, int version, MBusMedium medium) {
-        super();
-        udrTemplate = new UserDataResponse();
+        this();
+        networkSelected = false;
         udrTemplate.setAddress((byte) primaryAddress);
         udrTemplate.setIdentNumber(id);
         udrTemplate.setManufacturer(man);
@@ -56,7 +66,7 @@ public class Slave {
         udrTemplate.setStatus(new UserDataResponse.StatusCode[]{UserDataResponse.StatusCode.APPLICATION_NO_ERROR});
     }
 
-    public byte getAddress() {
+    public int getAddress() {
         return udrTemplate.getAddress();
     }
 
@@ -68,8 +78,12 @@ public class Slave {
         return udrTemplate.getManufacturer();
     }
 
-    public MBusMedium getMedium(MBusMedium medium) {
+    public MBusMedium getMedium() {
         return udrTemplate.getMedium();
+    }
+
+    public int getVersion() {
+        return udrTemplate.getVersion();
     }
 
     public Frame handleApplicationReset(ApplicationReset applicationReset) {
@@ -104,8 +118,8 @@ public class Slave {
         return SingleCharFrame.SINGLE_CHAR_FRAME;
     }
 
-    public void setAddress(byte address) {
-        udrTemplate.setAddress(address);
+    public void setAddress(int address) {
+        udrTemplate.setAddress((byte)address);
     }
 
     public void setId(int id) {
@@ -120,17 +134,129 @@ public class Slave {
         udrTemplate.setMedium(medium);
     }
 
+    public void setVersion(int version) {
+        udrTemplate.setVersion((byte)version);
+    }
+
     /**
      *
      * @param primaryAddress
      * @return
      */
     public boolean willHandleRequest(Frame frame) {
-        if (frame instanceof PrimaryAddress) {
+        if (frame instanceof SelectionOfSlaves) {
+            SelectionOfSlaves selectionOfSlaves = (SelectionOfSlaves)frame;
+            log.info("will handle SelectionOfSlaves: " + ((selectionOfSlaves.getAddress()  & 0xFF) ==  MBusMaster.SLAVE_SELECT_PRIMARY_ADDRESS));
+            return (selectionOfSlaves.getAddress() & 0xFF) ==  MBusMaster.SLAVE_SELECT_PRIMARY_ADDRESS;
+        } else if (frame instanceof PrimaryAddress) {
             int primaryAddress = ((PrimaryAddress) frame).getAddress() & 0xFF;
-            return primaryAddress == Master.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS || primaryAddress == Master.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS || primaryAddress == getAddress();
+            return willHandleByAddress(primaryAddress);
+        } else if (frame instanceof RequestClassXData) {
+            int primaryAddress = ((RequestClassXData)frame).getAddress() & 0xFF;
+            return willHandleByAddress(primaryAddress);
         } else {
             return false;
         }
     }
+
+    Frame handleSelectionOfSlaves(SelectionOfSlaves selectionOfSlaves) {
+        if ((selectionOfSlaves.getAddress() & 0xFF)!=  MBusMaster.SLAVE_SELECT_PRIMARY_ADDRESS) {
+            log.warn("NETWORK SELECT ERROR");
+            return null;
+        }
+        if (selectionOfSlaves.matchAll(getId(), getMan(), getMedium(), getVersion())) {
+            networkSelected = true;
+            log.info("Network selected: " + slaveIdToString());
+            return SingleCharFrame.SINGLE_CHAR_FRAME;
+        } else {
+            log.info("Network deselected: " + slaveIdToString());
+            networkSelected = false;
+            return null;
+        }
+    }
+
+    /**
+     * @return the networkSelected
+     */
+    public boolean isNetworkSelected() {
+        return networkSelected;
+    }
+
+    /**
+     * @param networkSelected the networkSelected to set
+     */
+    public void setNetworkSelected(boolean networkSelected) {
+        this.networkSelected = networkSelected;
+    }
+
+    public String slaveIdToString() {
+        return String.format("address = 0x%02x, id = %08d, man = %s, medium = %s, version = 0x%02X", getAddress(), getId(), getMan(), getMedium(), getVersion());
+    }
+
+    private boolean willHandleByAddress(int primaryAddress) {
+       return primaryAddress == MBusMaster.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS || primaryAddress == MBusMaster.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS || primaryAddress == (getAddress() & 0xFF) || ((primaryAddress == MBusMaster.SLAVE_SELECT_PRIMARY_ADDRESS) && isNetworkSelected());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Slave) {
+            Slave other = (Slave)o;
+            return (getAddress() == other.getAddress()) && (getId() == other.getId()) && getMan().equals(other.getMan()) && getMedium().equals(other.getMedium()) && (getVersion() == other.getVersion());
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * track the version of self saved data !!!
+     */
+    private final static int MY_SERIAL_VERSION = 0;
+
+        private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+            stream.defaultWriteObject();
+            stream.writeInt(MY_SERIAL_VERSION);
+            stream.writeByte(getAddress());
+            stream.writeInt(getId());
+            stream.writeObject(getMan());
+            stream.writeObject(getMedium());
+            stream.writeByte(getVersion());
+            stream.writeBoolean(isAcd());
+            stream.writeBoolean(isDfc());
+    }
+
+    private void readObject(java.io.ObjectInputStream stream) throws IOException, ClassNotFoundException {
+        stream.defaultReadObject();
+        // construct
+        udrTemplate = new UserDataResponse();
+
+        switch (stream.readInt()) {
+            case MY_SERIAL_VERSION:
+            setAddress(stream.readByte());
+            setId(stream.readInt());
+            setMan((String)stream.readObject());
+            setMedium((MBusMedium)stream.readObject());
+            setVersion(stream.readByte());
+            setAcd(stream.readBoolean());
+            setDfc(stream.readBoolean());
+            break;
+                default :
+            }
+    }
+
+    public boolean isAcd() {
+        return udrTemplate.isAcd();
+    }
+
+    public boolean isDfc() {
+        return udrTemplate.isDfc();
+    }
+
+    public void setAcd(boolean acd) {
+        udrTemplate.setAcd(acd);
+    }
+
+    public void setDfc(boolean dfc) {
+        udrTemplate.setDfc(dfc);
+    }
+
 }

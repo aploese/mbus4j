@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,10 +13,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public abstract class DataBlock {
+public abstract class DataBlock implements Serializable {
 
     private ObjectAction action;
     private Vif vif;
@@ -241,5 +242,12 @@ public abstract class DataBlock {
             sb.append(inset).append("functionField = ").append(getFunctionField()).append("\n");
             sb.append(inset).append("subUnit = ").append(getSubUnit()).append("\n");
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        toString(sb, "");
+        return sb.toString();
     }
 }

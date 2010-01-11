@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.decoder;
 
@@ -56,18 +56,18 @@ public class MBusDocumentationExamplesTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    private PacketParser instance;
+    private Decoder instance;
 
     private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
         System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
         InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
-        final byte[] data = PacketParser.ascii2Bytes(br.readLine());
+        final byte[] data = Decoder.ascii2Bytes(br.readLine());
         for (byte b : data) {
             instance.addByte(b);
         }
-        assertEquals("ParserState", PacketParser.DecodeState.EXPECT_START, instance.getState());
+        assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
         assertNotNull("DataValue not available", instance.getFrame());
         assertEquals(clazz, instance.getFrame().getClass());
 //        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
@@ -89,7 +89,7 @@ public class MBusDocumentationExamplesTest {
 
     @Before
     public void setUp() {
-        instance = new PacketParser();
+        instance = new Decoder();
     }
 
     @After
@@ -184,7 +184,7 @@ public class MBusDocumentationExamplesTest {
 
     public void testRequestClass2Data() throws Exception {
         Frame dv = null;
-        for (byte b : PacketParser.ascii2Bytes("107BFE7916")) {
+        for (byte b : Decoder.ascii2Bytes("107BFE7916")) {
             dv = instance.addByte(b);
         }
         assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());

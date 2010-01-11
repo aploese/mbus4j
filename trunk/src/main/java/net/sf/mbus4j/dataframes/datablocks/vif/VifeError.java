@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
@@ -59,7 +59,7 @@ public enum VifeError implements Vife {
     OTHER_ERROR_RESERVED_0X1D("Other Error Reserved 0x1D"),
     OTHER_ERROR_RESERVED_0X1E("Other Error Reserved 0x1E"),
     OTHER_ERROR_RESERVED_0X1F("Other Error Reserved 0x1F");
-    private final String name;
+    private final String label;
     private static Map<Byte, VifeError> map;
 
     public static VifeError valueOfTableIndex(byte ordinal) {
@@ -72,8 +72,8 @@ public enum VifeError implements Vife {
         return map.get(ordinal);
     }
 
-    private VifeError(String name) {
-        this.name = name;
+    private VifeError(String label) {
+        this.label = label;
     }
 
     public byte getTableIndex() {
@@ -82,6 +82,12 @@ public enum VifeError implements Vife {
 
     @Override
     public String toString() {
-        return name;
+        return label;
     }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
 }

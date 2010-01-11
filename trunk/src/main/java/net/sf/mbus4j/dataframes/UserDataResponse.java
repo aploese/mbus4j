@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes;
 
@@ -35,7 +35,7 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  */
 public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
 
-    public enum StatusCode {
+    public static enum StatusCode {
         // Taken from Chapter 6.6 Fig 27
 
         APPLICATION_NO_ERROR(0x00, "No application error"),
@@ -95,6 +95,10 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
     @Override
     public boolean addDataBlock(DataBlock dataBlock) {
         return dataBlocks.add(dataBlock);
+    }
+
+    public boolean  addAllDataBlocks(List<DataBlock> list) {
+        return dataBlocks.addAll(list);
     }
 
     public void addStatus(StatusCode status) {

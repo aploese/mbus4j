@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes;
 
@@ -37,6 +37,11 @@ public class RequestClassXData implements ShortFrame {
 
     public RequestClassXData(ControlCode controlCode) {
         this(false, true, controlCode);
+    }
+
+    public RequestClassXData(ControlCode controlCode, byte address) {
+        this(false, true, controlCode);
+        this.address = address;
     }
 
     @Override

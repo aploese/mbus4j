@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.encoder;
 
@@ -53,7 +53,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
-import net.sf.mbus4j.decoder.PacketParser;
+import net.sf.mbus4j.decoder.Decoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -407,7 +407,7 @@ public class Encoder {
                 data[currentPos++] = 0x7F;
                 return;
             default:
-                data[currentPos] |= needDIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+                data[currentPos] |= needDIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
                 if (db.getFunctionField() != null) {
                     data[currentPos] |= db.getFunctionField().code;
                 }
@@ -416,7 +416,7 @@ public class Encoder {
     }
 
     private void pushDIFE(DataBlock db, int index) {
-        data[currentPos] = needDIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
+        data[currentPos] = needDIFE(db, index + 1) ? Decoder.EXTENTIONS_BIT : 0x00;
         data[currentPos] |= (db.getStorageNumber() >> (1 + index * 4)) & 0x0F;
         data[currentPos] |= ((db.getTariff() >> (index * 2)) << 0x04) & 0x30;
         data[currentPos++] |= ((db.getSubUnit() >> index) << 0x06) & 0x40;
@@ -454,15 +454,22 @@ public class Encoder {
         }
     }
 
-    private void pushManufacturer(String man) {
-        int v;
+    /**
+     * convert the man string to 2 byte binary representation
+     * @param man
+     * @return
+     */
+    public static short man2Short(String man) {
         if (man == null) {
-            v = -1;
+            return -1;
         } else {
             byte[] bytes = man.getBytes();
-            v = bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024;
+            return (short)(bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024);
         }
-        pushInteger(v, 2);
+    }
+
+    private void pushManufacturer(String man) {
+        pushInteger(man2Short(man), 2);
     }
 
     private void pushObjectAction(DataBlock db) {
@@ -470,10 +477,10 @@ public class Encoder {
     }
 
     private void pushSelectionOfSlavesDataHeader(SelectionOfSlaves frame) {
-        pushInteger(frame.getMaskedId(), 4);
-        pushInteger(frame.getMaskedMan(), 2);
-        data[currentPos++] = (byte) frame.getMaskedVersion();
-        data[currentPos++] = (byte) frame.getMaskedMedium();
+        pushInteger(frame.getBcdId(), 4);
+        pushInteger(frame.getBcdMan(), 2);
+        data[currentPos++] = (byte) frame.getBcdVersion();
+        data[currentPos++] = (byte) frame.getBcdMedium();
     }
 
     private void pushString(String value) {
@@ -532,15 +539,15 @@ public class Encoder {
     private void pushVIF(DataBlock db) {
         if (db.getVif() == null) {
         } else if (db.getVif() instanceof VifStd) {
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
             data[currentPos++] |= ((VifStd) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifFB) {
             data[currentPos++] = (byte) 0xFB;
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
             data[currentPos++] |= ((VifFB) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifFD) {
             data[currentPos++] = (byte) 0xFD;
-            data[currentPos] = needVIFE(db, 0) ? PacketParser.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
             data[currentPos++] |= ((VifFD) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof AsciiVif) {
             data[currentPos++] = (byte) (needVIFE(db, 0) ? 0xFC : 0x7C);
@@ -554,7 +561,7 @@ public class Encoder {
     }
 
     private void pushVIFE(DataBlock db, int index) {
-        data[currentPos] = needVIFE(db, index + 1) ? PacketParser.EXTENTIONS_BIT : 0x00;
+        data[currentPos] = needVIFE(db, index + 1) ? Decoder.EXTENTIONS_BIT : 0x00;
         if (db.getVifes().get(index) instanceof VifeStd) {
             data[currentPos++] |= ((VifeStd) db.getVifes().get(index)).getTableIndex();
         } else if (db.getVifes().get(index) instanceof VifeError) {

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.master;
 
@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
-import net.sf.mbus4j.devices.MBusDevice;
+import net.sf.mbus4j.devices.MBusResponseFramesContainer;
 import net.sf.mbus4j.slave.Slaves;
 import net.sf.mbus4j.slave.acw.AcwHeatMeter;
 
@@ -45,14 +45,14 @@ public class Explorer {
         Explorer expl = new Explorer();
         try {
             if ((args.length > 1) || (args.length == 0)) {
-                for (int i = 0; i <= Master.LAST_REGULAR_PRIMARY_ADDRESS; i++) {
+                for (int i = 0; i <= MBusMaster.LAST_REGULAR_PRIMARY_ADDRESS; i++) {
                     expl.getSlaves().addSlave(new AcwHeatMeter(i, i, 0x09, MBusMedium.StdMedium.HEAT_OUTLET, VifStd.ENERGY_KILO_WH_E_1, VifStd.VOLUME_L_E_2, VifStd.POWER_W_E_2, VifStd.VOLUME_L_E_1, VifStd.VOLUME_L_E_1, VifStd.ENERGY_KILO_WH_E_0, AcwHeatMeter.State.STANDARD, false, 1000 + i, 0, 0));
                 }
-                slavePort = Master.openPort(args[1]);
+                slavePort = MBusMaster.openPort(args[1]);
                 expl.getSlaves().setStreams(slavePort.getInputStream(), slavePort.getOutputStream());
             }
             if (args.length > 0) {
-                masterPort = Master.openPort(args[0]);
+                masterPort = MBusMaster.openPort(args[0]);
                 expl.getMaster().setStreams(masterPort.getInputStream(), masterPort.getOutputStream(), masterPort.getBaudRate());
             }
         } catch (NoSuchPortException ex) {
@@ -65,7 +65,7 @@ public class Explorer {
             java.util.logging.Logger.getLogger(Slaves.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
-            for (MBusDevice dev : expl.searchDevicesByPrimaryAddress()) {
+            for (MBusResponseFramesContainer dev : expl.searchDevicesByPrimaryAddress()) {
                 System.out.println("DEV:\n " + dev.toString());
             }
         } catch (Exception ex) {
@@ -89,18 +89,18 @@ public class Explorer {
         }
 
     }
-    private Master master;
+    private MBusMaster master;
     private Slaves slaves;
 
     public Explorer() {
-        master = new Master();
+        master = new MBusMaster();
         slaves = new Slaves();
     }
 
     /**
      * @return the master
      */
-    public Master getMaster() {
+    public MBusMaster getMaster() {
         return master;
     }
 
@@ -111,14 +111,14 @@ public class Explorer {
         return slaves;
     }
 
-    private MBusDevice[] searchDevicesByPrimaryAddress() throws IOException, InterruptedException {
+    private MBusResponseFramesContainer[] searchDevicesByPrimaryAddress() throws IOException, InterruptedException {
         return master.searchDevicesByPrimaryAddress();
     }
 
     /**
      * @param master the master to set
      */
-    public void setMaster(Master master) {
+    public void setMaster(MBusMaster master) {
         this.master = master;
     }
 

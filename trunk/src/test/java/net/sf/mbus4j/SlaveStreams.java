@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j;
 
@@ -30,12 +30,26 @@ public class SlaveStreams extends MockStreams {
     private final static Logger log = LoggerFactory.getLogger(SlaveStreams.class);
 
     @Override
-    protected synchronized void dataReaded() {
-        setNextData(true);
+    protected synchronized void lastByteReading(final long endWaitTime) {
+        if (endWaitTime == 0) {
+            setNextData(true);
+        } else {
+            new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(endWaitTime);
+                    } catch (InterruptedException ex) {
+                    }
+                    setNextData(true);
+                }
+            }).start();
+        }
     }
 
     @Override
-    protected synchronized void dataWritten() {
+    protected synchronized void lastByteWriting() {
         is.releaseReadLock();
         if (data.get(0).response == null) {
             setNextData(true);

@@ -1,5 +1,5 @@
 /*
- * mbus4j - Open source drivers for mbus protocol (http://www.m-bus.com) - http://mbus4j.sourceforge.net
+ * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
  * Copyright (C) 2009  Arne Plöse
  *
  * This program is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
  */
 package net.sf.mbus4j.dataframes.datablocks.vif;
 
@@ -194,7 +194,7 @@ public enum VifStd implements Vif {
         }
         return map.get(vifCode);
     }
-    private final String friendlyName;
+    private final String label;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final int vifCode;
@@ -203,31 +203,31 @@ public enum VifStd implements Vif {
 
     private VifStd(int vifCode) {
         this.vifCode = vifCode;
-        this.friendlyName = String.format("Reserved 0x%02x", vifCode);
+        this.label = String.format("VifStd Reserved 0x%02x", vifCode);
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
     }
 
-    private VifStd(int vifCode, String friendlyName) {
+    private VifStd(int vifCode, String label) {
         this.vifCode = vifCode;
-        this.friendlyName = friendlyName;
+        this.label = label;
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
     }
 
-    private VifStd(int vifCode, String friendlyName, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
+    private VifStd(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
         this.vifCode = vifCode;
-        this.friendlyName = friendlyName;
+        this.label = label;
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
     }
 
-    private VifStd(int vifCode, String friendlyName, UnitOfMeasurement unit) {
+    private VifStd(int vifCode, String label, UnitOfMeasurement unit) {
         this.vifCode = vifCode;
-        this.friendlyName = friendlyName;
+        this.label = label;
         this.siPrefix = null;
         this.unit = unit;
         this.exponent = null;
@@ -243,7 +243,7 @@ public enum VifStd implements Vif {
 
     @Override
     public String getLabel() {
-        return friendlyName;
+        return label;
     }
 
     /**
