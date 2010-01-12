@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.decoder.Decoder;
 
@@ -45,7 +44,6 @@ public class UserDataResponseTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        LogInit.initLog(LogInit.INFO);
     }
 
     @AfterClass
