@@ -35,6 +35,25 @@
             <artifactId>log4j</artifactId>
         </dependency>
     </dependencies>
+
+    <!--build>
+  <plugins>
+    <plugin>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-javafx-maven</artifactId>
+      <version>0.1</version>
+      <executions>
+        <execution>
+          <phase>compile</phase>
+          <goals>
+            <goal>desktopCompile</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build-->
+
 </project>
 
 

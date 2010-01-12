@@ -37,7 +37,6 @@ public class MasterStreamTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        LogInit.initLog(LogInit.INFO);
     }
 
     @AfterClass

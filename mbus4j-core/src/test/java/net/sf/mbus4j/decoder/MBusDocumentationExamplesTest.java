@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.GeneralApplicationError;
@@ -50,7 +49,6 @@ public class MBusDocumentationExamplesTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        LogInit.initLog(LogInit.INFO);
     }
 
     @AfterClass

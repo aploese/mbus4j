@@ -18,7 +18,6 @@
 package net.sf.mbus4j.encoder;
 
 import static org.junit.Assert.assertEquals;
-import net.sf.mbus4j.LogInit;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
@@ -37,7 +36,6 @@ public class TestEncoder {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        LogInit.initLog(LogInit.INFO);
     }
 
     @AfterClass

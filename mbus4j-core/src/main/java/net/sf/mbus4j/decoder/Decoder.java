@@ -167,57 +167,6 @@ public class Decoder {
         return sb.toString();
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-        //log stuff
-        Properties props = new Properties();
-        props.setProperty("log4j.appender.stdout",
-                "org.apache.log4j.ConsoleAppender");
-        props.setProperty("log4j.appender.stdout.Target", "System.out");
-        //log4j.appender.stdout=org.apache.log4j.FileAppender
-        //log4j.appender.stdout.File=Easy.log
-        props.setProperty("log4j.appender.stdout.layout",
-                "org.apache.log4j.PatternLayout");
-        props.setProperty("log4j.appender.stdout.layout.ConversionPattern",
-                "%d{ABSOLUTE} %5p %c{1}: %m%n");
-
-        //set log levels - for more verbose logging change 'info' to 'debug' ###
-        props.setProperty("log4j.rootLogger", "info" + ", stdout");
-        PropertyConfigurator.configure(props);
-
-
-        // TODO code application logic here
-        BufferedReader dataIn = new BufferedReader(new InputStreamReader(System.in));
-
-
-        System.out.println("Please paste M-Bus packet:");
-        // Read data into name variable
-        String data;
-        try {
-             data = dataIn.readLine();
-        } catch (Exception e) {
-            System.out.println("Error!");
-            return;
-        }
-        System.out.println("RAW M-Bus packet:" + data);
-
-        Decoder pp = new Decoder();
-        Frame v = null;
-        for (byte b : ascii2Bytes(data)) {
-            v = pp.addByte(b);
-            if (v != null) {
-                break;
-            }
-        }
-        System.out.println(pp.getState());
-        System.out.println("Package Data >>>>");
-        System.out.println(v);
-        System.out.println("<<<< Package Data");
-
-    }
     private int expectedLengt;
     private byte checksum;
     private Frame parsingFrame;
