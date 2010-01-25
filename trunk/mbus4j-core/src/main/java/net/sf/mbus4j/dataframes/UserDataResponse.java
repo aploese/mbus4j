@@ -70,7 +70,7 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
     @Override
     public void fromJSON(JSONObject json) {
             setManufacturer(json.getString("manufacturer"));
-            setMedium(MBusMedium.StdMedium.fromLabel(json.getString("medium")));
+            setMedium(MBusMedium.fromLabel(json.getString("medium")));
             setVersion((byte)json.getInt("version"));
             setIdentNumber(json.getInt("identNumber"));
             setAddress(json.containsKey("address") ? (byte)json.getInt("address") : 0);
@@ -233,7 +233,7 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
 
     @Override
     public DataBlock getLastDataBlock() {
-        return dataBlocks.get(dataBlocks.size() - 1);
+        return dataBlocks.size() == 0 ? null : dataBlocks.get(dataBlocks.size() - 1);
     }
 
     public String getManufacturer() {
@@ -275,7 +275,7 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
      * @return
      */
     public boolean isLastPackage() {
-        return !DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS.equals(getLastDataBlock().getDataFieldCode());
+        return getLastDataBlock() == null ? true : !DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS.equals(getLastDataBlock().getDataFieldCode());
     }
 
     @Override

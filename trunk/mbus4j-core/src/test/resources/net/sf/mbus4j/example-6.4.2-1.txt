@@ -8,4 +8,4 @@ datablock[0]:
   id = 01020304
   man = PAD
   version = 1
-  medium = Heat/outlet
+  medium = Heat

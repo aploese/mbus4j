@@ -28,6 +28,12 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 public class LongDataBlock extends DataBlock {
 
     private long value;
+    private String bcdError;
+
+    public boolean isBcdError() {
+        return bcdError != null;
+    }
+
 
     public LongDataBlock(DataFieldCode dataFieldCode) {
         super(dataFieldCode);
@@ -37,12 +43,19 @@ public class LongDataBlock extends DataBlock {
      * @return the value
      */
     public long getValue() {
-        return value;
+        if (isBcdError()) {
+            throw new IllegalArgumentException("No value BCD Error: " + bcdError);
+        } else {
+            return value;
+        }
     }
 
     @Override
     public String getValueAsString() {
-        switch (getDataFieldCode()) {
+            if (bcdError != null) {
+            return "BCD Error: " + bcdError;
+        }
+    switch (getDataFieldCode()) {
             case _48_BIT_INTEGER:
             case _64_BIT_INTEGER:
                 return Long.toString(value);
@@ -66,7 +79,13 @@ public class LongDataBlock extends DataBlock {
     public JSONObject toJSON(boolean isTemplate) {
         JSONObject result = super.toJSON(isTemplate);
         if (!isTemplate) {
-            result.accumulate("data", getValue());
+            if (!isBcdError()) {
+                result.accumulate("data", getValue());
+            } else {
+                JSONObject jsonBcdError = new JSONObject();
+                jsonBcdError.accumulate("bcdErrorCode", getBcdError());
+                result.accumulate("data", jsonBcdError);
+            }
         }
         return result;
     }
@@ -74,6 +93,31 @@ public class LongDataBlock extends DataBlock {
     @Override
     public void fromJSON(JSONObject json) {
         super.fromJSON(json);
-        setValue(json.getLong("data"));
+          if (json.get("data") instanceof JSONObject) {
+            JSONObject data = json.getJSONObject("data");
+            if (data.containsKey("bcdErrorCode")) {
+                bcdError = data.getString("bcdErrorCode");
+            } else {
+                throw new IllegalArgumentException("Unknown value at data: " + data.toString(1));
+            }
+        } else {
+            setValue(json.getLong("data"));
+        }
     }
+
+        /**
+     * @return the bcdError
+     */
+    public String getBcdError() {
+        return bcdError;
+    }
+
+    /**
+     * @param bcdError the bcdError to set
+     */
+    public void setBcdError(String bcdError) {
+        this.bcdError = bcdError;
+    }
+
+
 }

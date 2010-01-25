@@ -142,7 +142,7 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
             JSONObject jsonData = json.getJSONObject("data");
             if (getDataFieldCode().equals(DataFieldCode._64_BIT_INTEGER)) {
                 setMan(jsonData.getString("man"));
-                setMedium(MBusMedium.StdMedium.fromLabel(jsonData.getString("medium")));
+                setMedium(MBusMedium.fromLabel(jsonData.getString("medium")));
                 setVersion(jsonData.getInt("version"));
             }
             setId(jsonData.getInt("id"));

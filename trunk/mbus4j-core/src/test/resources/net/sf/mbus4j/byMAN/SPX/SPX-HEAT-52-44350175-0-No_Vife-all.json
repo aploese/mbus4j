@@ -1,11 +1,11 @@
 {
  "controlCode": "RSP_UD",
- "manufacturer": "ACW",
- "medium": "Heat/outlet",
- "version": 11,
- "identNumber": 8772050,
+ "manufacturer": "SPX",
+ "medium": "Heat",
+ "version": 52,
+ "identNumber": 44350175,
  "address": 0,
- "accessNumber": 45,
+ "accessNumber": 189,
  "acd": false,
  "dfc": false,
  "signature": 0,
@@ -22,29 +22,13 @@
     },
     "vib": {"vif":     {
      "vifType": "primary",
-     "description": "Fabrication No"
-    }}
-   },
-   "data": 8772050
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
      "description": "Energy",
      "unitOfMeasurement": "Wh",
      "siPrefix": "k",
      "exponent": 1
     }}
    },
-   "data": 14554
+   "data": 13312
   },
     {
    "drh":    {
@@ -60,34 +44,15 @@
      "description": "Volume",
      "unitOfMeasurement": "l",
      "siPrefix": "",
-     "exponent": 2
+     "exponent": 1
     }}
    },
-   "data": 83320
+   "data": 1067225
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "6 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Power",
-     "unitOfMeasurement": "W",
-     "siPrefix": "",
-     "exponent": 2
-    }}
-   },
-   "data": 226
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "6 digit BCD",
+     "dataFieldCode": "8 digit BCD",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -98,10 +63,29 @@
      "description": "Volume Flow",
      "unitOfMeasurement": "l/h",
      "siPrefix": "",
-     "exponent": 0
+     "exponent": 1
     }}
    },
-   "data": 1293
+   "data": 54
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 1427
   },
     {
    "drh":    {
@@ -120,7 +104,7 @@
      "exponent": -1
     }}
    },
-   "data": 639
+   "data": 537
   },
     {
    "drh":    {
@@ -139,7 +123,7 @@
      "exponent": -1
     }}
    },
-   "data": 487
+   "data": 310
   },
     {
    "drh":    {
@@ -155,15 +139,15 @@
      "description": "Temperature Difference",
      "unitOfMeasurement": "K",
      "siPrefix": "",
-     "exponent": -2
+     "exponent": -3
     }}
    },
-   "data": 1522
+   "data": 22623
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "32 Bit Integer",
+     "dataFieldCode": "8 digit BCD",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -171,40 +155,15 @@
     },
     "vib": {"vif":     {
      "vifType": "primary",
-     "description": "Time Point",
-     "unitOfMeasurement": "time and date"
+     "description": "Fabrication No"
     }}
    },
-   "data":    {
-    "timestamp": "13.03.2009 09:35:00",
-    "summertime": false,
-    "valid": true,
-    "res1": false,
-    "res2": false,
-    "res3": false
-   }
+   "data": 44350175
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Operating Time",
-     "unitOfMeasurement": "d"
-    }}
-   },
-   "data": 251
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "2 digit BCD",
+     "dataFieldCode": "8 digit BCD",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -212,33 +171,14 @@
     },
     "vib": {"vif":     {
      "vifType": "extention FD",
-     "description": "Firmware version #"
+     "description": "Other location"
     }}
    },
-   "data": 10
+   "data": 44350175
   },
     {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "2 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "extention FD",
-     "description": "Software version #"
-    }}
-   },
-   "data": 20
-  },
-    {
-   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    0,
-    0
-   ]
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}},
+   "data": []
   }
  ]
 }

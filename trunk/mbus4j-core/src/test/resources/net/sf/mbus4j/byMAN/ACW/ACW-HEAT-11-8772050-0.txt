@@ -9,7 +9,7 @@ version = 0x0B
 accessnumber = 45
 status = [No application error]
 signature = 0x0000
-medium = Heat/outlet
+medium = Heat
 lastPackage = true
 datablock[0]:
   dataType = 8 digit BCD
@@ -99,7 +99,7 @@ datablock[9]:
   subUnit = 0
 datablock[10]:
   dataType = 2 digit BCD
-  description = Firmware version #
+  description = Metrology (firmware) version #
   value = 10
   tariff = 0
   storageNumber = 0
@@ -107,7 +107,7 @@ datablock[10]:
   subUnit = 0
 datablock[11]:
   dataType = 2 digit BCD
-  description = Software version #
+  description = Other software version #
   value = 20
   tariff = 0
   storageNumber = 0

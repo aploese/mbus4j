@@ -34,6 +34,7 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE_PE
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONNS;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VAR_HOUR;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,8 +49,8 @@ public enum VifFB implements Vif {
 // DO NOT CHANGE ORDER!!!!
     ENERGY_KWH_E_2(ENERGY, KILO, WATT_HOUR, 2),
     ENERGY_MWH_E_0(ENERGY, MEGA, WATT_HOUR, 0),
-    RESERVED_0X02(),
-    RESERVED_0X03(),
+    REACTIVE_ENERGY_KVARH_E_2(ENERGY, KILO, VAR_HOUR, 2),
+    REACTIVE_ENERGY_MVARH_E_0(ENERGY, MEGA, VAR_HOUR, 0),
     RESERVED_0X04(),
     RESERVED_0X05(),
     RESERVED_0X06(),

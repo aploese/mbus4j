@@ -25,6 +25,7 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
 public enum UnitOfMeasurement {
 
     WATT_HOUR("Wh"),
+    VAR_HOUR("VARh"),
     JOULE("J"),
     LITRE("l"),
     CUBIC_METER("m³"),

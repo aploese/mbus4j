@@ -55,7 +55,7 @@ import java.util.Map;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public enum VifStd implements Vif {
+public enum VifPrimary implements Vif {
 
     ENERGY_MILLI_WH_E_0(0x00, ENERGY, MILLI, WATT_HOUR, 0),
     ENERGY_MILLI_WH_E_1(0x01, ENERGY, MILLI, WATT_HOUR, 1),
@@ -186,10 +186,10 @@ public enum VifStd implements Vif {
     READOUT_SELECTION(0x7E, "Readout selection of all storage numbers, all tariffs and all VIF");
     public final static String PRIMARY = "primary";
 
-    public static VifStd valueOfTableIndex(int vifCode) {
+    public static VifPrimary valueOfTableIndex(int vifCode) {
         if (map == null) {
-            map = new HashMap<Integer, VifStd>(0xFE);
-            for (VifStd val : values()) {
+            map = new HashMap<Integer, VifPrimary>(0xFE);
+            for (VifPrimary val : values()) {
                 map.put(val.vifCode, val);
             }
         }
@@ -200,9 +200,9 @@ public enum VifStd implements Vif {
     private final UnitOfMeasurement unit;
     private final int vifCode;
     private final Integer exponent;
-    private static Map<Integer, VifStd> map;
+    private static Map<Integer, VifPrimary> map;
 
-    private VifStd(int vifCode) {
+    private VifPrimary(int vifCode) {
         this.vifCode = vifCode;
         this.label = String.format("VifStd Reserved 0x%02x", vifCode);
         this.siPrefix = null;
@@ -210,7 +210,7 @@ public enum VifStd implements Vif {
         this.exponent = null;
     }
 
-    private VifStd(int vifCode, String label) {
+    private VifPrimary(int vifCode, String label) {
         this.vifCode = vifCode;
         this.label = label;
         this.siPrefix = null;
@@ -218,7 +218,7 @@ public enum VifStd implements Vif {
         this.exponent = null;
     }
 
-    private VifStd(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
+    private VifPrimary(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
         this.vifCode = vifCode;
         this.label = label;
         this.siPrefix = siPrefix;
@@ -226,7 +226,7 @@ public enum VifStd implements Vif {
         this.exponent = exponent;
     }
 
-    private VifStd(int vifCode, String label, UnitOfMeasurement unit) {
+    private VifPrimary(int vifCode, String label, UnitOfMeasurement unit) {
         this.vifCode = vifCode;
         this.label = label;
         this.siPrefix = null;
@@ -285,8 +285,8 @@ public enum VifStd implements Vif {
         return PRIMARY;
     }
 
-    public static VifStd assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
-        for (VifStd value : values()) {
+    public static VifPrimary assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
+        for (VifPrimary value : values()) {
             if (value.getLabel().equals(label) && ((unitOfMeasurement == value.getUnitOfMeasurement()) || ((unitOfMeasurement != null) && unitOfMeasurement.equals(value.getUnitOfMeasurement()))) && ((siPrefix == value.getSiPrefix()) || ((siPrefix != null) && siPrefix.equals(value.getSiPrefix()))) && ((exponent == value.getExponent()) || ((exponent != null) && exponent.equals(value.getExponent())))) {
                 return value;
             }

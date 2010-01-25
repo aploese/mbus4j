@@ -50,7 +50,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
 import net.sf.mbus4j.decoder.Decoder;
@@ -176,11 +176,25 @@ public class Encoder {
         data[currentPos++] = (byte) (applicationReset.getTelegramType().id | applicationReset.getSubTelegram());
     }
 
+    private void pushBcdError(String value, int bcdDigits) {
+        for (int i = bcdDigits / 2; i > 0; i--) {
+            data[currentPos++] = (byte)Short.parseShort(value.substring(i * 2 - 2, i * 2), 16);
+        }
+    }
+
     private void pushBcd(long value, int bcdDigits) {
+        final boolean isNegative = value < 0;
+        if (isNegative) {
+            value = - value; 
+        }
         for (int i = bcdDigits / 2; i > 0; i--) {
             data[currentPos] = (byte) (value % 10);
             value /= 10;
-            data[currentPos++] |= (byte) ((value % 10) << 4);
+            if ((i == 1) && (isNegative)) {
+                data[currentPos++] |= (byte) (0xF0);
+            } else {
+                data[currentPos++] |= (byte) ((value % 10) << 4);
+            }
             value /= 10;
         }
     }
@@ -327,19 +341,35 @@ public class Encoder {
             case SELECTION_FOR_READOUT:
                 break;
             case _2_DIGIT_BCD:
-                pushBcd(((ByteDataBlock) db).getValue(), 2);
+                if (((ByteDataBlock) db).isBcdError()) {
+                    pushBcdError(((ByteDataBlock) db).getBcdError(), 2);
+                } else {
+                    pushBcd(((ByteDataBlock) db).getValue(), 2);
+                }
                 break;
             case _4_DIGIT_BCD:
-                pushBcd(((ShortDataBlock) db).getValue(), 4);
+                if (((ShortDataBlock) db).isBcdError()) {
+                    pushBcdError(((ShortDataBlock) db).getBcdError(), 4);
+                } else {
+                    pushBcd(((ShortDataBlock) db).getValue(), 4);
+                }
                 break;
             case _6_DIGIT_BCD:
-                pushBcd(((IntegerDataBlock) db).getValue(), 6);
+                if (((IntegerDataBlock) db).isBcdError()) {
+                    pushBcdError(((IntegerDataBlock) db).getBcdError(), 6);
+                } else {
+                    pushBcd(((IntegerDataBlock) db).getValue(), 6);
+                }
                 break;
             case _8_DIGIT_BCD:
                 if (db instanceof EnhancedIdentificationDataBlock) {
                     pushEnhancedIdentificationDataBlockShort((EnhancedIdentificationDataBlock) db);
                 } else {
+                if (((IntegerDataBlock) db).isBcdError()) {
+                    pushBcdError(((IntegerDataBlock) db).getBcdError(), 8);
+                } else {
                     pushBcd(((IntegerDataBlock) db).getValue(), 8);
+                }
                 }
                 break;
             case VARIABLE_LENGTH:
@@ -351,7 +381,11 @@ public class Encoder {
                 }
                 break;
             case _12_DIGIT_BCD:
-                pushBcd(((LongDataBlock) db).getValue(), 12);
+                if (((LongDataBlock) db).isBcdError()) {
+                    pushBcdError(((LongDataBlock) db).getBcdError(), 12);
+                } else {
+                    pushBcd(((LongDataBlock) db).getValue(), 12);
+                }
                 break;
             case SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST:
                 break;
@@ -538,9 +572,9 @@ public class Encoder {
 
     private void pushVIF(DataBlock db) {
         if (db.getVif() == null) {
-        } else if (db.getVif() instanceof VifStd) {
+        } else if (db.getVif() instanceof VifPrimary) {
             data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
-            data[currentPos++] |= ((VifStd) db.getVif()).getTableIndex();
+            data[currentPos++] |= ((VifPrimary) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifFB) {
             data[currentPos++] = (byte) 0xFB;
             data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;

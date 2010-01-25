@@ -9,7 +9,7 @@ version = 0x05
 accessnumber = 30
 status = [Any application error]
 signature = 0x0000
-medium = Unknown ID (0x20)
+medium = Reserved 0x20
 lastPackage = true
 datablock[0]:
   dataType = 32 Bit Integer

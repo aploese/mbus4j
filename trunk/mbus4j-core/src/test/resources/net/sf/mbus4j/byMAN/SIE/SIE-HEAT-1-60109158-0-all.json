@@ -1,7 +1,7 @@
 {
  "controlCode": "RSP_UD",
  "manufacturer": "SIE",
- "medium": "Heat/outlet",
+ "medium": "Heat",
  "version": 1,
  "identNumber": 60109158,
  "address": 0,
