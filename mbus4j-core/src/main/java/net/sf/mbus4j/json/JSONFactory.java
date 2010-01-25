@@ -4,13 +4,11 @@
  */
 package net.sf.mbus4j.json;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.Frame.ControlCode;
 import net.sf.mbus4j.dataframes.GeneralApplicationError;
-import net.sf.mbus4j.dataframes.MBusMedium.StdMedium;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
@@ -32,7 +30,7 @@ import net.sf.mbus4j.dataframes.datablocks.VariableLengthDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
 
@@ -182,7 +180,7 @@ public class JSONFactory {
             case _12_DIGIT_BCD:
                 return new LongDataBlock(dfc);
             case _16_BIT_INTEGER:
-                if (VifStd.TIMEPOINT_DATE.equals(vif)) {
+                if (VifPrimary.TIMEPOINT_DATE.equals(vif)) {
                     return new DateDataBlock(vif);
                 } else {
                     return new ShortDataBlock(dfc);
@@ -192,7 +190,7 @@ public class JSONFactory {
             case _2_DIGIT_BCD:
                 return new ByteDataBlock(dfc);
             case _32_BIT_INTEGER:
-                if (VifStd.TIMEPOINT_TIME_AND_DATE.equals(vif)) {
+                if (VifPrimary.TIMEPOINT_TIME_AND_DATE.equals(vif)) {
                     return new DateAndTimeDataBlock(vif);
                 } else {
                     return new IntegerDataBlock(dfc);
@@ -204,7 +202,7 @@ public class JSONFactory {
             case _4_DIGIT_BCD:
                 return new ShortDataBlock(dfc);
             case _64_BIT_INTEGER:
-                if (VifStd.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
+                if (VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
                     return new EnhancedIdentificationDataBlock(dfc);
                 } else {
                     return new LongDataBlock(dfc);
@@ -214,7 +212,7 @@ public class JSONFactory {
             case _8_BIT_INTEGER:
                 return new ByteDataBlock(dfc);
             case _8_DIGIT_BCD:
-                if (VifStd.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
+                if (VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
                     return new EnhancedIdentificationDataBlock(dfc);
                 } else {
                     return new IntegerDataBlock(dfc);

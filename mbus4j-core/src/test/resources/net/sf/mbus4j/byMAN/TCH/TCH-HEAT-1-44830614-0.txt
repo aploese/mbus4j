@@ -9,7 +9,7 @@ version = 0x01
 accessnumber = 4
 status = [No application error, Temporary error, Specific to manufacturer 0x20]
 signature = 0x0000
-medium = Heat/outlet
+medium = Heat
 lastPackage = true
 datablock[0]:
   dataType = 8 digit BCD

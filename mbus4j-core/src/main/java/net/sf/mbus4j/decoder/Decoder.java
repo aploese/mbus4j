@@ -17,10 +17,6 @@
  */
 package net.sf.mbus4j.decoder;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Properties;
-
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -43,11 +39,10 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +66,7 @@ public class Decoder {
     }
 
     public static Vif getVif(String label, String unitOfMeasurement, String siPrefix, Integer exponent) {
-        for (Vif vif : VifStd.values()) {
+        for (Vif vif : VifPrimary.values()) {
             if (compareVif(vif, label, unitOfMeasurement, siPrefix, exponent)) {
                 return vif;
             }
@@ -108,19 +103,6 @@ public class Decoder {
             }
         }
         throw new IllegalArgumentException("Could not find Vife");
-    }
-
-    public static MBusMedium getMBusMedium(String label) {
-                for (MBusMedium medium : MBusMedium.StdMedium.values()) {
-            if (compareMedium(medium, label)) {
-                return medium;
-            }
-        }
-        return MBusMedium.UnknownMBusMedium.fromLabel(label);
-    }
-
-    private static boolean compareMedium(MBusMedium medium, String label) {
-        return medium.getLabel() == null ? label == null : medium.getLabel().equals(label);
     }
 
     public enum DecodeState {
@@ -337,7 +319,7 @@ public class Decoder {
                     getSelectionOfSlaves().setBcdMedium((byte)(b & 0xFF));
                     setState(DecodeState.CHECKSUM);
                 } else {
-                    getUserDataResponse().setMedium(MBusMedium.StdMedium.valueOf(b));
+                    getUserDataResponse().setMedium(MBusMedium.valueOf(b));
                     setState(DecodeState.ACCESS_NUMBER);
                 }
                 break;

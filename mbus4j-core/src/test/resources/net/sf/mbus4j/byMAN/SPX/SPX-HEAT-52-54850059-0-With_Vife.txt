@@ -9,7 +9,7 @@ version = 0x34
 accessnumber = 166
 status = [No application error]
 signature = 0x0000
-medium = Heat/outlet
+medium = Heat
 lastPackage = false
 datablock[0]:
   dataType = 8 digit BCD
@@ -77,7 +77,7 @@ datablock[7]:
   subUnit = 0
 datablock[8]:
   dataType = 8 digit BCD
-  description = Customer location
+  description = Other location
   value = 54850059
   tariff = 0
   storageNumber = 0

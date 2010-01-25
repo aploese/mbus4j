@@ -66,6 +66,7 @@ public enum VifeStd implements Vife {
     RESERVED_0X3D(),
     RESERVED_0X3E(),
     RESERVED_0X3F(),
+    // 0x40
     LOWER_LIMIT("lower limit value"),
     EXCEEDS_LOWER_LIMIT("# of exceeds of lower limit"),
     TIMESTAMP_OF_BEGIN_FIRST_LOWER(String.format(TIMESTAMP_OF_LIMIT_EXCEED, BEGIN, FIRST, LOWER)),
@@ -74,8 +75,8 @@ public enum VifeStd implements Vife {
     RESERVED_0X45(),
     TIMESTAMP_BEGIN_LAST_LOWER(String.format(TIMESTAMP_OF_LIMIT_EXCEED, BEGIN, LAST, LOWER)),
     TIMESTAMP_END_LAST_LOWER(String.format(TIMESTAMP_OF_LIMIT_EXCEED, END, LAST, LOWER)),
-    RESERVED_0X48(),
-    RESERVED_0X49(),
+    UPPER_LIMIT("upper limit value"),
+    EXCEEDS_UPPER_LIMIT("# of exceeds of upper limit"),
     TIMESTAMP_BEGIN_FIRST_UPPER(String.format(TIMESTAMP_OF_LIMIT_EXCEED, BEGIN, FIRST, UPPER)),
     TIMESTAMP_END_FIRST_UPPER(String.format(TIMESTAMP_OF_LIMIT_EXCEED, END, FIRST, UPPER)),
     RESERVED_0X4C(),

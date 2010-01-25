@@ -1,7 +1,7 @@
 {
  "controlCode": "RSP_UD",
  "manufacturer": "TCH",
- "medium": "Heat/outlet",
+ "medium": "Heat",
  "version": 38,
  "identNumber": 21519982,
  "address": 78,

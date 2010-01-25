@@ -1,11 +1,11 @@
 {
  "controlCode": "RSP_UD",
- "manufacturer": "SPX",
- "medium": "Heat/outlet",
- "version": 52,
- "identNumber": 44350175,
- "address": 0,
- "accessNumber": 189,
+ "manufacturer": "ABB",
+ "medium": "Heat",
+ "version": 8,
+ "identNumber": 3476,
+ "address": 1,
+ "accessNumber": 178,
  "acd": false,
  "dfc": false,
  "signature": 0,
@@ -14,7 +14,7 @@
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "8 digit BCD",
+     "dataFieldCode": "32 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -28,12 +28,12 @@
      "exponent": 1
     }}
    },
-   "data": 13312
+   "data": 397590
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "8 digit BCD",
+     "dataFieldCode": "32 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -44,53 +44,15 @@
      "description": "Volume",
      "unitOfMeasurement": "l",
      "siPrefix": "",
-     "exponent": 1
+     "exponent": 2
     }}
    },
-   "data": 1067225
+   "data": 2455403
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Volume Flow",
-     "unitOfMeasurement": "l/h",
-     "siPrefix": "",
-     "exponent": 1
-    }}
-   },
-   "data": 54
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Power",
-     "unitOfMeasurement": "W",
-     "siPrefix": "",
-     "exponent": 1
-    }}
-   },
-   "data": 1427
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "4 digit BCD",
+     "dataFieldCode": "16 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -101,15 +63,15 @@
      "description": "Flow Temperature",
      "unitOfMeasurement": "°C",
      "siPrefix": "",
-     "exponent": -1
+     "exponent": 0
     }}
    },
-   "data": 537
+   "data": 75
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "4 digit BCD",
+     "dataFieldCode": "16 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -120,15 +82,15 @@
      "description": "Return Temperature",
      "unitOfMeasurement": "°C",
      "siPrefix": "",
-     "exponent": -1
+     "exponent": 0
     }}
    },
-   "data": 310
+   "data": 60
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "6 digit BCD",
+     "dataFieldCode": "16 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -139,15 +101,15 @@
      "description": "Temperature Difference",
      "unitOfMeasurement": "K",
      "siPrefix": "",
-     "exponent": -3
+     "exponent": -1
     }}
    },
-   "data": 22623
+   "data": 147
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "8 digit BCD",
+     "dataFieldCode": "32 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
@@ -155,26 +117,56 @@
     },
     "vib": {"vif":     {
      "vifType": "primary",
-     "description": "Fabrication No"
+     "description": "Volume Flow",
+     "unitOfMeasurement": "l/h",
+     "siPrefix": "",
+     "exponent": 2
     }}
    },
-   "data": 44350175
+   "data": 60
   },
     {
    "drh":    {
     "dib":     {
-     "dataFieldCode": "8 digit BCD",
+     "dataFieldCode": "32 Bit Integer",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,
      "tariff": 0
     },
     "vib": {"vif":     {
-     "vifType": "extention FD",
-     "description": "Customer location"
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "k",
+     "exponent": 0
     }}
    },
-   "data": 44350175
+   "data": 81
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "15.12.2007 23:42:00",
+    "summertime": false,
+    "valid": true,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}},

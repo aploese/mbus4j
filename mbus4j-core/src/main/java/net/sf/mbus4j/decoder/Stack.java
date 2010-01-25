@@ -44,11 +44,6 @@ public class Stack {
         return data.length == stackPos;
     }
 
-    public boolean peekBCD() {
-        //TODO daten/fehler holen
-        return false;
-    }
-
     public boolean peekIsTimestampRes1() {
         return (data[stackPos - 4] & 0x40) == 0x40;
     }
@@ -70,43 +65,55 @@ public class Stack {
     }
 
     public byte popBcdByte() {
-        return (byte) popBcdShort(2);
+        return (byte) popBcdLong(2);
+    }
+
+    public String peekBcdError(int digits) {
+        char[] result = new char[digits];
+        int resultPos = 0;
+        final int floorPos = stackPos - digits / 2;
+        boolean isError = false;
+        for (int i = stackPos - 1; i >= floorPos; i--) {
+            result[resultPos++] = Integer.toHexString((data[i] >> 4) & 0x0F).charAt(0);
+            isError |= (i == stackPos -1) && ((data[i] & 0xF0) == 0x0F);
+            result[resultPos++] += Integer.toHexString(data[i] & 0x0F).charAt(0);
+            isError |= (data[i] & 0x0F) > 0x09;
+        }
+        if (isError) {
+            return new String(result);
+        } else {
+            return null;
+        }
     }
 
     public int popBcdInteger(int digits) {
-        int result = 0;
-        for (int i = stackPos - 1; i >= stackPos - digits / 2; i--) {
-            result *= 10;
-            result += (data[i] >> 4) & 0x0F;
-            result *= 10;
-            result += (data[i] & 0x0F);
-        }
-        stackPos -= digits / 2;
-        return result;
+        return (int) popBcdLong(digits);
+    }
+
+    public short popBcdShort(int digits) {
+        return (short) popBcdLong(digits);
     }
 
     public long popBcdLong(int digits) {
         long result = 0;
-        for (int i = stackPos - 1; i >= stackPos - digits / 2; i--) {
+        final int floorPos = stackPos - digits / 2;
+        boolean isNegative = false;
+        for (int i = stackPos - 1; i >= floorPos; i--) {
             result *= 10;
-            result += (data[i] >> 4) & 0x0F;
-            result *= 10;
-            result += (data[i] & 0x0F);
-        }
-        stackPos -= digits / 2;
-        return result;
-    }
-
-    public short popBcdShort(int digits) {
-        short result = 0;
-        for (int i = stackPos - 1; i >= stackPos - digits / 2; i--) {
-            result *= 10;
-            result += (data[i] >> 4) & 0x0F;
+            if ((i == stackPos - 1) && (((data[i] >> 4) & 0x0F) == 0x0F)) {
+                isNegative = true;
+            } else {
+                result += (data[i] >> 4) & 0x0F;
+            }
             result *= 10;
             result += (data[i] & 0x0F);
         }
         stackPos -= digits / 2;
-        return result;
+        if (isNegative) {
+            return -result;
+        } else {
+            return result;
+        }
     }
 
     public byte popByte() {

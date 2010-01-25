@@ -7,18 +7,15 @@ package net.sf.mbus4j.decoder;
 
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.mbus4j.dataframes.Frame;
-import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
-import net.sf.mbus4j.decoder.Decoder.DecodeState;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,7 +55,7 @@ public class DecoderTest {
     public void testGetVif() {
         System.out.println("getVif");
         List<Vif> list = new ArrayList<Vif>();
-        for (Vif vif : VifStd.values()) {
+        for (Vif vif : VifPrimary.values()) {
             list.add(vif);
         }
         for (Vif vif : VifFB.values()) {
@@ -104,30 +101,6 @@ public class DecoderTest {
                 System.out.println("vif: " + vife.getLabel());
             }
             assertEquals(vife.getLabel() , vife, Decoder.getVife(vife.getLabel()));
-        }
-    }
-
-    /**
-     * Test of getVife method, of class Decoder.
-     */
-    @Test
-    public void testGetMedium() {
-        System.out.println("getMedium");
-        List<MBusMedium> list = new ArrayList<MBusMedium>();
-        for (MBusMedium medium : MBusMedium.StdMedium.values()) {
-            list.add(medium);
-        }
-        list.add(new MBusMedium.UnknownMBusMedium(0xF0));
-        //TODO VifeObjectAction ???
-        for (MBusMedium medium : list) {
-            MBusMedium m = Decoder.getMBusMedium(medium.getLabel());
-
-            if (!medium.equals(m)) {
-                System.out.println("V: " + medium.getClass().getName());
-                System.out.println("V: " + medium.getClass().getName());
-                System.out.println("vif: " + medium.getLabel());
-            }
-            assertEquals(medium.getLabel() , medium, Decoder.getMBusMedium(medium.getLabel()));
         }
     }
 

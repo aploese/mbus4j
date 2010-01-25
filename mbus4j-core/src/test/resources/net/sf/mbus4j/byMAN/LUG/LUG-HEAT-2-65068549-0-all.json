@@ -1,7 +1,7 @@
 {
  "controlCode": "RSP_UD",
  "manufacturer": "LUG",
- "medium": "Heat/outlet",
+ "medium": "Heat",
  "version": 2,
  "identNumber": 65068549,
  "address": 0,

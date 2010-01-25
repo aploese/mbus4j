@@ -20,7 +20,6 @@ package net.sf.mbus4j.dataframes.datablocks;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -34,7 +33,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
@@ -359,8 +358,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
         SiPrefix siPrefix = jsonVif.containsKey("siPrefix") ? SiPrefix.fromLabel(jsonVif.getString("siPrefix")) : null;
         Integer exponent = jsonVif.containsKey("exponent") ? jsonVif.getInt("exponent") : null;
         UnitOfMeasurement unitOfMeasurement = jsonVif.containsKey("unitOfMeasurement") ? UnitOfMeasurement.fromLabel(jsonVif.getString("unitOfMeasurement")) : null;
-        if (VifStd.PRIMARY.equals(vifType)) {
-            return VifStd.assemble(jsonVif.getString("description"), unitOfMeasurement, siPrefix, exponent);
+        if (VifPrimary.PRIMARY.equals(vifType)) {
+            return VifPrimary.assemble(jsonVif.getString("description"), unitOfMeasurement, siPrefix, exponent);
         } else if (VifFB.EXTENTION_FB.equals(vifType)) {
             return VifFB.assemble(description, unitOfMeasurement, siPrefix, exponent);
         } else if (VifFD.EXTENTION_FD.equals(vifType)) {

@@ -28,7 +28,12 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  */
 public class ShortDataBlock extends DataBlock {
 
-    private short value = 0;
+    private short value;
+    private String bcdError;
+
+    public boolean isBcdError() {
+        return bcdError != null;
+    }
 
     public ShortDataBlock(DataFieldCode dataFieldCode) {
         super(dataFieldCode);
@@ -42,11 +47,18 @@ public class ShortDataBlock extends DataBlock {
      * @return the value
      */
     public short getValue() {
-        return value;
+        if (isBcdError()) {
+            throw new IllegalArgumentException("No value BCD Error: " + bcdError);
+        } else {
+            return value;
+        }
     }
 
     @Override
     public String getValueAsString() {
+        if (bcdError != null) {
+            return "BCD Error: " + bcdError;
+        }
         switch (getDataFieldCode()) {
             case _16_BIT_INTEGER:
                 return Short.toString(value);
@@ -63,19 +75,48 @@ public class ShortDataBlock extends DataBlock {
     public void setValue(short value) {
         this.value = value;
     }
-        @Override
+
+    @Override
     public JSONObject toJSON(boolean isTemplate) {
         JSONObject result = super.toJSON(isTemplate);
-           if (!isTemplate) {
-      result.accumulate("data", getValue());
-           }        return result;
+        if (!isTemplate) {
+             if (!isBcdError()) {
+                result.accumulate("data", getValue());
+            } else {
+                JSONObject jsonBcdError = new JSONObject();
+                jsonBcdError.accumulate("bcdErrorCode", getBcdError());
+                result.accumulate("data", jsonBcdError);
+            }
+       }
+        return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
         super.fromJSON(json);
-        setValue((short)json.getInt("data"));
+           if (json.get("data") instanceof JSONObject) {
+            JSONObject data = json.getJSONObject("data");
+            if (data.containsKey("bcdErrorCode")) {
+                bcdError = data.getString("bcdErrorCode");
+            } else {
+                throw new IllegalArgumentException("Unknown value at data: " + data.toString(1));
+            }
+        } else {
+            setValue((short) json.getInt("data"));
+        }
     }
 
+    /**
+     * @return the bcdError
+     */
+    public String getBcdError() {
+        return bcdError;
+    }
 
+    /**
+     * @param bcdError the bcdError to set
+     */
+    public void setBcdError(String bcdError) {
+        this.bcdError = bcdError;
+    }
 }

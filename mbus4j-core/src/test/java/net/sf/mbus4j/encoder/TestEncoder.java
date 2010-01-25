@@ -67,7 +67,7 @@ public class TestEncoder {
         udr.setAddress((byte) 1);
         udr.setIdentNumber(12345678);
         udr.setManufacturer("AMK");
-        udr.setMedium(MBusMedium.StdMedium.OTHER);
+        udr.setMedium(MBusMedium.OTHER);
         udr.addStatus(UserDataResponse.StatusCode.APPLICATION_NO_ERROR);
         byte[] result = instance.encodeFrame(udr);
         assertEquals("680F0F6808017278563412AB050000000000003F16", arrayToString(result));

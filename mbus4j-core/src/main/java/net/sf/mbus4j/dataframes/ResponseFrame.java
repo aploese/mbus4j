@@ -23,7 +23,7 @@ import java.util.Iterator;
 
 import java.util.Map;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
 
 /**
@@ -111,7 +111,7 @@ public abstract class ResponseFrame implements Cloneable, Iterable<DataBlock> {
     private DataBlock searchForTimeData(DataBlock dt) {
         for (int i = 0; i < getDataBlockCount(); i++) {
             if (getDataBlock(i).getStorageNumber() == dt.getStorageNumber() ) {
-                if (getDataBlock(i).getVif().equals(VifStd.TIMEPOINT_DATE) || getDataBlock(i).getVif().equals(VifStd.TIMEPOINT_TIME_AND_DATE)) {
+                if (getDataBlock(i).getVif().equals(VifPrimary.TIMEPOINT_DATE) || getDataBlock(i).getVif().equals(VifPrimary.TIMEPOINT_TIME_AND_DATE)) {
                     if (!getDataBlock(i).equals(dt)) {
                         return getDataBlock(i);
                     }

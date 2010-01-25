@@ -43,7 +43,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
@@ -285,7 +285,7 @@ public class VariableDataBlockDecoder {
 
     private void decodeEnhancedIdentificationDataBlock() {
         final EnhancedIdentificationDataBlock b = (EnhancedIdentificationDataBlock) db;
-        b.setMedium(MBusMedium.StdMedium.valueOf(stack.popByte()));
+        b.setMedium(MBusMedium.valueOf(stack.popByte()));
         b.setVersion(stack.popByte());
         b.setMan(stack.popMan());
         b.setId(stack.popBcdInteger(8));
@@ -300,7 +300,12 @@ public class VariableDataBlockDecoder {
                 ((ByteDataBlock) db).setValue(stack.popByte());
                 break;
             case _2_DIGIT_BCD:
-                ((ByteDataBlock) db).setValue(stack.popBcdByte());
+                ((ByteDataBlock) db).setBcdError(stack.peekBcdError(2));
+                if (((ByteDataBlock) db).getBcdError() != null) {
+                    stack.popBcdByte();
+                } else {
+                    ((ByteDataBlock) db).setValue(stack.popBcdByte());
+                }
                 break;
             case _16_BIT_INTEGER:
                 if (db instanceof DateDataBlock) {
@@ -310,13 +315,23 @@ public class VariableDataBlockDecoder {
                 }
                 break;
             case _4_DIGIT_BCD:
-                ((ShortDataBlock) db).setValue(stack.popBcdShort(4));
+                ((ShortDataBlock) db).setBcdError(stack.peekBcdError(4));
+                if (((ShortDataBlock) db).getBcdError() != null) {
+                    stack.popBcdShort(4);
+                } else {
+                    ((ShortDataBlock) db).setValue(stack.popBcdShort(4));
+                }
                 break;
             case _24_BIT_INTEGER:
                 ((IntegerDataBlock) db).setValue(stack.popInteger(3));
                 break;
             case _6_DIGIT_BCD:
-                ((IntegerDataBlock) db).setValue(stack.popBcdInteger(6));
+                ((IntegerDataBlock) db).setBcdError(stack.peekBcdError(6));
+                if (((IntegerDataBlock) db).getBcdError() != null) {
+                    stack.popBcdInteger(6);
+                } else {
+                    ((IntegerDataBlock) db).setValue(stack.popBcdInteger(6));
+                }
                 break;
             case _32_BIT_INTEGER:
                 if (db instanceof DateAndTimeDataBlock) {
@@ -335,7 +350,12 @@ public class VariableDataBlockDecoder {
                 if (db instanceof EnhancedIdentificationDataBlock) {
                     ((EnhancedIdentificationDataBlock) db).setId(stack.popBcdInteger(8));
                 } else {
-                    ((IntegerDataBlock) db).setValue(stack.popBcdInteger(8));
+                    ((IntegerDataBlock) db).setBcdError(stack.peekBcdError(8));
+                if (((IntegerDataBlock) db).getBcdError() != null) {
+                    stack.popBcdInteger(8);
+                } else {
+                        ((IntegerDataBlock) db).setValue(stack.popBcdInteger(8));
+                }
                 }
                 break;
             case _32_BIT_REAL:
@@ -345,7 +365,12 @@ public class VariableDataBlockDecoder {
                 ((LongDataBlock) db).setValue(stack.popLong(6));
                 break;
             case _12_DIGIT_BCD:
-                ((LongDataBlock) db).setValue(stack.popBcdLong(12));
+                ((LongDataBlock) db).setBcdError(stack.peekBcdError(12));
+                  if (((LongDataBlock) db).getBcdError() != null) {
+                    stack.popBcdInteger(12);
+                } else {
+                    ((LongDataBlock) db).setValue(stack.popBcdLong(12));
+                }
                 break;
             case _64_BIT_INTEGER:
                 if (db instanceof EnhancedIdentificationDataBlock) {
@@ -396,7 +421,7 @@ public class VariableDataBlockDecoder {
                 setState(DecodeState.VIFE_FD);
                 return;
             case 0x7E:
-                db.setVif(VifStd.READOUT_SELECTION);
+                db.setVif(VifPrimary.READOUT_SELECTION);
                 break;
             case 0x7F:
                 db.setVif(new VifManufacturerSpecific(b));
@@ -406,12 +431,12 @@ public class VariableDataBlockDecoder {
                 }
                 break;
             default:
-                db.setVif(VifStd.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
+                db.setVif(VifPrimary.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
                 if (UnitOfMeasurement.DATE.equals(db.getUnitOfMeasurement())) {
                     db = new DateDataBlock(db);
                 } else if (UnitOfMeasurement.TIME_AND_DATE.equals(db.getUnitOfMeasurement())) {
                     db = new DateAndTimeDataBlock(db);
-                } else if (VifStd.ENHANCED_IDENTIFICATION_RECORD.equals(db.getVif())) {
+                } else if (VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals(db.getVif())) {
                     db = new EnhancedIdentificationDataBlock(db);
                 }
         }

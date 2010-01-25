@@ -1,7 +1,7 @@
 {
  "controlCode": "RSP_UD",
  "manufacturer": "ACW",
- "medium": "Heat/outlet",
+ "medium": "Heat",
  "version": 11,
  "identNumber": 9803784,
  "address": 0,
