@@ -1,6 +1,6 @@
 68040468080170017A16
 control code = RSP_UD
 isAcd = false
-isDcf = false
+isDfc = false
 address = 0x01
 error = unimplemented ci-field

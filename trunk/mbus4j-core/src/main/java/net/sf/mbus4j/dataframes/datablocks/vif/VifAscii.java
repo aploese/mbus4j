@@ -22,14 +22,16 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class AsciiVif implements Vif {
+public class VifAscii implements Vif {
+
+    public final static String ASCII = "ascii";
 
     private String value;
 
-    public AsciiVif() {
+    public VifAscii() {
     }
 
-    public AsciiVif(String value) {
+    public VifAscii(String value) {
         this.value = value;
     }
 
@@ -68,8 +70,8 @@ public class AsciiVif implements Vif {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof AsciiVif) {
-            return value.equals(((AsciiVif)o).value);
+        if (o instanceof VifAscii) {
+            return value.equals(((VifAscii)o).value);
         } else {
             return false;
         }
@@ -80,5 +82,10 @@ public class AsciiVif implements Vif {
         int hash = 5;
         hash = 97 * hash + (this.value != null ? this.value.hashCode() : 0);
         return hash;
+    }
+
+    @Override
+    public String getVifTypeName() {
+        return ASCII;
     }
 }

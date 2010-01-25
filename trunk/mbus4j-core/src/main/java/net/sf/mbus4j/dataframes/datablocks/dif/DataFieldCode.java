@@ -44,16 +44,29 @@ public enum DataFieldCode {
     SPECIAL_FUNCTION_IDLE_FILLER(0x2f, "Special Function Idle filler"),
     // 3,4,5,6 reserved
     SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST(0x7f, "Special Function Global readout request");
-    private final String userFrendlyName;
+    private final String label;
     public final byte code;
 
     private DataFieldCode(int code, String name) {
-        this.userFrendlyName = name;
+        this.label = name;
         this.code = (byte) code;
     }
 
     @Override
     public String toString() {
-        return userFrendlyName;
+        return label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static DataFieldCode fromLabel(String label) {
+        for (DataFieldCode value : values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

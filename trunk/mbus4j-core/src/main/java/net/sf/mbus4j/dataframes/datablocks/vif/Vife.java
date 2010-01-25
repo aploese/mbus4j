@@ -38,5 +38,6 @@ public interface Vife {
     public final static String UPPER = "upper";
 
     String getLabel();
-
+    String getVifeTypeName();
+    
 }

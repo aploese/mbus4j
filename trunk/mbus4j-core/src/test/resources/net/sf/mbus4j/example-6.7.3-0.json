@@ -1,0 +1,29 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "PAD",
+ "medium": "Water",
+ "version": 1,
+ "identNumber": 12345678,
+ "address": 2,
+ "accessNumber": 19,
+ "acd": false,
+ "dfc": false,
+ "signature": 0,
+ "status": ["No application error"],
+ "dataBlocks": [ {
+  "drh":   {
+   "dib":    {
+    "dataFieldCode": "8 digit BCD",
+    "functionField": "Instantaneous value",
+    "storageNumber": 0,
+    "subUnit": 0,
+    "tariff": 0
+   },
+   "vib": {"vif":    {
+    "vifType": "primary",
+    "description": "Fabrication No"
+   }}
+  },
+  "data": 1020304
+ }]
+}

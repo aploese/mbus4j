@@ -25,7 +25,6 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -135,6 +134,8 @@ public enum VifeStd implements Vife {
     FUTUR_VALUE("future value"),
     MAN_SPEC("next VIFE's and data of this block are manufacturer specific");
 
+    public final static String PRIMARY = "primary";
+
     public static VifeStd valueOfTableIndex(byte ordinal) {
         if (map == null) {
             map = new HashMap<Byte, VifeStd>(values().length);
@@ -183,4 +184,20 @@ public enum VifeStd implements Vife {
     public String getLabel() {
         return label;
     }
+
+    @Override
+    public String getVifeTypeName() {
+        return PRIMARY;
+    }
+
+    public static VifeStd fromLabel(String label) {
+        for (VifeStd value : values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
+    }
+
+
 }

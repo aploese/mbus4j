@@ -18,7 +18,9 @@
 package net.sf.mbus4j.dataframes.datablocks;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
@@ -176,5 +178,39 @@ public class DateAndTimeDataBlock extends DataBlock {
         sb.append(inset).append("res1 = ").append(res1).append("\n");
         sb.append(inset).append("res2 = ").append(res2).append("\n");
         sb.append(inset).append("res3 = ").append(res3).append("\n");
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+        if (!isTemplate) {
+            DateFormat df = DateFormat.getDateTimeInstance();
+            JSONObject jsonValue = new JSONObject();
+            jsonValue.accumulate("timestamp", df.format(value));
+            jsonValue.accumulate("summertime", summerTime);
+            jsonValue.accumulate("valid", valid);
+            jsonValue.accumulate("res1", res1);
+            jsonValue.accumulate("res2", res2);
+            jsonValue.accumulate("res3", res3);
+            result.accumulate("data", jsonValue);
+        }
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+            super.fromJSON(json);
+        try {
+            JSONObject jsonValue = json.getJSONObject("data");
+            valid = jsonValue.getBoolean("valid");
+            summerTime = jsonValue.getBoolean("summertime");
+            res1 = jsonValue.getBoolean("res1");
+            res2 = jsonValue.getBoolean("res2");
+            res3 = jsonValue.getBoolean("res3");
+            DateFormat df = DateFormat.getDateTimeInstance();
+            value = df.parse(jsonValue.getString("timestamp"));
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

@@ -1,0 +1,120 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "REL",
+ "medium": "Heat Cost Allocator",
+ "version": 64,
+ "identNumber": 13131313,
+ "address": 1,
+ "accessNumber": 7,
+ "acd": false,
+ "dfc": false,
+ "signature": 0,
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Units for H.C.A."
+    }}
+   },
+   "data": 1000
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "09.12.2000 00:13:00",
+    "summertime": false,
+    "valid": false,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "Date"
+    }}
+   },
+   "data": {"date": "20.11.2000"}
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Units for H.C.A."
+    }}
+   },
+   "data": 1000
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Time Point",
+      "unitOfMeasurement": "Date"
+     },
+     "vifes": [     {
+      "vifeType": "primary",
+      "name": "future value"
+     }]
+    }
+   },
+   "data": {"date": "31.12.2000"}
+  },
+    {
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
+   "data":    [
+    -128,
+    1,
+    1,
+    12
+   ]
+  }
+ ]
+}

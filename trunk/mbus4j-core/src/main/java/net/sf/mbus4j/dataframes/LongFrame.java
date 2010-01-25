@@ -32,6 +32,4 @@ public interface LongFrame extends Frame, PrimaryAddress, Iterable<DataBlock>  {
 
     void replaceDataBlock(DataBlock oldDataBlock, DataBlock newDataBlock);
 
-    void setLastPackage(boolean isLastPackage);
-
 }

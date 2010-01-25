@@ -1,0 +1,72 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "PAD",
+ "medium": "Water",
+ "version": 1,
+ "identNumber": 12345678,
+ "address": 2,
+ "accessNumber": 85,
+ "acd": false,
+ "dfc": false,
+ "signature": 0,
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 12565
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 5,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume Flow",
+     "unitOfMeasurement": "l/h",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 113
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 2
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 21837
+  }
+ ]
+}

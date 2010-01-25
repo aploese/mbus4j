@@ -17,6 +17,7 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 
@@ -26,6 +27,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  * @version $Id$
  */
 public class StringDataBlock extends DataBlock {
+    public final static String STRING = "string";
 
     private String data;
 
@@ -52,5 +54,20 @@ public class StringDataBlock extends DataBlock {
 
     public void setValue(String data) {
         this.data = data;
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+        if (!isTemplate) {
+            result.accumulate("data", getValue());
+        }
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        setValue(json.getString("data"));
     }
 }

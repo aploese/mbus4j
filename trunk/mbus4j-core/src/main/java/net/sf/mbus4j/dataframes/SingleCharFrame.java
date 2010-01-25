@@ -17,6 +17,8 @@
  */
 package net.sf.mbus4j.dataframes;
 
+import net.sf.json.JSONObject;
+
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -29,6 +31,16 @@ public interface SingleCharFrame extends Frame {
         @Override
         public ControlCode getControlCode() {
             return ControlCode.CON_ACK;
+        }
+
+        @Override
+        public JSONObject toJSON(boolean isTemplate) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void fromJSON(JSONObject json) {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
     public final static SingleCharFrame SINGLE_CHAR_FRAME = new SingleCharFrameImpl();

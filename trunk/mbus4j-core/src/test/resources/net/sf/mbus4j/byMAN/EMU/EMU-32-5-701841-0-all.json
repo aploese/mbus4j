@@ -1,0 +1,621 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "EMU",
+ "medium": "Unknown ID (0x20)",
+ "version": 5,
+ "identNumber": 701841,
+ "address": 20,
+ "accessNumber": 30,
+ "acd": false,
+ "dfc": false,
+ "signature": 0,
+ "status": ["Any application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "11.04.2007 18:51:00",
+    "summertime": false,
+    "valid": true,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "On Time",
+     "unitOfMeasurement": "h"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 400
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Too many DIFE's"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Storage number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Unit number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Too many DIFE's"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Storage number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Unit number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Maximum value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 2570
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Too many DIFE's"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Storage number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Unit number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Too many DIFE's"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Storage number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "primary",
+       "name": "next VIFE's and data of this block are manufacturer specific"
+      },
+            {
+       "vifeType": "error",
+       "name": "Unit number not implemented"
+      }
+     ]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "manufacturer specific",
+     "code": -1,
+     "vifes": [82]
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "manufacturer specific",
+     "code": -1,
+     "vifes":      [
+      -31,
+      -1,
+      1
+     ]
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "manufacturer specific",
+     "code": -1,
+     "vifes":      [
+      -31,
+      -1,
+      2
+     ]
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "manufacturer specific",
+     "code": -1,
+     "vifes":      [
+      -31,
+      -1,
+      3
+     ]
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Reset counter"
+    }}
+   },
+   "data": 1
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Error flags (binary)"
+    }}
+   },
+   "data": 48
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "11.04.2007 15:06:00",
+    "summertime": false,
+    "valid": true,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
+  }
+ ]
+}

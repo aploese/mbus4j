@@ -46,8 +46,8 @@ import net.sf.mbus4j.dataframes.datablocks.RawDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifStd;
@@ -549,12 +549,12 @@ public class Encoder {
             data[currentPos++] = (byte) 0xFD;
             data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
             data[currentPos++] |= ((VifFD) db.getVif()).getTableIndex();
-        } else if (db.getVif() instanceof AsciiVif) {
+        } else if (db.getVif() instanceof VifAscii) {
             data[currentPos++] = (byte) (needVIFE(db, 0) ? 0xFC : 0x7C);
-            pushString(((AsciiVif) db.getVif()).getValue());
-        } else if (db.getVif() instanceof ManufacturerSpecificVif) {
+            pushString(((VifAscii) db.getVif()).getValue());
+        } else if (db.getVif() instanceof VifManufacturerSpecific) {
             data[currentPos++] = (byte) 0xFF;
-            pushBytes(((ManufacturerSpecificVif) db.getVif()).getVifes());
+            pushBytes(((VifManufacturerSpecific) db.getVif()).getVifes());
         } else {
             throw new RuntimeException("Unknown vif " + db.getVif());
         }

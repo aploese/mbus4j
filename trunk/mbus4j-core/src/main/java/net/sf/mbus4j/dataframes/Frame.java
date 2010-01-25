@@ -17,12 +17,14 @@
  */
 package net.sf.mbus4j.dataframes;
 
+import net.sf.mbus4j.json.JSONSerializable;
+
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public interface Frame {
+public interface Frame extends JSONSerializable {
 
     public static enum ControlCode {
 
@@ -41,4 +43,5 @@ public interface Frame {
 //    void setFirstByteTimeStamp(long timestamp);
 //    long getLastByteTimeStamp();
 //    void setLastByteTimeStamp(long timestamp);
+
 }

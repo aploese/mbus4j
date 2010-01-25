@@ -63,14 +63,30 @@ public enum UnitOfMeasurement {
     KELVIN("K"),
     BAR("bar"),
     DATE("Date");
-    private final String name;
+    private final String label;
 
-    private UnitOfMeasurement(String name) {
-        this.name = name;
+    private UnitOfMeasurement(String label) {
+        this.label = label;
     }
 
     @Override
     public String toString() {
-        return name;
+        return label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static UnitOfMeasurement fromLabel(String label) {
+        if (label == null) {
+            return null;
+        }
+        for (UnitOfMeasurement value : values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

@@ -36,14 +36,33 @@ public enum SiPrefix {
     KILO("k"),
     MEGA("M"),
     GIGA("G");
-    private final String userFriendlyName;
+    private final String label;
 
-    private SiPrefix(String userFriendlyName) {
-        this.userFriendlyName = userFriendlyName;
+    private SiPrefix(String label) {
+        this.label = label;
     }
 
     @Override
     public String toString() {
-        return userFriendlyName;
+        return label;
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    public static SiPrefix fromLabel(String label) {
+        if (label == null) {
+            return null;
+        }
+        for (SiPrefix value : values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

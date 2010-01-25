@@ -48,15 +48,28 @@ public enum ObjectAction {
         return null;
     }
     public final int id;
-    private final String aname;
+    private final String label;
 
-    private ObjectAction(int id, String aname) {
+    private ObjectAction(int id, String label) {
         this.id = id;
-        this.aname = aname;
+        this.label = label;
     }
 
     @Override
     public String toString() {
-        return aname;
+        return label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public static ObjectAction fromLabel(String label) {
+        for (ObjectAction value: values()) {
+            if (value.label.equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -33,6 +34,7 @@ import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
+import net.sf.mbus4j.json.JSONFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -56,9 +58,9 @@ public class MBusDocumentationExamplesTest {
     }
     private Decoder instance;
 
-    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
+    private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws Exception {
         System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
-        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
+        InputStream is = MBusDocumentationExamplesTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
         final byte[] data = Decoder.ascii2Bytes(br.readLine());
@@ -68,6 +70,7 @@ public class MBusDocumentationExamplesTest {
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
         assertNotNull("DataValue not available", instance.getFrame());
         assertEquals(clazz, instance.getFrame().getClass());
+        testJSON(instance.getFrame(), chapter, exampleIndex);
 //        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
         BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
         int line = 1;
@@ -187,4 +190,30 @@ public class MBusDocumentationExamplesTest {
         }
         assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());
     }
+
+        private void testJSON(Frame frame, String chapter, int exampleIndex) throws Exception {
+        JSONObject json = frame.toJSON(false);
+//        System.out.println(json.toString(1));
+        Frame jsonFrame = JSONFactory.createFrame(json);
+        jsonFrame.fromJSON(json);
+        assertEquals("JSON Serializing of " + chapter + " " + exampleIndex, frame.toString(), jsonFrame.toString());
+
+        InputStream is = MBusDocumentationExamplesTest.class.getResourceAsStream(String.format("../example-%s-%d.json", chapter, exampleIndex));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader resultStr = new BufferedReader(new StringReader(json.toString(1)));
+        int line = 0;
+        String dataLine = br.readLine();
+        String parsedLine = resultStr.readLine();
+        while (parsedLine != null && dataLine != null) {
+            line++;
+            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
+            dataLine = br.readLine();
+            parsedLine = resultStr.readLine();
+        }
+        br.close();
+        resultStr.close();
+
+        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
+   }
+
 }

@@ -24,19 +24,20 @@ import java.util.Arrays;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class ManufacturerSpecificVif implements Vif {
+public class VifManufacturerSpecific implements Vif {
+    public static final String MANUFACTURER_SPECIFIC = "manufacturer specific";
 
     public static boolean isManufacturerSecific(String label) {
         return label.startsWith("Manufacturer specific coding including VIFE's (VIF == 0x");
     }
 
-    public static ManufacturerSpecificVif fromString(String label) {
+    public static VifManufacturerSpecific fromLabel(String label) {
         if (!isManufacturerSecific(label)) {
             throw new IllegalArgumentException("label is no man. spec. data !");
         }
 
         String[] splitted = label.split("0x");
-        ManufacturerSpecificVif result = new ManufacturerSpecificVif(Byte.parseByte(splitted[1].substring(0, 2), 16));
+        VifManufacturerSpecific result = new VifManufacturerSpecific((byte)Short.parseShort(splitted[1].substring(0, 2), 16));
         for (int i = 2; i < splitted.length; i++) {
             result.addVIFE(Byte.parseByte(splitted[i].substring(0, 2)));
         }
@@ -46,7 +47,7 @@ public class ManufacturerSpecificVif implements Vif {
     private byte[] vifes;
     final byte vife;
 
-    public ManufacturerSpecificVif(byte b) {
+    public VifManufacturerSpecific(byte b) {
         vife = b;
         vifes = new byte[0];
     }
@@ -83,6 +84,10 @@ public class ManufacturerSpecificVif implements Vif {
         return vifes;
     }
 
+    public byte getVife() {
+        return vife;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -96,10 +101,15 @@ public class ManufacturerSpecificVif implements Vif {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof ManufacturerSpecificVif)) {
+        if (!(other instanceof VifManufacturerSpecific)) {
             return false;
         }
-        ManufacturerSpecificVif o = (ManufacturerSpecificVif)other;
+        VifManufacturerSpecific o = (VifManufacturerSpecific)other;
         return vife == o.vife && Arrays.equals(vifes, o.vifes);
+    }
+
+    @Override
+    public String getVifTypeName() {
+        return MANUFACTURER_SPECIFIC;
     }
 }

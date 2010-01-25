@@ -20,8 +20,11 @@ package net.sf.mbus4j.dataframes;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.json.JSONFactory;
 
 /**
  *
@@ -30,13 +33,16 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  */
 public class SendUserData implements LongFrame {
 
+    public static String SEND_USER_DATA_SUBTYPE = "send user data";
     private List<DataBlock> dataBlocks = new ArrayList<DataBlock>();
     private byte address;
     private boolean fcb;
-    private boolean lastPackage;
 
     public SendUserData(boolean fcb) {
         this.fcb = fcb;
+    }
+
+    public SendUserData() {
     }
 
     @Override
@@ -85,11 +91,6 @@ public class SendUserData implements LongFrame {
     }
 
     @Override
-    public void setLastPackage(boolean isLastPackage) {
-        lastPackage = isLastPackage;
-    }
-
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
@@ -100,5 +101,34 @@ public class SendUserData implements LongFrame {
             dataBlocks.get(i).toString(sb, "  ");
         }
         return sb.toString();
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = new JSONObject();
+        result.accumulate("controlCode", getControlCode());
+        result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
+        result.accumulate("fcb", isFcb());
+        result.accumulate("address", address & 0xFF);
+        JSONArray jsonDataBlocks = new JSONArray();
+        for (DataBlock db : this) {
+            jsonDataBlocks.add(db.toJSON(isTemplate));
+        }
+        result.accumulate("dataBlocks", jsonDataBlocks);
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        fcb = json.getBoolean("fcb");
+        address = (byte)json.getInt("address");
+
+        JSONArray jsonDataBlocks = json.getJSONArray("dataBlocks");
+            for (int i = 0; i < jsonDataBlocks.size(); i++) {
+                DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
+                db.fromJSON(jsonDataBlocks.getJSONObject(i));
+                addDataBlock(db);
+            }
+
     }
 }

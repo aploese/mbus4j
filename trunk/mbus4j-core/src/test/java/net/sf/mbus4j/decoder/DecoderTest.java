@@ -9,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
@@ -67,8 +67,8 @@ public class DecoderTest {
         for (Vif vif : VifFD.values()) {
             list.add(vif);
         }
-        list.add(new AsciiVif("ASCII VIF"));
-        list.add(new ManufacturerSpecificVif((byte)0x00));
+        list.add(new VifAscii("ASCII VIF"));
+        list.add(new VifManufacturerSpecific((byte)0x00));
         for (Vif vif : list) {
             Vif v = Decoder.getVif(vif.getLabel(), vif.getUnitOfMeasurement() == null ? null : vif.getUnitOfMeasurement().name(), vif.getSiPrefix() == null ? null : vif.getSiPrefix().name(), vif.getExponent());
 
