@@ -1,0 +1,8 @@
+{
+ "controlCode": "SND_UD",
+ "subType": "application reset",
+ "fcb": false,
+ "address": 254,
+ "telegramType": "User data",
+ "subTelegram": 0
+}

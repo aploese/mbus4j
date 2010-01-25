@@ -25,8 +25,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.json.JSONFactory;
 
 /**
  *
@@ -34,6 +38,65 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  * @version $Id$
  */
 public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = new JSONObject();
+                    result.accumulate("controlCode", getControlCode());
+            result.accumulate("manufacturer", getManufacturer());
+            result.accumulate("medium", getMedium().getLabel());
+            result.accumulate("version", getVersion());
+            if (!isTemplate) {
+            result.accumulate("identNumber", getIdentNumber());
+            result.accumulate("address", getAddress() & 0xFF);
+            result.accumulate("accessNumber", getAccessNumber());
+            result.accumulate("acd", isAcd());
+            result.accumulate("dfc", isDfc());
+            result.accumulate("signature", getSignature());
+            JSONArray jsonStatusArray = new JSONArray();
+            for (StatusCode st : getStatus()) {
+                jsonStatusArray.add(st.getLabel());
+            }
+            result.accumulate("status", jsonStatusArray);
+            }
+            JSONArray jsonDataBlocks = new JSONArray();
+            for (DataBlock db: this) {
+                jsonDataBlocks.add(db.toJSON(isTemplate));
+            }
+            result.accumulate("dataBlocks", jsonDataBlocks);
+            return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+            setManufacturer(json.getString("manufacturer"));
+            setMedium(MBusMedium.StdMedium.fromLabel(json.getString("medium")));
+            setVersion((byte)json.getInt("version"));
+            setIdentNumber(json.getInt("identNumber"));
+            setAddress(json.containsKey("address") ? (byte)json.getInt("address") : 0);
+            setAccessNumber(json.containsKey("accessNumber") ? (short)json.getInt("accessNumber") : 0);
+            setAcd(json.containsKey("acd") ? json.getBoolean("acd") : false);
+            setDfc(json.containsKey("dfc") ? json.getBoolean("dfc") : false);
+            setSignature(json.containsKey("signature") ? (short)json.getInt("signature") : 0);
+            if (json.containsKey("status")) {
+                JSONArray statusArray = json.getJSONArray("status");
+                if (statusArray.size() == 0) {
+                    setStatus(new StatusCode[0]);
+                } else {
+                    status = new StatusCode[statusArray.size()];
+                    for (int i = 0; i < status.length; i++) {
+                        status[i] = StatusCode.fromLabel(statusArray.getString(i));
+                    }
+                }
+            }
+            
+            JSONArray jsonDataBlocks = json.getJSONArray("dataBlocks");
+            for (int i = 0; i < jsonDataBlocks.size(); i++) {
+                DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
+                db.fromJSON(jsonDataBlocks.getJSONObject(i));
+                addDataBlock(db);
+            }
+    }
 
     public static enum StatusCode {
         // Taken from Chapter 6.6 Fig 27
@@ -58,19 +121,32 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
             return result;
         }
         public final byte id;
-        private final String description;
+        private final String label;
 
         private StatusCode(int id, String description) {
             this.id = (byte) id;
-            this.description = description;
+            this.label = description;
         }
 
         @Override
         public String toString() {
-            return description;
+            return label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public static StatusCode fromLabel(String label) {
+            for (StatusCode value : values()) {
+                if (value.getLabel().equals(label)) {
+                    return value;
+                }
+            }
+            return valueOf(label);
         }
     }
-    private boolean lastPackage = true;
+
     private boolean acd;
     private boolean dfc;
     private byte version;
@@ -199,7 +275,7 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
      * @return
      */
     public boolean isLastPackage() {
-        return lastPackage;
+        return !DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS.equals(getLastDataBlock().getDataFieldCode());
     }
 
     @Override
@@ -244,11 +320,6 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         this.identNumber = identNumber;
     }
 
-    @Override
-    public void setLastPackage(boolean lastPackage) {
-        this.lastPackage = lastPackage;
-    }
-
     public void setManufacturer(String manufacturer) {
         this.manufacturer = manufacturer;
     }
@@ -269,65 +340,12 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         this.version = version;
     }
 
-    public String toJavaClassString() throws IOException {
-        InputStream is = UserDataResponse.class.getResourceAsStream(
-                "MBusMedium.template");
-        InputStreamReader isr = new InputStreamReader(is);
-        BufferedReader br = new BufferedReader(isr);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        String classname = getManufacturer() + "_" + getMedium() + "_V_" +
-                getVersion();
-        while (null != (line = br.readLine())) {
-            if (line.indexOf("$classname$") > 0) {
-                sb.append(line.replace("$classname$", classname));
-                sb.append('\n');
-            } else if (line.indexOf("$manufactor$") > 0) {
-                sb.append(line.replace("$manufactor$", getManufacturer()));
-                sb.append('\n');
-            } else if (line.indexOf("$medium$") > 0) {
-                sb.append(line.replace("$medium$", getMedium().toString()));
-                sb.append('\n');
-            } else if (line.indexOf("$version$") > 0) {
-                sb.append(line.replace("$version$", Integer.toString(
-                        getVersion())));
-                sb.append('\n');
-            } else if (line.indexOf("$blockcount$") > 0) {
-                sb.append(line.replace("$blockcount$", Integer.toString(
-                        dataBlocks.size())));
-                sb.append('\n');
-            } else if (line.indexOf("$blockclass$") > 0) {
-                for (int i = 0; i < dataBlocks.size(); i++) {
-                    DataBlock db = dataBlocks.get(i);
-                    String blockLine;
-                    blockLine = line.replace("$index$", Integer.toString(i));
-                    blockLine = line.replace("$blockclass$", db.getClass().
-                            getSimpleName());
-                    blockLine = blockLine.replace("$paramDescription$", db.getParamDescr() != null ? db.getParamDescr() : "");
-                    blockLine = blockLine.replace("$unitOfMeasurement$", db.getUnitOfMeasurement() != null ? db.getUnitOfMeasurement().toString() : "");
-                    blockLine = blockLine.replace("$exponent$", db.getExponent() != null
-                            ? db.getExponent().toString() : "0");
-                    blockLine = blockLine.replace("$tariff$", Integer.toString(
-                            db.getTariff()));
-                    blockLine = blockLine.replace("$storageNo$", Long.toString(
-                            db.getStorageNumber()));
-                    sb.append(
-                            blockLine);
-                    sb.append('\n');
-                }
-            } else {
-                sb.append(line).append('\n');
-            }
-        }
-        return sb.toString();
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
         sb.append("isAcd = ").append(isAcd()).append('\n');
-        sb.append("isDcf = ").append(isDfc()).append('\n');
+        sb.append("isDfc = ").append(isDfc()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         sb.append(String.format("ident number = %08d\n", identNumber));
         sb.append("manufacturer = ").append(manufacturer).append('\n');

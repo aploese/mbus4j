@@ -173,6 +173,7 @@ public enum VifFB implements Vif {
     CUMUL_COUNT_MAX_POWER_W_E_2(CUMUL_COUNT_MAX_POWER, ONE, WATT, 2),
     CUMUL_COUNT_MAX_POWER_KILO_W_E_0(CUMUL_COUNT_MAX_POWER, KILO, WATT, 0),
     CUMUL_COUNT_MAX_POWER_KILO_W_E_1(CUMUL_COUNT_MAX_POWER, KILO, WATT, 1);
+    public final static String EXTENTION_FB = "extention FB";
 
     public static VifFB valueOfTableIndex(byte ordinal) {
         if (map == null) {
@@ -243,5 +244,19 @@ public enum VifFB implements Vif {
         } else {
             return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
         }
+    }
+
+    @Override
+    public String getVifTypeName() {
+        return EXTENTION_FB;
+    }
+
+    public static VifFB assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
+        for (VifFB value : values()) {
+            if (value.getLabel().equals(label) && ((unitOfMeasurement == value.getUnitOfMeasurement()) || ((unitOfMeasurement != null) && unitOfMeasurement.equals(value.getUnitOfMeasurement()))) && ((siPrefix == value.getSiPrefix()) || ((siPrefix != null) && siPrefix.equals(value.getSiPrefix()))) && ((exponent == value.getExponent()) || ((exponent != null) && exponent.equals(value.getExponent())))) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

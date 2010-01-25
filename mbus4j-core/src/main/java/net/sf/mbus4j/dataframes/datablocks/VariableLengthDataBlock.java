@@ -32,6 +32,7 @@ public class VariableLengthDataBlock extends DataBlock {
 
     @Override
     public String getValueAsString() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(); // TODO STRING / BYTES ....
     }
+
 }

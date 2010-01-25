@@ -17,6 +17,8 @@
  */
 package net.sf.mbus4j.dataframes;
 
+import net.sf.json.JSONObject;
+
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -59,5 +61,15 @@ public class SendInitSlave implements ShortFrame {
     @Override
     public void setFcv(boolean fcv) {
         throw new UnsupportedOperationException("set FCV not supported.");
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

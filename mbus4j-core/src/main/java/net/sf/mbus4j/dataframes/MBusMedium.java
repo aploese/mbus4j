@@ -83,6 +83,15 @@ public interface MBusMedium {
         public String getLabel() {
             return label;
         }
+
+        public static MBusMedium fromLabel(String label) {
+            for (StdMedium value : values()) {
+                if (value.getLabel().equals(label)) {
+                    return value;
+                }
+            }
+            return UnknownMBusMedium.fromLabel(label);
+        }
     }
 
     /** Something really bad happend... Someone dont take care of Specifications....
@@ -90,7 +99,7 @@ public interface MBusMedium {
      */
     public static class UnknownMBusMedium implements MBusMedium {
 
-        public static UnknownMBusMedium fromString(String label) {
+        public static UnknownMBusMedium fromLabel(String label) {
             String[] splitted = label.split("0x");
             return new UnknownMBusMedium(Integer.parseInt(splitted[1].substring(0, 2), 16));
         }

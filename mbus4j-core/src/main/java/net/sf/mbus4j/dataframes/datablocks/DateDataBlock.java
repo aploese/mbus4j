@@ -18,7 +18,9 @@
 package net.sf.mbus4j.dataframes.datablocks;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
@@ -58,5 +60,29 @@ public class DateDataBlock extends DataBlock {
      */
     public void setValue(Date value) {
         this.value = value;
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+        if (!isTemplate) {
+            DateFormat df = DateFormat.getDateInstance();
+            JSONObject jsonValue = new JSONObject();
+            jsonValue.accumulate("date", df.format(value));
+            result.accumulate("data", jsonValue);
+        }
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        try {
+            JSONObject jsonValue = json.getJSONObject("data");
+            DateFormat df = DateFormat.getDateInstance();
+            value = df.parse(jsonValue.getString("date"));
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

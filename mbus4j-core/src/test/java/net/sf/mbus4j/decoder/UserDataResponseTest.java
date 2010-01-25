@@ -17,16 +17,19 @@
  */
 package net.sf.mbus4j.decoder;
 
+import net.sf.mbus4j.dataframes.Frame;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.json.JSONFactory;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -120,7 +123,7 @@ public class UserDataResponseTest {
         testPackage(manufacturerId, String.format("%s-%s-%d-%d-%d-%s", manufacturerId, medium.name(), version, identNumber, packetIndex, comment));
     }
 
-    private void testPackage(final String man, final String deviceName) throws IOException {
+    private void testPackage(final String man, final String deviceName) throws Exception {
         System.out.println("testPackage: " + deviceName);
         InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../byMAN/%s/%s.txt", man, deviceName));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -136,6 +139,7 @@ public class UserDataResponseTest {
         }
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
         assertNotNull("DataValue not available", instance.getFrame());
+        testJSON(instance.getFrame(), man, deviceName);
         BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
         int line = 1;
         String dataLine = br.readLine();
@@ -216,4 +220,30 @@ public class UserDataResponseTest {
     public void testTCH_HEAT_OUTLET_38_21519982_1() throws Exception {
         testPackage("TCH", MBusMedium.StdMedium.HEAT_OUTLET, 38, 21519982, 1);
     }
+
+    private void testJSON(Frame frame, String man, String deviceName) throws Exception {
+        JSONObject json = frame.toJSON(false);
+//        System.out.println(json.toString(1));
+        Frame jsonFrame = JSONFactory.createFrame(json);
+        jsonFrame.fromJSON(json);
+        assertEquals("JSON Serializing of " + deviceName, frame.toString(), jsonFrame.toString());
+
+        InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../byMAN/%s/%s-all.json", man, deviceName));
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader resultStr = new BufferedReader(new StringReader(json.toString(1)));
+        int line = 0;
+        String dataLine = br.readLine();
+        String parsedLine = resultStr.readLine();
+        while (parsedLine != null && dataLine != null) {
+            line++;
+            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
+            dataLine = br.readLine();
+            parsedLine = resultStr.readLine();
+        }
+        br.close();
+        resultStr.close();
+
+        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
+   }
+
 }

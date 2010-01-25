@@ -56,7 +56,7 @@ public interface Vif {
     Integer getExponent();
 
     /**
-     * User friendly name for use in guis
+     * User friendly name
      * @return
      */
     String getLabel();
@@ -64,5 +64,11 @@ public interface Vif {
     SiPrefix getSiPrefix();
 
     UnitOfMeasurement getUnitOfMeasurement();
+
+    /**
+     * Name of the vif i.e. ascii, primary extention FB, extention FD
+     * @return
+     */
+    String getVifTypeName();
 
 }

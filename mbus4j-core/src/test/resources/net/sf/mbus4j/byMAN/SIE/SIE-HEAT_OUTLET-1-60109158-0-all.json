@@ -1,0 +1,426 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "SIE",
+ "medium": "Heat/outlet",
+ "version": 1,
+ "identNumber": 60109158,
+ "address": 0,
+ "accessNumber": 0,
+ "acd": false,
+ "dfc": false,
+ "signature": 0,
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "2 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Actually Duration",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 2
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "2 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Averaging Duration",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 2
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "k",
+     "exponent": 1
+    }}
+   },
+   "data": 360894
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 7717309
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 1331
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume Flow",
+     "unitOfMeasurement": "l/h",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 5860
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Flow Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 84
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Return Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 64
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Temperature Difference",
+     "unitOfMeasurement": "K",
+     "siPrefix": "",
+     "exponent": -1
+    }}
+   },
+   "data": 198
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 3369483
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "k",
+     "exponent": 1
+    }}
+   },
+   "data": 291478
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Fabrication No"
+    }}
+   },
+   "data": 60109158
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "2 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Averaging Duration",
+     "unitOfMeasurement": "min"
+    }}
+   },
+   "data": 60
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 3070
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 3048
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume Flow",
+     "unitOfMeasurement": "l/h",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 12480
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Flow Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 140
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Maximum value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Return Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 80
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "On Time",
+     "unitOfMeasurement": "d"
+    }}
+   },
+   "data": 1738
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Value during error state",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "On Time",
+     "unitOfMeasurement": "d"
+    }}
+   },
+   "data": 144
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Value during error state",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "On Time",
+     "unitOfMeasurement": "d"
+    }}
+   },
+   "data": 144
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "Date"
+    }}
+   },
+   "data": {"date": "01.01.2000"}
+  },
+    {
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
+   "data":    [
+    4,
+    1,
+    0,
+    0,
+    0
+   ]
+  }
+ ]
+}

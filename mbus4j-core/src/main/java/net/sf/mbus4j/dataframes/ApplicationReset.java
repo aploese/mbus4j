@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes;
 
 import java.util.Iterator;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
@@ -27,6 +28,30 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  * @version $Id$
  */
 public class ApplicationReset implements LongFrame {
+    public static String SEND_USER_DATA_SUBTYPE = "application reset";
+
+    public ApplicationReset() {
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = new JSONObject();
+        result.accumulate("controlCode", getControlCode());
+        result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
+        result.accumulate("fcb", isFcb());
+        result.accumulate("address", address & 0xFF);
+        result.accumulate("telegramType", getTelegramType().getLabel());
+        result.accumulate("subTelegram", getSubTelegram());
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        fcb = json.getBoolean("fcb");
+        address = (byte)json.getInt("address");
+        telegramType = TelegramType.fromLabel(json.getString("telegramType"));
+        subTelegram = json.getInt("subTelegram");
+    }
 
     public static enum TelegramType {
 
@@ -56,17 +81,31 @@ public class ApplicationReset implements LongFrame {
             return null;
         }
         final public byte id;
-        final public String sname;
+        final public String label;
 
-        TelegramType(int id, String sname) {
+        TelegramType(int id, String label) {
             this.id = (byte) id;
-            this.sname = sname;
+            this.label = label;
         }
 
         @Override
         public String toString() {
-            return sname;
+            return label;
         }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public static TelegramType fromLabel(String label) {
+            for (TelegramType value : values()) {
+                if (value.label.equals(label)) {
+                    return value;
+                }
+            }
+            return valueOf(label);
+        }
+
     }
     private byte address;
     private boolean fcb;
@@ -154,11 +193,6 @@ public class ApplicationReset implements LongFrame {
 
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
-    }
-
-    @Override
-    public void setLastPackage(boolean isLastPackage) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**

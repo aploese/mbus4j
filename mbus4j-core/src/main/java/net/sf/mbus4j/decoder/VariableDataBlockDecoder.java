@@ -37,8 +37,8 @@ import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.VariableLengthDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
@@ -97,7 +97,7 @@ public class VariableDataBlockDecoder {
                 setState(DecodeState.ASCII_VIF_COLLECT);
                 break;
             case COLLECT_MANUFACTURER_SPECIFIC_VIFE:
-                ((ManufacturerSpecificVif) db.getVif()).addVIFE(b);
+                ((VifManufacturerSpecific) db.getVif()).addVIFE(b);
                 if ((b & Decoder.EXTENTIONS_BIT) == 0x00) {
                     startCollectingValue();
                 }
@@ -105,7 +105,7 @@ public class VariableDataBlockDecoder {
             case ASCII_VIF_COLLECT:
                 stack.push(b);
                 if (stack.isFull()) {
-                    ((AsciiVif) db.getVif()).setValue(stack.popString());
+                    ((VifAscii) db.getVif()).setValue(stack.popString());
                     startCollectingValue();
                 }
                 break;
@@ -222,7 +222,6 @@ public class VariableDataBlockDecoder {
                 } else {
                     startCollectingValue(bytesLeft);
                 }
-                frame.setLastPackage(false);
                 return;
             case 0x2F:
                 // Skip idlefiller next byte is DIF
@@ -389,7 +388,7 @@ public class VariableDataBlockDecoder {
                 return;
             case 0x7C:
                 stack.clear();
-                db.setVif(new AsciiVif());
+                db.setVif(new VifAscii());
                 setState(DecodeState.ASCII_VIF_LENGTH);
                 return;
             case 0x7D:
@@ -400,7 +399,7 @@ public class VariableDataBlockDecoder {
                 db.setVif(VifStd.READOUT_SELECTION);
                 break;
             case 0x7F:
-                db.setVif(new ManufacturerSpecificVif(b));
+                db.setVif(new VifManufacturerSpecific(b));
                 if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
                     setState(DecodeState.COLLECT_MANUFACTURER_SPECIFIC_VIFE);
                     return;

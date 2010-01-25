@@ -20,6 +20,7 @@ package net.sf.mbus4j.dataframes;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.encoder.Encoder;
@@ -116,11 +117,6 @@ public class SelectionOfSlaves implements LongFrame {
     @Override
     public void setAddress(byte address) {
         this.address = address;
-    }
-
-    @Override
-    public void setLastPackage(boolean isLastPackage) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -229,6 +225,16 @@ public class SelectionOfSlaves implements LongFrame {
             hexBcdVersion >>= 4;
         }
         return true;
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

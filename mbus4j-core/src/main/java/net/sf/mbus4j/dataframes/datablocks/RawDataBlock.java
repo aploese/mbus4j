@@ -17,6 +17,8 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 
 /**
@@ -70,5 +72,30 @@ public class RawDataBlock extends DataBlock {
     public void toString(StringBuilder sb, String inset) {
         sb.append(inset).append("dataType = ").append(getDataFieldCode()).append("\n");
         sb.append(inset).append("value = ").append(getValueAsString()).append("\n");
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+        if (!isTemplate) {
+            JSONArray jsonValues = new JSONArray();
+            if (getValue() != null) {
+                for (byte b : getValue()) {
+                    jsonValues.add(b);
+                }
+            }
+            result.accumulate("data", jsonValues);
+        }
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        JSONArray jsonValues = json.getJSONArray("data");
+        value = new byte[jsonValues.size()];
+        for (int i = 0; i < value.length; i++) {
+            value[i] = (byte) jsonValues.getInt(i);
+        }
     }
 }

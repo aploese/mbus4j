@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes;
 
 import java.util.Iterator;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
@@ -27,6 +28,27 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  * @version $Id$
  */
 public class GeneralApplicationError implements LongFrame, PrimaryAddress {
+    public static String RSP_UD_SUBTYPE = "general application error";
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+         JSONObject result = new JSONObject();
+        result.accumulate("controlCode", getControlCode());
+        result.accumulate("subType", RSP_UD_SUBTYPE);
+        result.accumulate("acd", isAcd());
+        result.accumulate("dfc", isDfc());
+        result.accumulate("address", address & 0xFF);
+        result.accumulate("error", error.getLabel());
+        return result;
+   }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        acd = json.getBoolean("acd");
+        dfc = json.getBoolean("dfc");
+        address = (byte)json.getInt("address");
+        error = GeneralApplicationErrorEnum.fromLabel(json.getString("error"));
+    }
 
     public static enum GeneralApplicationErrorEnum {
 
@@ -50,17 +72,31 @@ public class GeneralApplicationError implements LongFrame, PrimaryAddress {
             return null;
         }
         public final byte id;
-        private final String ename;
+        private final String label;
 
-        private GeneralApplicationErrorEnum(int id, String ename) {
+        private GeneralApplicationErrorEnum(int id, String label) {
             this.id = (byte) id;
-            this.ename = ename;
+            this.label = label;
         }
 
         @Override
         public String toString() {
-            return ename;
+            return label;
         }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public static GeneralApplicationErrorEnum fromLabel(String label) {
+            for (GeneralApplicationErrorEnum value : values()) {
+                if (value.label.equals(label)) {
+                    return value;
+                }
+            }
+            return valueOf(label);
+        }
+        
     }
     private boolean acd;
     private boolean dfc;
@@ -181,16 +217,11 @@ public class GeneralApplicationError implements LongFrame, PrimaryAddress {
     }
 
     @Override
-    public void setLastPackage(boolean isLastPackage) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
         sb.append("isAcd = ").append(isAcd()).append('\n');
-        sb.append("isDcf = ").append(isDfc()).append('\n');
+        sb.append("isDfc = ").append(isDfc()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         sb.append("error = ").append(error).append('\n');
         return sb.toString();

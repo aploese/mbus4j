@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes.datablocks;
 
 import java.math.BigDecimal;
+import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 
@@ -28,7 +29,7 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
  */
 public class BigDecimalDataBlock extends DataBlock {
 
-    BigDecimal value;
+    private BigDecimal value;
 
     public BigDecimalDataBlock(DataBlock dataBlock) {
         super(dataBlock);
@@ -40,6 +41,35 @@ public class BigDecimalDataBlock extends DataBlock {
 
     @Override
     public String getValueAsString() {
-        return value != null ? value.toPlainString() : null;
+        return getValue() != null ? getValue().toPlainString() : null;
     }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+         if (!isTemplate) {
+       result.accumulate("data", getValue().toEngineeringString());
+         }        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        setValue(new BigDecimal(json.getString("data")));
+    }
+
+    /**
+     * @return the value
+     */
+    public BigDecimal getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(BigDecimal value) {
+        this.value = value;
+    }
+
 }

@@ -25,9 +25,26 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
 public enum VifeObjectAction implements Vife {
 
     ;
-    
+ 
+    public final static String OBJECT_ACTION = "object action";
     @Override
     public String getLabel() {
         return null;
     }
+
+        @Override
+    public String getVifeTypeName() {
+        return OBJECT_ACTION;
+    }
+
+    public static VifeObjectAction fromLabel(String label) {
+        for (VifeObjectAction value : values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
+    }
+
+
 }

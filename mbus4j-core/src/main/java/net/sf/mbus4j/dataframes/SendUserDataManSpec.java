@@ -17,6 +17,8 @@
  */
 package net.sf.mbus4j.dataframes;
 
+import net.sf.json.JSONObject;
+
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -81,5 +83,15 @@ public class SendUserDataManSpec implements ControlFrame {
      */
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

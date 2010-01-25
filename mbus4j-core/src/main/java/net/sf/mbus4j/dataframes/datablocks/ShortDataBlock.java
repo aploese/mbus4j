@@ -17,6 +17,7 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 
@@ -62,4 +63,19 @@ public class ShortDataBlock extends DataBlock {
     public void setValue(short value) {
         this.value = value;
     }
+        @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+           if (!isTemplate) {
+      result.accumulate("data", getValue());
+           }        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        setValue((short)json.getInt("data"));
+    }
+
+
 }

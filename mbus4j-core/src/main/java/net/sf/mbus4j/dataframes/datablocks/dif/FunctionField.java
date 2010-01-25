@@ -28,16 +28,32 @@ public enum FunctionField {
     MAXIMUM_VALUE(0x10, "Maximum value"),
     MINIMUM_VALUE(0x20, "Minimum value"),
     VALUE_DURING_ERROR_STATE(0x30, "Value during error state");
-    private final String userFriendlyName;
+    private final String label;
     public final byte code;
 
-    private FunctionField(int code, String name) {
-        this.userFriendlyName = name;
+    private FunctionField(int code, String label) {
+        this.label = label;
         this.code = (byte) code;
     }
 
     @Override
     public String toString() {
-        return userFriendlyName;
+        return label;
+    }
+
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return label;
+    }
+
+    public static FunctionField fromLabel(String label) {
+        for (FunctionField value: values()) {
+            if (value.getLabel().equals(label)) {
+                return value;
+            }
+        }
+        return valueOf(label);
     }
 }

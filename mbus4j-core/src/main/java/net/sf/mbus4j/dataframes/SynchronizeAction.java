@@ -17,12 +17,15 @@
  */
 package net.sf.mbus4j.dataframes;
 
+import net.sf.json.JSONObject;
+
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
 public class SynchronizeAction implements ControlFrame {
+    public static String SEND_USER_DATA_SUBTYPE = "synchronize action";
 
     private byte address;
     private boolean fcb;
@@ -30,6 +33,9 @@ public class SynchronizeAction implements ControlFrame {
     public SynchronizeAction(SendUserData old) {
         this.address = old.getAddress();
         this.fcb = old.isFcb();
+    }
+
+    public SynchronizeAction() {
     }
 
     @Override
@@ -68,5 +74,21 @@ public class SynchronizeAction implements ControlFrame {
         sb.append("isFcb = ").append(isFcb()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         return sb.toString();
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = new JSONObject();
+        result.accumulate("controlCode", getControlCode());
+        result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
+        result.accumulate("fcb", isFcb());
+        result.accumulate("address", address & 0xFF);
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        fcb = json.getBoolean("fcb");
+        address = (byte)json.getInt("address");
     }
 }

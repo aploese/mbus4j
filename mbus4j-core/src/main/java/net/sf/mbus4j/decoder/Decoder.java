@@ -38,8 +38,8 @@ import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
-import net.sf.mbus4j.dataframes.datablocks.vif.AsciiVif;
-import net.sf.mbus4j.dataframes.datablocks.vif.ManufacturerSpecificVif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
@@ -87,10 +87,10 @@ public class Decoder {
             }
         }
         if ((siPrefix == null) && (exponent == null) && (unitOfMeasurement == null)) {
-            if (ManufacturerSpecificVif.isManufacturerSecific(label)) {
-                return ManufacturerSpecificVif.fromString(label);
+            if (VifManufacturerSpecific.isManufacturerSecific(label)) {
+                return VifManufacturerSpecific.fromLabel(label);
             } else {
-                return new AsciiVif(label);
+                return new VifAscii(label);
             }
         }
         throw new IllegalArgumentException("Could not find Vif");
@@ -116,7 +116,7 @@ public class Decoder {
                 return medium;
             }
         }
-        return MBusMedium.UnknownMBusMedium.fromString(label);
+        return MBusMedium.UnknownMBusMedium.fromLabel(label);
     }
 
     private static boolean compareMedium(MBusMedium medium, String label) {

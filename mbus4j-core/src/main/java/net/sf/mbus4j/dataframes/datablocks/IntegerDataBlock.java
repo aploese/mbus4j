@@ -17,6 +17,7 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
@@ -71,4 +72,19 @@ public class IntegerDataBlock extends DataBlock {
     public void setValue(int value) {
         this.value = value;
     }
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+               if (!isTemplate) {
+  result.accumulate("data", getValue());
+               }        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        setValue(json.getInt("data"));
+    }
+
+
 }

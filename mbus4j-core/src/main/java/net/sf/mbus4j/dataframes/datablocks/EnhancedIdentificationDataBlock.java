@@ -17,7 +17,9 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 
 /**
  *
@@ -33,6 +35,10 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
 
     public EnhancedIdentificationDataBlock(DataBlock db) {
         super(db);
+    }
+
+    public EnhancedIdentificationDataBlock(DataFieldCode dataFieldCode) {
+        super(dataFieldCode);
     }
 
     /**
@@ -110,6 +116,36 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
         }
         if (medium != null) {
             sb.append(inset).append("medium = ").append(medium).append("\n");
+        }
+    }
+
+    @Override
+    public JSONObject toJSON(boolean isTemplate) {
+        JSONObject result = super.toJSON(isTemplate);
+        if (!isTemplate) {
+            JSONObject jsonData = new JSONObject();
+            if (getDataFieldCode().equals(DataFieldCode._64_BIT_INTEGER)) {
+                jsonData.accumulate("man", getMan());
+                jsonData.accumulate("medium", getMedium().getLabel());
+                jsonData.accumulate("version", getVersion());
+            }
+            jsonData.accumulate("id", getId());
+            result.accumulate("data", jsonData);
+        }
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        if (json.containsKey("data")) {
+            JSONObject jsonData = json.getJSONObject("data");
+            if (getDataFieldCode().equals(DataFieldCode._64_BIT_INTEGER)) {
+                setMan(jsonData.getString("man"));
+                setMedium(MBusMedium.StdMedium.fromLabel(jsonData.getString("medium")));
+                setVersion(jsonData.getInt("version"));
+            }
+            setId(jsonData.getInt("id"));
         }
     }
 }
