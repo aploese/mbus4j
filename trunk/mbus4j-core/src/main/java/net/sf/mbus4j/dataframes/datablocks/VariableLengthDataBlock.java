@@ -35,4 +35,9 @@ public class VariableLengthDataBlock extends DataBlock {
         throw new UnsupportedOperationException(); // TODO STRING / BYTES ....
     }
 
+    @Override
+    public void setValue(String text) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

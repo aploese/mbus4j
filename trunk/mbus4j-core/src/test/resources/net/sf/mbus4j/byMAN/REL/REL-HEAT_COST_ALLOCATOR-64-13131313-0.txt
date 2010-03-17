@@ -59,4 +59,4 @@ datablock[4]:
   subUnit = 0
 datablock[5]:
   dataType = Special Function Manufacturer specific data
-  value = (hex)[8001010C]
+  value = 8001010C

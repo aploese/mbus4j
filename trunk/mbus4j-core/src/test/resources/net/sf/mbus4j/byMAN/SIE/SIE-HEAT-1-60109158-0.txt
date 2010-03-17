@@ -189,4 +189,4 @@ datablock[21]:
   subUnit = 0
 datablock[22]:
   dataType = Special Function Manufacturer specific data
-  value = (hex)[0401000000]
+  value = 0401000000

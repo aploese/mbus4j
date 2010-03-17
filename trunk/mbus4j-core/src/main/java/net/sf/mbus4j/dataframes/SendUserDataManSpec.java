@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes;
 
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -86,7 +87,7 @@ public class SendUserDataManSpec implements ControlFrame {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

@@ -68,17 +68,17 @@ public class UserDataResponseTest {
     }
 
     @Test
-    public void testABB_HEAT_OUTLET_8_3476_0() throws Exception {
+    public void testABB_HEAT_8_3476_0() throws Exception {
         testPackage("ABB", MBusMedium.HEAT, 8, 3476, 0);
     }
 
     @Test
-    public void testACW_HEAT_OUTLET_11_8772050_0() throws Exception {
+    public void testACW_HEAT_11_8772050_0() throws Exception {
         testPackage("ACW", MBusMedium.HEAT, 11, 8772050, 0);
     }
 
     @Test
-    public void testACW_HEAT_OUTLET_9_6522360_0() throws Exception {
+    public void testACW_HEAT_9_6522360_0() throws Exception {
         testPackage("ACW", MBusMedium.HEAT, 9, 6522360, 0);
     }
 
@@ -93,7 +93,7 @@ public class UserDataResponseTest {
     }
 
     @Test
-    public void testLUG_HEAT_OUTLET_2_65068549_0() throws Exception {
+    public void testLUG_HEAT_2_65068549_0() throws Exception {
         testPackage("LUG", MBusMedium.HEAT, 2, 65068549, 0);
     }
 
@@ -148,7 +148,7 @@ public class UserDataResponseTest {
     }
 
     @Test
-    public void testSIE_HEAT_OUTLET_1_60109158_0() throws Exception {
+    public void testSIE_HEAT_1_60109158_0() throws Exception {
         testPackage("SIE", MBusMedium.HEAT, 1, 60109158, 0);
     }
 
@@ -163,27 +163,27 @@ public class UserDataResponseTest {
     }
 
     @Test
-    public void testSPX_HEAT_OUTLET_52_44350175_0_No_Vife() throws Exception {
+    public void testSPX_HEAT_52_44350175_0_No_Vife() throws Exception {
         testPackage("SPX", MBusMedium.HEAT, 52, 44350175, 0, "No_Vife");
     }
 
     @Test
-    public void testSPX_HEAT_OUTLET_52_54850059_0_With_Vife() throws Exception {
+    public void testSPX_HEAT_52_54850059_0_With_Vife() throws Exception {
         testPackage("SPX", MBusMedium.HEAT, 52, 54850059, 0, "With_Vife");
     }
 
     @Test
-    public void testTCH_HEAT_OUTLET_1_44830614_0() throws Exception {
+    public void testTCH_HEAT_1_44830614_0() throws Exception {
         testPackage("TCH", MBusMedium.HEAT, 1, 44830614, 0);
     }
 
     @Test
-    public void testTCH_HEAT_OUTLET_38_21519982_0() throws Exception {
+    public void testTCH_HEAT_38_21519982_0() throws Exception {
         testPackage("TCH", MBusMedium.HEAT, 38, 21519982, 0);
     }
 
     @Test
-    public void testTCH_HEAT_OUTLET_38_21519982_1() throws Exception {
+    public void testTCH_HEAT_38_21519982_1() throws Exception {
         testPackage("TCH", MBusMedium.HEAT, 38, 21519982, 1);
     }
 }

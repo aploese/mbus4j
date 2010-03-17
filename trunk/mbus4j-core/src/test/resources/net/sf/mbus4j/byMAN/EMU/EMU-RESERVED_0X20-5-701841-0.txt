@@ -155,7 +155,7 @@ datablock[16]:
   subUnit = 0
 datablock[17]:
   dataType = 16 Bit Integer
-  description = Manufacturer specific coding including VIFE's (VIF == 0xFF) VIFE's = [52]
+  description = 0x7F 0x52
   value = 0
   tariff = 0
   storageNumber = 0
@@ -163,7 +163,7 @@ datablock[17]:
   subUnit = 0
 datablock[18]:
   dataType = 8 Bit Integer
-  description = Manufacturer specific coding including VIFE's (VIF == 0xFF) VIFE's = [E1FF01]
+  description = 0x7F 0x61 0x7f 0x01
   value = 0
   tariff = 0
   storageNumber = 0
@@ -171,7 +171,7 @@ datablock[18]:
   subUnit = 0
 datablock[19]:
   dataType = 8 Bit Integer
-  description = Manufacturer specific coding including VIFE's (VIF == 0xFF) VIFE's = [E1FF02]
+  description = 0x7F 0x61 0x7f 0x02
   value = 0
   tariff = 0
   storageNumber = 0
@@ -179,7 +179,7 @@ datablock[19]:
   subUnit = 0
 datablock[20]:
   dataType = 8 Bit Integer
-  description = Manufacturer specific coding including VIFE's (VIF == 0xFF) VIFE's = [E1FF03]
+  description = 0x7F 0x61 0x7f 0x03
   value = 0
   tariff = 0
   storageNumber = 0

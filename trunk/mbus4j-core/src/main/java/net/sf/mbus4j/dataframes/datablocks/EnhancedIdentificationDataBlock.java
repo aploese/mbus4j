@@ -120,9 +120,7 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
+    protected void accumulateDatatoJSON(JSONObject json) {
             JSONObject jsonData = new JSONObject();
             if (getDataFieldCode().equals(DataFieldCode._64_BIT_INTEGER)) {
                 jsonData.accumulate("man", getMan());
@@ -130,9 +128,7 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
                 jsonData.accumulate("version", getVersion());
             }
             jsonData.accumulate("id", getId());
-            result.accumulate("data", jsonData);
-        }
-        return result;
+            json.accumulate("data", jsonData);
     }
 
     @Override
@@ -147,5 +143,10 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
             }
             setId(jsonData.getInt("id"));
         }
+    }
+
+    @Override
+    public void setValue(String text) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

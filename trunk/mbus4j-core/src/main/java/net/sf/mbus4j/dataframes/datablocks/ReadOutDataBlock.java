@@ -35,4 +35,9 @@ public class ReadOutDataBlock extends DataBlock {
         return "(selected for read out)";
     }
 
+    @Override
+    public void setValue(String text) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

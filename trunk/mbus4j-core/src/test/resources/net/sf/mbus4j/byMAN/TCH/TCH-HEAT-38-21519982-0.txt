@@ -91,4 +91,4 @@ datablock[8]:
   subUnit = 0
 datablock[9]:
   dataType = Special Function Manufacturer specific data more records follow in next telegram
-  value = (hex)[]
+  value = 

@@ -21,6 +21,8 @@ import java.util.Iterator;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.json.JSONFactory;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -28,27 +30,30 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  * @version $Id$
  */
 public class ApplicationReset implements LongFrame {
+
     public static String SEND_USER_DATA_SUBTYPE = "application reset";
 
     public ApplicationReset() {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
         result.accumulate("controlCode", getControlCode());
         result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
-        result.accumulate("fcb", isFcb());
-        result.accumulate("address", address & 0xFF);
         result.accumulate("telegramType", getTelegramType().getLabel());
         result.accumulate("subTelegram", getSubTelegram());
+        if (JsonSerializeType.ALL == jsonSerializeType) {
+            result.accumulate("fcb", isFcb());
+            result.accumulate("address", JSONFactory.encodeHexByte(address));
+        }
         return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
-        fcb = json.getBoolean("fcb");
-        address = (byte)json.getInt("address");
+        fcb =  JSONFactory.getBoolean(json, "fcb", false);
+        address = JSONFactory.decodeHexByte(json, "address", (byte)0);
         telegramType = TelegramType.fromLabel(json.getString("telegramType"));
         subTelegram = json.getInt("subTelegram");
     }
@@ -105,7 +110,6 @@ public class ApplicationReset implements LongFrame {
             }
             return valueOf(label);
         }
-
     }
     private byte address;
     private boolean fcb;

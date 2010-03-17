@@ -60,8 +60,6 @@ public enum VifeError implements Vife {
     OTHER_ERROR_RESERVED_0X1E("Other Error Reserved 0x1E"),
     OTHER_ERROR_RESERVED_0X1F("Other Error Reserved 0x1F");
 
-    public static final String ERROR = "error";
-
     private final String label;
     private static Map<Byte, VifeError> map;
 
@@ -94,8 +92,8 @@ public enum VifeError implements Vife {
     }
 
     @Override
-    public String getVifeTypeName() {
-        return ERROR;
+    public VifeTypes getVifeType() {
+        return VifeTypes.ERROR;
     }
 
     public static VifeError fromLabel(String label) {

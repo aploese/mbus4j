@@ -18,6 +18,7 @@
 package net.sf.mbus4j.slaves;
 
 import gnu.io.SerialPort;
+import java.io.BufferedReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +27,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,6 +36,8 @@ import java.util.logging.Level;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import net.sf.mbus4j.SerialPortTools;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
@@ -47,8 +49,9 @@ import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.SendUserDataManSpec;
 import net.sf.mbus4j.decoder.Decoder;
 import net.sf.mbus4j.encoder.Encoder;
+import net.sf.mbus4j.json.JSONSerializable;
+import net.sf.mbus4j.json.JsonSerializeType;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,33 +60,86 @@ import org.slf4j.LoggerFactory;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class Slaves {
+public class Slaves implements JSONSerializable {
 
-    public static class LogInit {
-
-        public static final String TRACE = "trace";
-        public static final String DEBUG = "debug";
-        public static final String INFO = "info";
-        public static final String WARN = "warn";
-        public static final String ERROR = "error";
-        public static final String FATAL = "fatal";
-
-        public static synchronized void initLog(String level) {
-            Properties props = new Properties();
-            props.setProperty("log4j.appender.stdout",
-                    "org.apache.log4j.ConsoleAppender");
-            props.setProperty("log4j.appender.stdout.Target", "System.out");
-            //log4j.appender.stdout=org.apache.log4j.FileAppender
-            //log4j.appender.stdout.File=Easy.log
-            props.setProperty("log4j.appender.stdout.layout",
-                    "org.apache.log4j.PatternLayout");
-            props.setProperty("log4j.appender.stdout.layout.ConversionPattern",
-                    "%d{ABSOLUTE} %5p %c{1}: %m%n");
-
-            //set log levels - for more verbose logging change 'info' to 'debug' ###
-            props.setProperty("log4j.rootLogger", level + ", stdout");
-            PropertyConfigurator.configure(props);
+    public static Slaves readJsonStream(InputStream is) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
         }
+        Slaves result = new Slaves();
+        result.fromJSON(JSONObject.fromObject(sb.toString()));
+        return result;
+    }
+
+    /**
+     * @return the serialPortName
+     */
+    public String getSerialPortName() {
+        return serialPortName;
+    }
+
+    /**
+     * @param serialPort the serialPortName to set
+     */
+    public void setSerialPortName(String serialPortName) {
+        this.serialPortName = serialPortName;
+    }
+
+    /**
+     * @return the baudrate
+     */
+    public int getBaudrate() {
+        return baudrate;
+    }
+
+    /**
+     * @param baudrate the baudrate to set
+     */
+    public void setBaudrate(int baudrate) {
+        this.baudrate = baudrate;
+    }
+
+    @Override
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
+        JSONObject result = new JSONObject();
+        if (serialPortName != null) {
+            JSONObject jsonSerialPort = new JSONObject();
+            jsonSerialPort.accumulate("portname", serialPortName);
+            jsonSerialPort.accumulate("baudrate", baudrate);
+            result.accumulate("serialPort", jsonSerialPort);
+        }
+        JSONArray jsonSlaves = new JSONArray();
+        for (Slave s : slaves) {
+            jsonSlaves.add(s.toJSON(jsonSerializeType));
+        }
+        result.accumulate("slaves", jsonSlaves);
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        if (json.containsKey("serialPort")) {
+            JSONObject jsonSerialPort = json.getJSONObject("serialPort");
+            serialPortName = jsonSerialPort.getString("portname");
+            baudrate = jsonSerialPort.getInt("baudrate");
+        }
+        JSONArray jsonSlaves = json.getJSONArray("slaves");
+        for (int i = 0; i < jsonSlaves.size(); i++) {
+            Slave s = new Slave();
+            s.fromJSON(jsonSlaves.getJSONObject(i));
+            addSlave(s);
+        }
+    }
+
+    public int getSalvesSize() {
+        return slaves.size();
+    }
+
+    public Slave getSlave(int index) {
+        return slaves.get(index);
     }
 
     private class RequestHandler implements Callable<Frame> {
@@ -99,8 +155,8 @@ public class Slaves {
         @Override
         public Frame call() throws Exception {
             try {
-                if (log.isTraceEnabled()) {
-                    log.trace("req dispatching: " + request);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("req dispatching: " + request);
                 }
                 Frame result;
                 switch (request.getControlCode()) {
@@ -148,17 +204,17 @@ public class Slaves {
                 }
                 if (result != null) {
                     send(result);
-                    if (log.isDebugEnabled()) {
-                        log.debug("req dispatched: " + result);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("req dispatched: " + result);
                     }
                 } else {
-                    log.debug("req dispatched no result");
+                    LOG.debug("req dispatched no result");
                 }
 
                 return result;
 
             } catch (Exception ex) {
-                log.error("Call", ex);
+                LOG.error("Call", ex);
                 throw ex;
             }
         }
@@ -174,42 +230,42 @@ public class Slaves {
             try {
                 int theData;
                 Decoder parser = new Decoder();
-                log.info("Wait for data to process");
+                LOG.info("Wait for data to process");
                 try {
                     while (!closed) {
                         if ((theData = is.read()) == -1) {
-                            if (log.isTraceEnabled()) {
-                                log.trace("Thread interrupted or EOF on waiting occured");
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace("Thread interrupted or EOF on waiting occured");
                             }
                         } else {
-                            if (log.isTraceEnabled()) {
-                                log.trace(String.format("Data received 0x%02x", theData));
+                            if (LOG.isTraceEnabled()) {
+                                LOG.trace(String.format("Data received 0x%02x", theData));
                             }
                             try {
                                 Frame frame = parser.addByte((byte) theData);
                                 if (frame != null) {
-                                    if (log.isTraceEnabled()) {
-                                        log.trace("Frame parsed ... will process: " + frame);
+                                    if (LOG.isTraceEnabled()) {
+                                        LOG.trace("Frame parsed ... will process: " + frame);
                                     } else {
-                                        log.debug("Frame parsed ... will process");
+                                        LOG.debug("Frame parsed ... will process");
                                     }
                                     for (Slave slave : slaves) {
                                         if (slave.willHandleRequest(frame)) {
-                                            log.debug(String.format("Frame will be handled by slave %s", slave.slaveIdToString()));
+                                            LOG.debug(String.format("Frame will be handled by slave %s", slave.slaveIdToString()));
                                             tpe.submit(new RequestHandler(frame, slave));
                                         }
                                     }
                                 }
                             } catch (Exception e) {
-                                log.error("Error during createPackage()", e);
+                                LOG.error("Error during createPackage()", e);
                             }
                         }
                     }
-                    log.info("closing down - finish waiting for new data");
+                    LOG.info("closing down - finish waiting for new data");
                 } catch (IOException e) {
-                    log.error("run()", e);
+                    LOG.error("run()", e);
                 } catch (Exception e) {
-                    log.info("finished waiting for packages", e);
+                    LOG.info("finished waiting for packages", e);
 
                 }
             } finally {
@@ -217,10 +273,10 @@ public class Slaves {
             }
         }
     }
-    private static Logger log;
+    private static Logger LOG = LoggerFactory.getLogger(Slaves.class);
+
 
     public static void main(String[] args) throws Exception {
-        LogInit.initLog(LogInit.TRACE);
         Slaves app = new Slaves();
         SerialPort sPort = null;
         int timeout = 0;
@@ -254,6 +310,9 @@ public class Slaves {
         }
         sPort.close();
     }
+
+    private String serialPortName;
+    private int baudrate = SerialPortTools.DEFAULT_BAUDRATE;;
     private InputStream is;
     private OutputStream os;
     private boolean closed = true;
@@ -264,7 +323,6 @@ public class Slaves {
 
     public Slaves() {
         super();
-        log = LoggerFactory.getLogger(Slaves.class);
     }
 
     public boolean addSlave(Slave slave) {

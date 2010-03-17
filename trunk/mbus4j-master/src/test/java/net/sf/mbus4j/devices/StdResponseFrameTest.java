@@ -63,11 +63,6 @@ public class StdResponseFrameTest {
             }
 
             @Override
-            public Frame[] getinitFrames() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            @Override
             public DataBlock getDataBlock(int i) {
                 throw new UnsupportedOperationException("Not supported yet.");
             }

@@ -129,7 +129,7 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
             UserDataResponse udr = (UserDataResponse) f;
             //TODO detect dev and create
             log.info(String.format("add device: address = 0x%02X, id = = %08d, man = %s, medium = %s, version = 0x%02X", udr.getAddress(), udr.getIdentNumber(), udr.getManufacturer(), udr.getMedium(), udr.getVersion()));
-            devices.add(DeviceFactory.createDevice(udr));
+            devices.add(DeviceFactory.createDevice(udr, new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address)));
             //TODO check wenn dev braucht mehr ( falsces udr)
         } else {
             log.info(String.format("no device at address = 0x%02X", address));

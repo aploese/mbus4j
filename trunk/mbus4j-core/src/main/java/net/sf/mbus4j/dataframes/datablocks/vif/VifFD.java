@@ -173,7 +173,6 @@ public enum VifFD implements Vif {
     RESERVED_0X7D(),
     RESERVED_0X7E(),
     RESERVED_0X7F();
-    public final static String EXTENTION_FD = "extention FD";
 
     public static VifFD valueOfTableIndex(byte ordinal) {
         if (map == null) {
@@ -254,16 +253,7 @@ public enum VifFD implements Vif {
 
     @Override
     public String toString() {
-        if (exponent != null) {
-            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        } else {
-            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        }
-    }
-
-    @Override
-    public String getVifTypeName() {
-        return EXTENTION_FD;
+        return VifToString.vifToString(this);
     }
 
     public static VifFD assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
@@ -273,5 +263,10 @@ public enum VifFD implements Vif {
             }
         }
         return valueOf(label);
+    }
+
+    @Override
+    public VifTypes getVifType() {
+        return VifTypes.FD_EXTENTION;
     }
 }

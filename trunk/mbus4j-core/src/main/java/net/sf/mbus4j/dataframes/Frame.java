@@ -34,14 +34,12 @@ public interface Frame extends JSONSerializable {
         REQ_UD2,
         REQ_UD1,
         RSP_UD;
+
+        public String getLabel() {
+            return name();
+        }
     }
 
     ControlCode getControlCode();
-    //TODO GarbageFrame for unparsable stuff ie multiple answers??
-    //TODO Timespamps for send/receive tracking
-//    long getFirstByteTimeStamp();
-//    void setFirstByteTimeStamp(long timestamp);
-//    long getLastByteTimeStamp();
-//    void setLastByteTimeStamp(long timestamp);
 
 }

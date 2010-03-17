@@ -24,14 +24,16 @@ import java.util.Iterator;
 import java.util.Map;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
+@Deprecated
 public abstract class ResponseFrame implements Cloneable, Iterable<DataBlock> {
+
     public static interface MBusResponsesTreeMap extends Map<ResponseFrame, Collection<DataBlock>> {}
 
 
@@ -40,8 +42,6 @@ public abstract class ResponseFrame implements Cloneable, Iterable<DataBlock> {
     public abstract Iterable<DataBlock> getDataBlocksIterable();
 
     public abstract int getDataBlockCount();
-
-    public abstract Frame[] getinitFrames();
 
     public abstract DataBlock getDataBlock(int i);
 
@@ -127,13 +127,13 @@ public abstract class ResponseFrame implements Cloneable, Iterable<DataBlock> {
      * @return
      */
     private DataBlock searchForTimestamp(DataBlock dt) {
-        if (VifeStd.isTimestampVife(dt.getVifes())) {
+        if (VifePrimary.isTimestampVife(dt.getVifes())) {
             return null;
         }
         for (int i = 0; i < getDataBlockCount(); i++) {
             if (getDataBlock(i).getStorageNumber() == dt.getStorageNumber() ) {
                 if (getDataBlock(i).getVif().equals(dt.getVif())) {
-                if (VifeStd.isTimestampVife(getDataBlock(i).getVifes())) {
+                if (VifePrimary.isTimestampVife(getDataBlock(i).getVifes())) {
                     if (!getDataBlock(i).equals(dt)) {
                         return getDataBlock(i);
                     }

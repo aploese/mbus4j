@@ -17,9 +17,11 @@ import java.io.IOException;
  * @author aploese
  */
 public class SerialPortTools {
+    
+    public static final int DEFAULT_BAUDRATE = 2400;
 
     public static SerialPort openPort(String portName) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {
-        return openPort(portName, 2400);
+        return openPort(portName, DEFAULT_BAUDRATE);
     }
 
     public static SerialPort openPort(String portName, int baudrate) throws NoSuchPortException, PortInUseException, UnsupportedCommOperationException, IOException {

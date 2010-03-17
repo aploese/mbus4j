@@ -18,6 +18,8 @@
 package net.sf.mbus4j.dataframes;
 
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.json.JSONFactory;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -92,12 +94,21 @@ public class RequestClassXData implements ShortFrame {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
+        JSONObject result = new JSONObject();
+        result.accumulate("controlCode", getControlCode().getLabel());
+        if (JsonSerializeType.ALL == jsonSerializeType) {
+            result.accumulate("fcb", isFcb());
+            result.accumulate("fcv", isFcv());
+            result.accumulate("address", address);
+        }
+        return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        setFcb(JSONFactory.getBoolean(json, "fcb", false));
+        setFcv(JSONFactory.getBoolean(json, "fcv", false));
+        setAddress(JSONFactory.decodeHexByte(json, "address", (byte)0));
     }
 }

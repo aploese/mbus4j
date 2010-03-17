@@ -77,24 +77,20 @@ public class ShortDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
-             if (!isBcdError()) {
-                result.accumulate("data", getValue());
-            } else {
-                JSONObject jsonBcdError = new JSONObject();
-                jsonBcdError.accumulate("bcdErrorCode", getBcdError());
-                result.accumulate("data", jsonBcdError);
-            }
-       }
-        return result;
+    protected void accumulateDatatoJSON(JSONObject json) {
+        if (!isBcdError()) {
+            json.accumulate("data", getValue());
+        } else {
+            JSONObject jsonBcdError = new JSONObject();
+            jsonBcdError.accumulate("bcdErrorCode", getBcdError());
+            json.accumulate("data", jsonBcdError);
+        }
     }
 
     @Override
     public void fromJSON(JSONObject json) {
         super.fromJSON(json);
-           if (json.get("data") instanceof JSONObject) {
+        if (json.get("data") instanceof JSONObject) {
             JSONObject data = json.getJSONObject("data");
             if (data.containsKey("bcdErrorCode")) {
                 bcdError = data.getString("bcdErrorCode");
@@ -118,5 +114,16 @@ public class ShortDataBlock extends DataBlock {
      */
     public void setBcdError(String bcdError) {
         this.bcdError = bcdError;
+    }
+
+    @Override
+    public void setValue(String text) {
+        try {
+            value = Short.parseShort(text);
+            bcdError = null;
+        } catch (NumberFormatException ex) {
+            value = 0;
+            bcdError = text;
+        }
     }
 }

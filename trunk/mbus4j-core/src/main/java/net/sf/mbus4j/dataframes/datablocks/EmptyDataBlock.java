@@ -35,4 +35,9 @@ public class EmptyDataBlock extends DataBlock {
         return "";
     }
 
+    @Override
+    public void setValue(String text) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

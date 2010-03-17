@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "SLB",
  "medium": "Cold Water",
- "version": 3,
+ "version": "0x03",
  "identNumber": 1309125,
- "address": 14,
+ "address": "0x0e",
  "accessNumber": 140,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status":  [
   "No application error",
   "Permanent error",
@@ -154,11 +154,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    28,
-    1,
-    31
-   ]
+   "data": "0x[1C011F]"
   }
  ]
 }

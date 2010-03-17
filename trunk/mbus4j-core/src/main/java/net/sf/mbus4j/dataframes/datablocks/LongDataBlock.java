@@ -76,18 +76,14 @@ public class LongDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
+    protected void accumulateDatatoJSON(JSONObject json) {
             if (!isBcdError()) {
-                result.accumulate("data", getValue());
+                json.accumulate("data", getValue());
             } else {
                 JSONObject jsonBcdError = new JSONObject();
                 jsonBcdError.accumulate("bcdErrorCode", getBcdError());
-                result.accumulate("data", jsonBcdError);
+                json.accumulate("data", jsonBcdError);
             }
-        }
-        return result;
     }
 
     @Override
@@ -117,6 +113,17 @@ public class LongDataBlock extends DataBlock {
      */
     public void setBcdError(String bcdError) {
         this.bcdError = bcdError;
+    }
+
+    @Override
+    public void setValue(String text) {
+        try {
+            value = Long.parseLong(text);
+            bcdError = null;
+        } catch (NumberFormatException ex) {
+            value = 0;
+            bcdError = text;
+        }
     }
 
 

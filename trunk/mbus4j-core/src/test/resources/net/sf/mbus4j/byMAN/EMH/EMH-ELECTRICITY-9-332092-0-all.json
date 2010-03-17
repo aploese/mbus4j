@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "EMH",
  "medium": "Electricity",
- "version": 9,
+ "version": "0x09",
  "identNumber": 332092,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 32,
  "acd": false,
  "dfc": false,
- "signature": 2,
+ "signature": "0x0002",
  "status": ["No application error"],
  "dataBlocks":  [
     {

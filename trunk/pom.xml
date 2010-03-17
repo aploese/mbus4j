@@ -32,18 +32,18 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.6</version>
+            <version>4.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.rxtx</groupId>
             <artifactId>rxtx</artifactId>
-            <version>2.1.7</version>
+            <version>2.2</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -55,6 +55,11 @@
             <artifactId>json-lib</artifactId>
             <version>2.3</version>
             <classifier>jdk15</classifier>
+        </dependency>
+                <dependency>
+            <groupId>org.jdesktop</groupId>
+            <artifactId>appframework</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
     </dependencyManagement>

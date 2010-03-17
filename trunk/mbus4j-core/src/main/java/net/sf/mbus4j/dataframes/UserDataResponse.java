@@ -17,10 +17,6 @@
  */
 package net.sf.mbus4j.dataframes;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -31,6 +27,7 @@ import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.json.JSONFactory;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -40,62 +37,64 @@ import net.sf.mbus4j.json.JSONFactory;
 public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
-                    result.accumulate("controlCode", getControlCode());
+        result.accumulate("controlCode", getControlCode());
+        if (JsonSerializeType.ALL == jsonSerializeType) {
             result.accumulate("manufacturer", getManufacturer());
             result.accumulate("medium", getMedium().getLabel());
-            result.accumulate("version", getVersion());
-            if (!isTemplate) {
+            result.accumulate("version", JSONFactory.encodeHexByte(getVersion()));
             result.accumulate("identNumber", getIdentNumber());
-            result.accumulate("address", getAddress() & 0xFF);
+            result.accumulate("address", JSONFactory.encodeHexByte(getAddress()));
             result.accumulate("accessNumber", getAccessNumber());
             result.accumulate("acd", isAcd());
             result.accumulate("dfc", isDfc());
-            result.accumulate("signature", getSignature());
+            result.accumulate("signature", JSONFactory.encodeHexShort(getSignature()));
             JSONArray jsonStatusArray = new JSONArray();
             for (StatusCode st : getStatus()) {
                 jsonStatusArray.add(st.getLabel());
             }
             result.accumulate("status", jsonStatusArray);
-            }
+        }
+        if ((JsonSerializeType.ALL == jsonSerializeType) || (JsonSerializeType.SLAVE_CONFIG == jsonSerializeType)) {
             JSONArray jsonDataBlocks = new JSONArray();
-            for (DataBlock db: this) {
-                jsonDataBlocks.add(db.toJSON(isTemplate));
+            for (DataBlock db : this) {
+                jsonDataBlocks.add(db.toJSON(jsonSerializeType));
             }
             result.accumulate("dataBlocks", jsonDataBlocks);
-            return result;
+        }
+        return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
-            setManufacturer(json.getString("manufacturer"));
-            setMedium(MBusMedium.fromLabel(json.getString("medium")));
-            setVersion((byte)json.getInt("version"));
-            setIdentNumber(json.getInt("identNumber"));
-            setAddress(json.containsKey("address") ? (byte)json.getInt("address") : 0);
-            setAccessNumber(json.containsKey("accessNumber") ? (short)json.getInt("accessNumber") : 0);
-            setAcd(json.containsKey("acd") ? json.getBoolean("acd") : false);
-            setDfc(json.containsKey("dfc") ? json.getBoolean("dfc") : false);
-            setSignature(json.containsKey("signature") ? (short)json.getInt("signature") : 0);
-            if (json.containsKey("status")) {
-                JSONArray statusArray = json.getJSONArray("status");
-                if (statusArray.size() == 0) {
-                    setStatus(new StatusCode[0]);
-                } else {
-                    status = new StatusCode[statusArray.size()];
-                    for (int i = 0; i < status.length; i++) {
-                        status[i] = StatusCode.fromLabel(statusArray.getString(i));
-                    }
+        setManufacturer(json.containsKey("manufacturer") ? json.getString("manufacturer") : "");
+        setMedium(json.containsKey("medium") ? MBusMedium.fromLabel(json.getString("medium")) : MBusMedium.UNKNOWN_MEDIUM);
+        setVersion(JSONFactory.decodeHexByte(json, "version", (byte)0));
+        setIdentNumber(json.containsKey("identNumber") ? json.getInt("identNumber") : 0);
+        setAddress(JSONFactory.decodeHexByte(json, "address", (byte) 0));
+        setAccessNumber(JSONFactory.getShort(json, "accessNumber", (short)0));
+        setAcd(JSONFactory.getBoolean(json, "acd", false));
+        setDfc(JSONFactory.getBoolean(json, "dfc", false));
+        setSignature(JSONFactory.decodeHexShort(json, "signature", (short)0));
+        if (json.containsKey("status")) {
+            JSONArray statusArray = json.getJSONArray("status");
+            if (statusArray.size() == 0) {
+                setStatus(new StatusCode[0]);
+            } else {
+                status = new StatusCode[statusArray.size()];
+                for (int i = 0; i < status.length; i++) {
+                    status[i] = StatusCode.fromLabel(statusArray.getString(i));
                 }
             }
-            
-            JSONArray jsonDataBlocks = json.getJSONArray("dataBlocks");
-            for (int i = 0; i < jsonDataBlocks.size(); i++) {
-                DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
-                db.fromJSON(jsonDataBlocks.getJSONObject(i));
-                addDataBlock(db);
-            }
+        }
+
+        JSONArray jsonDataBlocks = json.getJSONArray("dataBlocks");
+        for (int i = 0; i < jsonDataBlocks.size(); i++) {
+            DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
+            db.fromJSON(jsonDataBlocks.getJSONObject(i));
+            addDataBlock(db);
+        }
     }
 
     public static enum StatusCode {
@@ -146,7 +145,6 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
             return valueOf(label);
         }
     }
-
     private boolean acd;
     private boolean dfc;
     private byte version;
@@ -173,7 +171,7 @@ public class UserDataResponse implements LongFrame, PrimaryAddress, Cloneable {
         return dataBlocks.add(dataBlock);
     }
 
-    public boolean  addAllDataBlocks(List<DataBlock> list) {
+    public boolean addAllDataBlocks(List<DataBlock> list) {
         return dataBlocks.addAll(list);
     }
 

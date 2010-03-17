@@ -53,11 +53,11 @@ public class GenericDeviceTest {
      */
     @Test
     @Ignore
-    public void testGetMan() {
-        System.out.println("getMan");
+    public void testGetManufacturer() {
+        System.out.println("getManufacturer");
         GenericDevice instance = null;
         String expResult = "";
-        String result = instance.getMan();
+        String result = instance.getManufacturer();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");

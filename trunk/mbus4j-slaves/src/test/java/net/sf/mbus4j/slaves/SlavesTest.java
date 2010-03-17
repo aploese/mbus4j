@@ -71,13 +71,13 @@ public class SlavesTest {
     @Test(timeout = 10000)
     public void testUserDataResponse() throws Exception {
         System.out.println("userDataResponse");
-        Slave slave = new Slave(0x01, 12345678, "AMK", 0, MBusMedium.StdMedium.OTHER);
+        Slave slave = new Slave(0x01, 12345678, "AMK", 0, MBusMedium.OTHER);
         slaves.addSlave(slave);
-        slave = new Slave(0x0F, 01234567, "AMK", 0, MBusMedium.StdMedium.OTHER);
+        slave = new Slave(0x0F, 01234567, "AMK", 0, MBusMedium.OTHER);
         slaves.addSlave(slave);
-        slave = new Slave(0x10, 00123456, "AMK", 0, MBusMedium.StdMedium.OTHER);
+        slave = new Slave(0x10, 00123456, "AMK", 0, MBusMedium.OTHER);
         slaves.addSlave(slave);
-        slave = new Slave(0xFA, 00012345, "AMK", 0, MBusMedium.StdMedium.OTHER);
+        slave = new Slave(0xFA, 00012345, "AMK", 0, MBusMedium.OTHER);
         slaves.addSlave(slave);
         master.sendRequestAndCollectResponse("107B017C16", "680F0F6808017278563412AB050000000000003F16");
         master.sendRequestAndCollectResponse("107B017C16", "680F0F6808017278563412AB050000010000004016");
@@ -96,10 +96,10 @@ public class SlavesTest {
     @Test(timeout = 60000)
     public void testWidcardSearch() throws Exception {
         System.out.println("widcardSearch");
-        slaves.addSlave(new Slave(0x01, 14491001, "DBW", 1, MBusMedium.StdMedium.HOT_WATER));
-        slaves.addSlave(new Slave(0x01, 14491008, "QKG", 1, MBusMedium.StdMedium.HOT_WATER));
-        slaves.addSlave(new Slave(0x01, 32104833, "H@P", 1, MBusMedium.StdMedium.ELECTRICITY));
-        slaves.addSlave(new Slave(0x01, 76543210, "H@P", 1, MBusMedium.StdMedium.GAS));
+        slaves.addSlave(new Slave(0x01, 14491001, "DBW", 1, MBusMedium.HOT_WATER));
+        slaves.addSlave(new Slave(0x01, 14491008, "QKG", 1, MBusMedium.HOT_WATER));
+        slaves.addSlave(new Slave(0x01, 32104833, "H@P", 1, MBusMedium.ELECTRICITY));
+        slaves.addSlave(new Slave(0x01, 76543210, "H@P", 1, MBusMedium.GAS));
 
         master.sendRequestNoAnswer("680B0B6853FD52FFFFFF0FFFFFFFFFAA16", 100, 3);
         master.sendRequestAndCollectResponse("680B0B6853FD52FFFFFF1FFFFFFFFFBA16", "E5E5");

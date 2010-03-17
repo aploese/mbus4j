@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "REL",
  "medium": "Heat Cost Allocator",
- "version": 64,
+ "version": "0x40",
  "identNumber": 13131313,
- "address": 1,
+ "address": "0x01",
  "accessNumber": 7,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -109,12 +109,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    -128,
-    1,
-    1,
-    12
-   ]
+   "data": "0x[8001010C]"
   }
  ]
 }

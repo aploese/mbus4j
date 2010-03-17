@@ -21,6 +21,7 @@ import java.util.Iterator;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -28,25 +29,28 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  * @version $Id$
  */
 public class GeneralApplicationError implements LongFrame, PrimaryAddress {
+
     public static String RSP_UD_SUBTYPE = "general application error";
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-         JSONObject result = new JSONObject();
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
+        JSONObject result = new JSONObject();
         result.accumulate("controlCode", getControlCode());
         result.accumulate("subType", RSP_UD_SUBTYPE);
-        result.accumulate("acd", isAcd());
-        result.accumulate("dfc", isDfc());
-        result.accumulate("address", address & 0xFF);
-        result.accumulate("error", error.getLabel());
+        if (jsonSerializeType.ALL == jsonSerializeType) {
+            result.accumulate("acd", isAcd());
+            result.accumulate("dfc", isDfc());
+            result.accumulate("address", address & 0xFF);
+            result.accumulate("error", error.getLabel());
+        }
         return result;
-   }
+    }
 
     @Override
     public void fromJSON(JSONObject json) {
         acd = json.getBoolean("acd");
         dfc = json.getBoolean("dfc");
-        address = (byte)json.getInt("address");
+        address = (byte) json.getInt("address");
         error = GeneralApplicationErrorEnum.fromLabel(json.getString("error"));
     }
 
@@ -96,7 +100,6 @@ public class GeneralApplicationError implements LongFrame, PrimaryAddress {
             }
             return valueOf(label);
         }
-        
     }
     private boolean acd;
     private boolean dfc;

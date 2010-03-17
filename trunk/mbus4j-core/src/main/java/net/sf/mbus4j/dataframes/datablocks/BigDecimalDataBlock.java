@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -45,11 +46,8 @@ public class BigDecimalDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-         if (!isTemplate) {
-       result.accumulate("data", getValue().toEngineeringString());
-         }        return result;
+    protected void accumulateDatatoJSON(JSONObject json) {
+       json.accumulate("data", getValue().toEngineeringString());
     }
 
     @Override
@@ -70,6 +68,11 @@ public class BigDecimalDataBlock extends DataBlock {
      */
     public void setValue(BigDecimal value) {
         this.value = value;
+    }
+
+    @Override
+    public void setValue(String text) {
+        this.value = new BigDecimal(text);
     }
 
 }

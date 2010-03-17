@@ -32,7 +32,7 @@ import java.util.Map;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public enum VifeStd implements Vife {
+public enum VifePrimary implements Vife {
 
     PER_SECOND("/s"),
     PER_MINUTE("/min"),
@@ -135,12 +135,10 @@ public enum VifeStd implements Vife {
     FUTUR_VALUE("future value"),
     MAN_SPEC("next VIFE's and data of this block are manufacturer specific");
 
-    public final static String PRIMARY = "primary";
-
-    public static VifeStd valueOfTableIndex(byte ordinal) {
+    public static VifePrimary valueOfTableIndex(byte ordinal) {
         if (map == null) {
-            map = new HashMap<Byte, VifeStd>(values().length);
-            for (VifeStd val : values()) {
+            map = new HashMap<Byte, VifePrimary>(values().length);
+            for (VifePrimary val : values()) {
                 map.put((byte) (val.ordinal() + 0x20), val);
 //                System.out.println(String.format("0x%02x %s", val.ordinal() + 0x20, val));
             }
@@ -162,13 +160,13 @@ public enum VifeStd implements Vife {
         return result == 1;
     }
     private final String label;
-    private static Map<Byte, VifeStd> map;
+    private static Map<Byte, VifePrimary> map;
 
-    private VifeStd() {
+    private VifePrimary() {
         this.label = String.format("Reserved 0x%02x", ordinal() + 0x20);
     }
 
-    private VifeStd(String friendlyName) {
+    private VifePrimary(String friendlyName) {
         this.label = friendlyName;
     }
 
@@ -187,12 +185,12 @@ public enum VifeStd implements Vife {
     }
 
     @Override
-    public String getVifeTypeName() {
-        return PRIMARY;
+    public VifeTypes getVifeType() {
+        return VifeTypes.PRIMARY;
     }
 
-    public static VifeStd fromLabel(String label) {
-        for (VifeStd value : values()) {
+    public static VifePrimary fromLabel(String label) {
+        for (VifePrimary value : values()) {
             if (value.getLabel().equals(label)) {
                 return value;
             }

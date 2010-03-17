@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "LUG",
  "medium": "Heat",
- "version": 2,
+ "version": "0x02",
  "identNumber": 65068549,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 0,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -740,13 +740,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    3,
-    2,
-    0,
-    0,
-    34
-   ]
+   "data": "0x[0302000022]"
   }
  ]
 }

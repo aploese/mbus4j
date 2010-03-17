@@ -34,19 +34,79 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifTypes;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeTypes;
 import net.sf.mbus4j.json.JSONSerializable;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public abstract class DataBlock implements Serializable, JSONSerializable {
+public abstract class DataBlock implements Serializable, JSONSerializable, Cloneable {
 
+    public static Vif getVif(String vifTypeLabel, String vifLabel, String unitOfMeasurementLabel, String siPrefixLabel, Integer exponent) {
+        VifTypes vifType = VifTypes.fromLabel(vifTypeLabel);
+        SiPrefix siPrefix = SiPrefix.fromLabel(siPrefixLabel);
+        UnitOfMeasurement unitOfMeasurement = UnitOfMeasurement.fromLabel(unitOfMeasurementLabel);
+        switch (vifType) {
+            case PRIMARY:
+                return VifPrimary.assemble(vifLabel, unitOfMeasurement, siPrefix, exponent);
+            case FB_EXTENTION:
+                return VifFB.assemble(vifLabel, unitOfMeasurement, siPrefix, exponent);
+            case FD_EXTENTION:
+                return VifFD.assemble(vifLabel, unitOfMeasurement, siPrefix, exponent);
+            case ASCII:
+                return new VifAscii(vifLabel);
+            case MANUFACTURER_SPECIFIC:
+                return new VifManufacturerSpecific((byte) Integer.parseInt(vifLabel.substring(2), 16));
+            default: {
+                throw new IllegalArgumentException("Unknown vifType: " + vifTypeLabel);
+            }
+        }
+    }
+
+    public static Vif vifFromJSON(JSONObject jsonVif) {
+        return getVif(jsonVif.getString("vifType"),
+                jsonVif.containsKey("description") ? jsonVif.getString("description") : null,
+                jsonVif.containsKey("unitOfMeasurement") ? jsonVif.getString("unitOfMeasurement") : null,
+                jsonVif.containsKey("siPrefix") ? jsonVif.getString("siPrefix") : null,
+                jsonVif.containsKey("exponent") ? jsonVif.getInt("exponent") : null);
+    }
+
+    public static Vife getVife(String vifeTypeLabel, String vifeLabel) {
+        VifeTypes vifeType = VifeTypes.fromLabel(vifeTypeLabel);
+        switch (vifeType) {
+            case PRIMARY:
+                return VifePrimary.fromLabel(vifeLabel);
+            case ERROR:
+                return VifeError.fromLabel(vifeLabel);
+            case OBJECT_ACTION:
+                return VifeObjectAction.fromLabel(vifeLabel);
+            case MAN_SPEC:
+                return new VifeManufacturerSpecific((byte) Integer.parseInt(vifeLabel.substring(2), 16));
+            default:
+                throw new IllegalArgumentException(vifeType.getLabel());
+        }
+    }
+
+    public static Vife[] vifesFromJSON(VifTypes vifType, JSONArray jsonVifes) {
+        if (jsonVifes instanceof JSONArray) {
+            Vife[] result = new Vife[jsonVifes.size()];
+            for (int i = 0; i < jsonVifes.size(); i++) {
+                result[i] = getVife(jsonVifes.getJSONObject(i).getString("vifeType"), jsonVifes.getJSONObject(i).getString("name"));
+            }
+            return result;
+        } else {
+            return new Vife[0];
+        }
+    }
     private ObjectAction action;
     private Vif vif;
     /**
@@ -94,6 +154,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
     public DataBlock(DataFieldCode dif, Vif vif, Vife... vifes) {
         super();
         this.dataFieldCode = dif;
+        functionField = FunctionField.INSTANTANEOUS_VALUE;
         this.vif = vif;
         if (vifes != null && vifes.length > 0) {
             this.vifes = new ArrayList<Vife>(vifes.length);
@@ -136,7 +197,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
         }
         if (vifes != null) {
             for (Vife vife : vifes) {
-                sb.append(" ").append(vife);
+                sb.append(" ").append(vife.getLabel());
             }
         }
         return sb.toString();
@@ -262,8 +323,11 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
         return sb.toString();
     }
 
+    protected void accumulateDatatoJSON(JSONObject json) {
+    }
+
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
         JSONObject drh = new JSONObject();
         JSONObject dib = new JSONObject();
@@ -289,20 +353,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
             dib.accumulate("tariff", getTariff());
             drh.accumulate("dib", dib);
             JSONObject jsonVif = new JSONObject();
-            jsonVif.accumulate("vifType", vif.getVifTypeName());
-            if (vif instanceof VifManufacturerSpecific) {
-                VifManufacturerSpecific vifManSpec = (VifManufacturerSpecific) vif;
-                jsonVif.accumulate("code", vifManSpec.getVife());
-                if (vifManSpec.getVifes().length > 0) {
-                    JSONArray jsonVifes = new JSONArray();
-                    for (byte b : vifManSpec.getVifes()) {
-                        jsonVifes.add(b);
-                    }
-                    jsonVif.accumulate("vifes", jsonVifes);
-                }
-            } else {
-                jsonVif.accumulate("description", vif.getLabel());
-            }
+            jsonVif.accumulate("vifType", vif.getVifType().getLabel());
+            jsonVif.accumulate("description", vif.getLabel());
             if (vif.getUnitOfMeasurement() != null) {
                 jsonVif.accumulate("unitOfMeasurement", vif.getUnitOfMeasurement().getLabel());
             }
@@ -318,7 +370,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
                 JSONArray jsonVifes = new JSONArray();
                 for (Vife value : vifes) {
                     JSONObject jsonVife = new JSONObject();
-                    jsonVife.accumulate("vifeType", value.getVifeTypeName());
+                    jsonVife.accumulate("vifeType", value.getVifeType().getLabel());
                     jsonVife.accumulate("name", value.getLabel());
                     jsonVifes.add(jsonVife);
                 }
@@ -327,57 +379,10 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
             drh.accumulate("vib", vib);
         }
         result.accumulate("drh", drh);
+        if ((JsonSerializeType.ALL == jsonSerializeType) || (JsonSerializeType.SLAVE_CONFIG == jsonSerializeType)) {
+            accumulateDatatoJSON(result);
+        }
         return result;
-    }
-
-    public static Vife[] vifesFromJSON(JSONArray jsonVifes) {
-        if (jsonVifes instanceof JSONArray) {
-            Vife[] result = new Vife[jsonVifes.size()];
-            for (int i = 0; i < jsonVifes.size(); i++) {
-                String vifeType = jsonVifes.getJSONObject(i).getString("vifeType");
-                String vifeName = jsonVifes.getJSONObject(i).getString("name");
-                if (VifeStd.PRIMARY.equals(vifeType)) {
-                    result[i] = VifeStd.fromLabel(vifeName);
-                } else if (VifeError.ERROR.equals(vifeType)) {
-                    result[i] = VifeError.fromLabel(vifeName);
-                } else if (VifeObjectAction.OBJECT_ACTION.equals(vifeType)) {
-                    result[i] = VifeObjectAction.fromLabel(vifeName);
-                } else {
-                    throw new IllegalArgumentException(vifeType);
-                }
-            }
-            return result;
-        } else {
-            return new Vife[0];
-        }
-    }
-
-    public static Vif vifFromJSON(JSONObject jsonVif) {
-        String vifType = jsonVif.getString("vifType");
-        String description = jsonVif.containsKey("description") ? jsonVif.getString("description") : null;
-        SiPrefix siPrefix = jsonVif.containsKey("siPrefix") ? SiPrefix.fromLabel(jsonVif.getString("siPrefix")) : null;
-        Integer exponent = jsonVif.containsKey("exponent") ? jsonVif.getInt("exponent") : null;
-        UnitOfMeasurement unitOfMeasurement = jsonVif.containsKey("unitOfMeasurement") ? UnitOfMeasurement.fromLabel(jsonVif.getString("unitOfMeasurement")) : null;
-        if (VifPrimary.PRIMARY.equals(vifType)) {
-            return VifPrimary.assemble(jsonVif.getString("description"), unitOfMeasurement, siPrefix, exponent);
-        } else if (VifFB.EXTENTION_FB.equals(vifType)) {
-            return VifFB.assemble(description, unitOfMeasurement, siPrefix, exponent);
-        } else if (VifFD.EXTENTION_FD.equals(vifType)) {
-            return VifFD.assemble(description, unitOfMeasurement, siPrefix, exponent);
-        } else if (VifAscii.ASCII.equals(vifType)) {
-            return new VifAscii(description);
-        } else if (VifManufacturerSpecific.MANUFACTURER_SPECIFIC.equals(vifType)) {
-            VifManufacturerSpecific manSpec = new VifManufacturerSpecific((byte) jsonVif.getInt("code"));
-            if (jsonVif.containsKey("vifes")) {
-                JSONArray jsonVifes = jsonVif.getJSONArray("vifes");
-                for (int i = 0; i < jsonVifes.size(); i++) {
-                    manSpec.addVIFE((byte) jsonVifes.getInt(i));
-                }
-            }
-            return manSpec;
-        } else {
-            throw new IllegalArgumentException(jsonVif.getString("vifType"));
-        }
     }
 
     @Override
@@ -400,7 +405,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
                 vif = vifFromJSON(jsonVif);
                 if (vib.containsKey("vifes")) {
 
-                    Vife[] parsedVifes = vifesFromJSON(vib.getJSONArray("vifes"));
+                    Vife[] parsedVifes = vifesFromJSON(vif.getVifType(), vib.getJSONArray("vifes"));
                     if (parsedVifes.length > 0) {
 
                         vifes = new ArrayList<Vife>(parsedVifes.length);
@@ -416,4 +421,6 @@ public abstract class DataBlock implements Serializable, JSONSerializable {
             }
         }
     }
+
+    public abstract void setValue(String text);
 }

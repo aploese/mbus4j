@@ -17,9 +17,9 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.json.JSONFactory;
 
 /**
  *
@@ -44,13 +44,11 @@ public class RawDataBlock extends DataBlock {
     @Override
     public String getValueAsString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("(hex)[");
         if (value != null) {
             for (byte b : value) {
                 sb.append(String.format("%02X", b));
             }
         }
-        sb.append("]");
         return sb.toString();
     }
 
@@ -75,27 +73,28 @@ public class RawDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
-            JSONArray jsonValues = new JSONArray();
-            if (getValue() != null) {
-                for (byte b : getValue()) {
-                    jsonValues.add(b);
-                }
-            }
-            result.accumulate("data", jsonValues);
+    protected void accumulateDatatoJSON(JSONObject json) {
+        if (getValue() != null) {
+            json.accumulate("data", JSONFactory.encodeHexByteArray(getValue()));
         }
-        return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
         super.fromJSON(json);
-        JSONArray jsonValues = json.getJSONArray("data");
-        value = new byte[jsonValues.size()];
-        for (int i = 0; i < value.length; i++) {
-            value[i] = (byte) jsonValues.getInt(i);
+        if (json.containsKey("data")) {
+            value = JSONFactory.decodeHexByteArray(json.getString("data"));
+        } else {
+            value = null;
         }
+    }
+
+    @Override
+    public void setValue(String text) {
+        value = new byte[text.length() / 2];
+        for (int i = 0; i < text.length() / 2; i++) {
+            value[i] = (byte)Integer.parseInt(text.substring(i* 2, i * 2 +1), 16);
+        }
+
     }
 }
