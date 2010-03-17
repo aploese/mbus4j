@@ -25,7 +25,6 @@ import java.util.Arrays;
  * @version $Id$
  */
 public class VifManufacturerSpecific implements Vif {
-    public static final String MANUFACTURER_SPECIFIC = "manufacturer specific";
 
     public static boolean isManufacturerSecific(String label) {
         return label.startsWith("Manufacturer specific coding including VIFE's (VIF == 0x");
@@ -38,23 +37,13 @@ public class VifManufacturerSpecific implements Vif {
 
         String[] splitted = label.split("0x");
         VifManufacturerSpecific result = new VifManufacturerSpecific((byte)Short.parseShort(splitted[1].substring(0, 2), 16));
-        for (int i = 2; i < splitted.length; i++) {
-            result.addVIFE(Byte.parseByte(splitted[i].substring(0, 2)));
-        }
         return result;
     }
 
-    private byte[] vifes;
-    final byte vife;
+    final byte vifByte;
 
     public VifManufacturerSpecific(byte b) {
-        vife = b;
-        vifes = new byte[0];
-    }
-
-    public void addVIFE(byte b) {
-        vifes = Arrays.copyOf(vifes, vifes.length + 1);
-        vifes[vifes.length - 1] = b;
+        vifByte = b;
     }
 
     @Override
@@ -64,7 +53,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public String getLabel() {
-        return toString();
+        return String.format("0x%02X", vifByte);
     }
 
     /**
@@ -80,23 +69,13 @@ public class VifManufacturerSpecific implements Vif {
         return null;
     }
 
-    public byte[] getVifes() {
-        return vifes;
-    }
-
-    public byte getVife() {
-        return vife;
+    public byte getVifByte() {
+        return vifByte;
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Manufacturer specific coding including VIFE's (VIF == 0x%02X) VIFE's = [", vife));
-        for (byte b : vifes) {
-            sb.append(String.format("%02X", b));
-        }
-        sb.append("]");
-        return sb.toString();
+        return getLabel();
     }
 
     @Override
@@ -105,11 +84,11 @@ public class VifManufacturerSpecific implements Vif {
             return false;
         }
         VifManufacturerSpecific o = (VifManufacturerSpecific)other;
-        return vife == o.vife && Arrays.equals(vifes, o.vifes);
+        return vifByte == o.vifByte;
     }
 
     @Override
-    public String getVifTypeName() {
-        return MANUFACTURER_SPECIFIC;
+    public VifTypes getVifType() {
+        return VifTypes.MANUFACTURER_SPECIFIC;
     }
 }

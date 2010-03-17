@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "SIE",
  "medium": "Heat",
- "version": 1,
+ "version": "0x01",
  "identNumber": 60109158,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 0,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -414,13 +414,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    4,
-    1,
-    0,
-    0,
-    0
-   ]
+   "data": "0x[0401000000]"
   }
  ]
 }

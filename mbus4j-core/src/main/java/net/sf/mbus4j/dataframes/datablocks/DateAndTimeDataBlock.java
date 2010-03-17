@@ -20,6 +20,8 @@ package net.sf.mbus4j.dataframes.datablocks;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
@@ -181,9 +183,7 @@ public class DateAndTimeDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
+    protected void accumulateDatatoJSON(JSONObject json) {
             DateFormat df = DateFormat.getDateTimeInstance();
             JSONObject jsonValue = new JSONObject();
             jsonValue.accumulate("timestamp", df.format(value));
@@ -192,9 +192,7 @@ public class DateAndTimeDataBlock extends DataBlock {
             jsonValue.accumulate("res1", res1);
             jsonValue.accumulate("res2", res2);
             jsonValue.accumulate("res3", res3);
-            result.accumulate("data", jsonValue);
-        }
-        return result;
+            json.accumulate("data", jsonValue);
     }
 
     @Override
@@ -212,5 +210,17 @@ public class DateAndTimeDataBlock extends DataBlock {
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public void setValue(String text) {
+        try {
+            value = DateFormat.getDateTimeInstance().parse(text);
+            valid = true;
+            //TODO summerTime
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }

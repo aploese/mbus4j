@@ -46,7 +46,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class VariableDataBlockDecoder {
 
         WAIT_FOR_INIT,
         DIF, DIFE,
-        VIF, VIFE_FB, VIFE_FD, VIFE, ASCII_VIF_LENGTH, ASCII_VIF_COLLECT, COLLECT_MANUFACTURER_SPECIFIC_VIFE,
+        VIF, VIF_FB, VIF_FD, VIFE, ASCII_VIF_LENGTH, ASCII_VIF_COLLECT,
         SET_VARIABLE_LENGTH,
         COLLECTING_VALUE,
         ERROR,
@@ -96,12 +97,6 @@ public class VariableDataBlockDecoder {
                 stack.init(b & 0xFF);
                 setState(DecodeState.ASCII_VIF_COLLECT);
                 break;
-            case COLLECT_MANUFACTURER_SPECIFIC_VIFE:
-                ((VifManufacturerSpecific) db.getVif()).addVIFE(b);
-                if ((b & Decoder.EXTENTIONS_BIT) == 0x00) {
-                    startCollectingValue();
-                }
-                break;
             case ASCII_VIF_COLLECT:
                 stack.push(b);
                 if (stack.isFull()) {
@@ -109,10 +104,10 @@ public class VariableDataBlockDecoder {
                     startCollectingValue();
                 }
                 break;
-            case VIFE_FB:
+            case VIF_FB:
                 decodeVifExtention_FB(b);
                 break;
-            case VIFE_FD:
+            case VIF_FD:
                 decodeVifExtention_FD(b);
                 break;
             case VIFE:
@@ -237,7 +232,7 @@ public class VariableDataBlockDecoder {
                 break;
             default:
                 try {
-                createDataBlock((byte) (b & 0x0F));
+                    createDataBlock((byte) (b & 0x0F));
                 } catch (Exception e) {
                     log.error("HALLO: " + b);
                     throw new RuntimeException(e);
@@ -262,7 +257,7 @@ public class VariableDataBlockDecoder {
         if (!DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals(db.getDataFieldCode())) {
             db.setStorageNumber((b >> 6) & 0x01);
         }
-        if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.DIFE);
         } else {
             if (bytesLeft == 0) {
@@ -278,7 +273,7 @@ public class VariableDataBlockDecoder {
         db.setStorageNumber(db.getStorageNumber() | ((long) (b & 0x0F) << (1 + dFIEIndex * 4)));
         db.setTariff(db.getTariff() | (((b >> 4) & 0x03) << (dFIEIndex * 2)));
         db.setSubUnit((short) (db.getSubUnit() | ((b >> 6) & 0x01) << dFIEIndex));
-        if ((b & Decoder.EXTENTIONS_BIT) != Decoder.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTION_BIT) != Decoder.EXTENTION_BIT) {
             setState(DecodeState.VIF);
         }
     }
@@ -351,11 +346,11 @@ public class VariableDataBlockDecoder {
                     ((EnhancedIdentificationDataBlock) db).setId(stack.popBcdInteger(8));
                 } else {
                     ((IntegerDataBlock) db).setBcdError(stack.peekBcdError(8));
-                if (((IntegerDataBlock) db).getBcdError() != null) {
-                    stack.popBcdInteger(8);
-                } else {
+                    if (((IntegerDataBlock) db).getBcdError() != null) {
+                        stack.popBcdInteger(8);
+                    } else {
                         ((IntegerDataBlock) db).setValue(stack.popBcdInteger(8));
-                }
+                    }
                 }
                 break;
             case _32_BIT_REAL:
@@ -366,7 +361,7 @@ public class VariableDataBlockDecoder {
                 break;
             case _12_DIGIT_BCD:
                 ((LongDataBlock) db).setBcdError(stack.peekBcdError(12));
-                  if (((LongDataBlock) db).getBcdError() != null) {
+                if (((LongDataBlock) db).getBcdError() != null) {
                     stack.popBcdInteger(12);
                 } else {
                     ((LongDataBlock) db).setValue(stack.popBcdLong(12));
@@ -406,10 +401,10 @@ public class VariableDataBlockDecoder {
      * b will be expanded to int, so clear the sign, wich will be nagative in the case extention bit is set
      */
     private void decodeVIF(final byte b) {
-        switch (b & Decoder.EXTENTIONS_BIT_MASK) {
+        switch (b & ~Decoder.EXTENTION_BIT) {
             case 0x7B:
                 // decode vife table 8.4.4 b
-                setState(DecodeState.VIFE_FB);
+                setState(DecodeState.VIF_FB);
                 return;
             case 0x7C:
                 stack.clear();
@@ -418,20 +413,20 @@ public class VariableDataBlockDecoder {
                 return;
             case 0x7D:
                 // decode vife table 8.4.4 a
-                setState(DecodeState.VIFE_FD);
+                setState(DecodeState.VIF_FD);
                 return;
             case 0x7E:
                 db.setVif(VifPrimary.READOUT_SELECTION);
                 break;
             case 0x7F:
-                db.setVif(new VifManufacturerSpecific(b));
-                if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
-                    setState(DecodeState.COLLECT_MANUFACTURER_SPECIFIC_VIFE);
+                db.setVif(new VifManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT)));
+                if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
+                    setState(DecodeState.VIFE);
                     return;
                 }
                 break;
             default:
-                db.setVif(VifPrimary.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
+                db.setVif(VifPrimary.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT)));
                 if (UnitOfMeasurement.DATE.equals(db.getUnitOfMeasurement())) {
                     db = new DateDataBlock(db);
                 } else if (UnitOfMeasurement.TIME_AND_DATE.equals(db.getUnitOfMeasurement())) {
@@ -447,81 +442,87 @@ public class VariableDataBlockDecoder {
         // Extended VID chapter 8.4.5
         switch (frame.getControlCode()) {
             case RSP_UD:
-                // Error Codes  Table 7 Chapter 6.6 0x00 to
-                Vife vife = VifeStd.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK));
-                if (vife == null) {
-                    vife = VifeError.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK));
-                }
-                //TODO Throw unknown ...
-                if (vife instanceof VifeStd) {
-                    switch ((VifeStd) vife) {
-                        case START_DATE_TIME_OF:
-                        case TIMESTAMP_OF_BEGIN_FIRST_LOWER:
-                        case TIMESTAMP_OF_END_FIRST_LOWER:
-                        case TIMESTAMP_BEGIN_LAST_LOWER:
-                        case TIMESTAMP_END_LAST_LOWER:
-                        case TIMESTAMP_BEGIN_FIRST_UPPER:
-                        case TIMESTAMP_END_FIRST_UPPER:
-                        case TIMESTAMP_BEGIN_LAST_UPPER:
-                        case TIMESTAMP_END_LAST_UPPER:
-                            db = new DateAndTimeDataBlock(db);
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_S:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_MIN:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_H:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_D:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_S:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_MIN:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_H:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_D:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_S:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_MIN:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_H:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_D:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_S:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_MIN:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_H:
-                            break;
-                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_D:
-                            break;
-                        case DURATION_OF_FIRST_S:
-                            break;
-                        case DURATION_OF_FIRST_MIN:
-                            break;
-                        case DURATION_OF_FIRST_H:
-                            break;
-                        case DURATION_OF_FIRST_D:
-                            break;
-                        case DURATION_OF_LAST_S:
-                            break;
-                        case DURATION_OF_LAST_MIN:
-                            break;
-                        case DURATION_OF_LAST_H:
-                            break;
-                        case DURATION_OF_LAST_D:
-                            break;
-                        case TIMESTAMP_BEGIN_OF_FIRST:
-                        case TIMESTAMP_END_OF_FIRST:
-                        case TIMESTAMP_BEGIN_OF_LAST:
-                        case TIMESTAMP_END_OF_LAST:
-                            db = new DateAndTimeDataBlock(db);
-                            break;
+                Vife vife;
+                // TODO last VidPrimary is Manspec ???
+                if ((db.getVif() instanceof VifManufacturerSpecific)) {
+                    vife = new VifeManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT));
+                } else {
+                    // Error Codes  Table 7 Chapter 6.6 0x00 to
+                    vife = VifePrimary.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+                    if (vife == null) {
+                        vife = VifeError.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+                    }
+                    //TODO Throw unknown ...
+                    if (vife instanceof VifePrimary) {
+                        switch ((VifePrimary) vife) {
+                            case START_DATE_TIME_OF:
+                            case TIMESTAMP_OF_BEGIN_FIRST_LOWER:
+                            case TIMESTAMP_OF_END_FIRST_LOWER:
+                            case TIMESTAMP_BEGIN_LAST_LOWER:
+                            case TIMESTAMP_END_LAST_LOWER:
+                            case TIMESTAMP_BEGIN_FIRST_UPPER:
+                            case TIMESTAMP_END_FIRST_UPPER:
+                            case TIMESTAMP_BEGIN_LAST_UPPER:
+                            case TIMESTAMP_END_LAST_UPPER:
+                                db = new DateAndTimeDataBlock(db);
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_S:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_MIN:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_H:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_D:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_S:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_MIN:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_H:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_D:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_S:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_MIN:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_H:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_D:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_S:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_MIN:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_H:
+                                break;
+                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_D:
+                                break;
+                            case DURATION_OF_FIRST_S:
+                                break;
+                            case DURATION_OF_FIRST_MIN:
+                                break;
+                            case DURATION_OF_FIRST_H:
+                                break;
+                            case DURATION_OF_FIRST_D:
+                                break;
+                            case DURATION_OF_LAST_S:
+                                break;
+                            case DURATION_OF_LAST_MIN:
+                                break;
+                            case DURATION_OF_LAST_H:
+                                break;
+                            case DURATION_OF_LAST_D:
+                                break;
+                            case TIMESTAMP_BEGIN_OF_FIRST:
+                            case TIMESTAMP_END_OF_FIRST:
+                            case TIMESTAMP_BEGIN_OF_LAST:
+                            case TIMESTAMP_END_OF_LAST:
+                                db = new DateAndTimeDataBlock(db);
+                                break;
 
-                        default:
+                            default:
+                        }
                     }
                 }
                 db.addVife(vife);
@@ -539,13 +540,13 @@ public class VariableDataBlockDecoder {
 
     private void decodeVifExtention_FB(final byte b) {
         // Extended VID chapter 8.4.4 table b
-        db.setVif(VifFB.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
+        db.setVif(VifFB.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT)));
         goFromVifOrVife(b);
     }
 
     private void decodeVifExtention_FD(final byte b) {
         // Extended VID chapter 8.4.4 table a
-        db.setVif(VifFD.valueOfTableIndex((byte) (b & Decoder.EXTENTIONS_BIT_MASK)));
+        db.setVif(VifFD.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT)));
         goFromVifOrVife(b);
     }
 
@@ -558,7 +559,7 @@ public class VariableDataBlockDecoder {
     }
 
     private void goFromVifOrVife(final byte b) {
-        if ((b & Decoder.EXTENTIONS_BIT) == Decoder.EXTENTIONS_BIT) {
+        if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.VIFE);
         } else {
             if (db instanceof ReadOutDataBlock) {

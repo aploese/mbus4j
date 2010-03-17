@@ -34,15 +34,6 @@ import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
-import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,58 +43,6 @@ import org.slf4j.LoggerFactory;
  * @version $Id$
  */
 public class Decoder {
-
-    public static boolean compareVif(Vif vif, String label, String unitOfMeasurement, String siPrefix, Integer exponent) {
-        boolean result = vif.getLabel() == null ? label == null : vif.getLabel().equals(label);
-        result &= vif.getUnitOfMeasurement() == null ? unitOfMeasurement == null : vif.getUnitOfMeasurement().name().equals(unitOfMeasurement);
-        result &= vif.getSiPrefix() == null ? siPrefix == null : vif.getSiPrefix().name().equals(siPrefix);
-        result &= vif.getExponent() == null ? exponent == null : vif.getExponent().equals(exponent);
-        return result;
-    }
-
-    public static boolean compareVife(Vife vife, String label) {
-        return vife.getLabel() == null ? label == null : vife.getLabel().equals(label);
-    }
-
-    public static Vif getVif(String label, String unitOfMeasurement, String siPrefix, Integer exponent) {
-        for (Vif vif : VifPrimary.values()) {
-            if (compareVif(vif, label, unitOfMeasurement, siPrefix, exponent)) {
-                return vif;
-            }
-        }
-        for (Vif vif : VifFB.values()) {
-            if (compareVif(vif, label, unitOfMeasurement, siPrefix, exponent)) {
-                return vif;
-            }
-        }
-        for (Vif vif : VifFD.values()) {
-            if (compareVif(vif, label, unitOfMeasurement, siPrefix, exponent)) {
-                return vif;
-            }
-        }
-        if ((siPrefix == null) && (exponent == null) && (unitOfMeasurement == null)) {
-            if (VifManufacturerSpecific.isManufacturerSecific(label)) {
-                return VifManufacturerSpecific.fromLabel(label);
-            } else {
-                return new VifAscii(label);
-            }
-        }
-        throw new IllegalArgumentException("Could not find Vif");
-    }
-
-    public static Vife getVife(String label) {
-        for (Vife vife : VifeError.values()) {
-            if (compareVife(vife, label)) {
-                return vife;
-            }
-        }
-        for (Vife vife : VifeStd.values()) {
-            if (compareVife(vife, label)) {
-                return vife;
-            }
-        }
-        throw new IllegalArgumentException("Could not find Vife");
-    }
 
     public enum DecodeState {
 
@@ -129,8 +68,7 @@ public class Decoder {
         ERROR;
     }
     private final static Logger log = LoggerFactory.getLogger(Decoder.class);
-    public static final byte EXTENTIONS_BIT = (byte) 0x80;
-    public static final byte EXTENTIONS_BIT_MASK = 0x7F;
+    public static final byte EXTENTION_BIT = (byte) 0x80;
 
     public static byte[] ascii2Bytes(String s) {
         byte[] result = new byte[s.length() / 2];

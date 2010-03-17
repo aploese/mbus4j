@@ -13,7 +13,7 @@ import net.sf.json.JSONObject;
  */
 public interface JSONSerializable {
 
-    JSONObject toJSON(boolean isTemplate);
+    JSONObject toJSON(JsonSerializeType jsonSerializeType);
 
     void fromJSON(JSONObject json);
 

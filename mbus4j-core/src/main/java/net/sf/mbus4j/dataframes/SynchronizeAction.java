@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes;
 
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -25,8 +26,8 @@ import net.sf.json.JSONObject;
  * @version $Id$
  */
 public class SynchronizeAction implements ControlFrame {
-    public static String SEND_USER_DATA_SUBTYPE = "synchronize action";
 
+    public static String SEND_USER_DATA_SUBTYPE = "synchronize action";
     private byte address;
     private boolean fcb;
 
@@ -77,18 +78,20 @@ public class SynchronizeAction implements ControlFrame {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
         result.accumulate("controlCode", getControlCode());
         result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
-        result.accumulate("fcb", isFcb());
-        result.accumulate("address", address & 0xFF);
+        if (JsonSerializeType.ALL == jsonSerializeType) {
+            result.accumulate("fcb", isFcb());
+            result.accumulate("address", address & 0xFF);
+        }
         return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
         fcb = json.getBoolean("fcb");
-        address = (byte)json.getInt("address");
+        address = (byte) json.getInt("address");
     }
 }

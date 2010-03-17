@@ -24,8 +24,6 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 public class VifAscii implements Vif {
 
-    public final static String ASCII = "ascii";
-
     private String value;
 
     public VifAscii() {
@@ -85,7 +83,7 @@ public class VifAscii implements Vif {
     }
 
     @Override
-    public String getVifTypeName() {
-        return ASCII;
-    }
+    public VifTypes getVifType() {
+         return VifTypes.ASCII;
+   }
 }

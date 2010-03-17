@@ -52,7 +52,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeStd;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 import net.sf.mbus4j.decoder.Decoder;
 
 import org.slf4j.Logger;
@@ -441,7 +442,7 @@ public class Encoder {
                 data[currentPos++] = 0x7F;
                 return;
             default:
-                data[currentPos] |= needDIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
+                data[currentPos] |= needDIFE(db, 0) ? Decoder.EXTENTION_BIT : 0x00;
                 if (db.getFunctionField() != null) {
                     data[currentPos] |= db.getFunctionField().code;
                 }
@@ -450,7 +451,7 @@ public class Encoder {
     }
 
     private void pushDIFE(DataBlock db, int index) {
-        data[currentPos] = needDIFE(db, index + 1) ? Decoder.EXTENTIONS_BIT : 0x00;
+        data[currentPos] = needDIFE(db, index + 1) ? Decoder.EXTENTION_BIT : 0x00;
         data[currentPos] |= (db.getStorageNumber() >> (1 + index * 4)) & 0x0F;
         data[currentPos] |= ((db.getTariff() >> (index * 2)) << 0x04) & 0x30;
         data[currentPos++] |= ((db.getSubUnit() >> index) << 0x06) & 0x40;
@@ -573,33 +574,35 @@ public class Encoder {
     private void pushVIF(DataBlock db) {
         if (db.getVif() == null) {
         } else if (db.getVif() instanceof VifPrimary) {
-            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTION_BIT : 0x00;
             data[currentPos++] |= ((VifPrimary) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifFB) {
             data[currentPos++] = (byte) 0xFB;
-            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTION_BIT : 0x00;
             data[currentPos++] |= ((VifFB) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifFD) {
             data[currentPos++] = (byte) 0xFD;
-            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTIONS_BIT : 0x00;
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTION_BIT : 0x00;
             data[currentPos++] |= ((VifFD) db.getVif()).getTableIndex();
         } else if (db.getVif() instanceof VifAscii) {
             data[currentPos++] = (byte) (needVIFE(db, 0) ? 0xFC : 0x7C);
             pushString(((VifAscii) db.getVif()).getValue());
         } else if (db.getVif() instanceof VifManufacturerSpecific) {
-            data[currentPos++] = (byte) 0xFF;
-            pushBytes(((VifManufacturerSpecific) db.getVif()).getVifes());
+            data[currentPos] = needVIFE(db, 0) ? Decoder.EXTENTION_BIT : 0x00;
+            data[currentPos++] |= 0x7F;
         } else {
             throw new RuntimeException("Unknown vif " + db.getVif());
         }
     }
 
     private void pushVIFE(DataBlock db, int index) {
-        data[currentPos] = needVIFE(db, index + 1) ? Decoder.EXTENTIONS_BIT : 0x00;
-        if (db.getVifes().get(index) instanceof VifeStd) {
-            data[currentPos++] |= ((VifeStd) db.getVifes().get(index)).getTableIndex();
+        data[currentPos] = needVIFE(db, index + 1) ? Decoder.EXTENTION_BIT : 0x00;
+        if (db.getVifes().get(index) instanceof VifePrimary) {
+            data[currentPos++] |= ((VifePrimary) db.getVifes().get(index)).getTableIndex();
         } else if (db.getVifes().get(index) instanceof VifeError) {
             data[currentPos++] |= ((VifeError) db.getVifes().get(index)).getTableIndex();
+        } else if (db.getVifes().get(index) instanceof VifeManufacturerSpecific) {
+            data[currentPos++] |= ((VifeManufacturerSpecific) db.getVifes().get(index)).getVifeValue();
 //        } else if (db.getVifes().get(index) instanceof VifeObjectAction) {
             //TODO
         }

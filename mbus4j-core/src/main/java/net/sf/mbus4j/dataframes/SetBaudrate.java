@@ -18,6 +18,7 @@
 package net.sf.mbus4j.dataframes;
 
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -94,13 +95,15 @@ public class SetBaudrate implements ControlFrame {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
         result.accumulate("controlCode", getControlCode());
         result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
+        if (jsonSerializeType.ALL == jsonSerializeType) {
         result.accumulate("fcb", isFcb());
         result.accumulate("address", address & 0xFF);
         result.accumulate("baudrate", baudrate);
+        }
         return result;
    }
 

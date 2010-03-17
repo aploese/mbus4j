@@ -66,9 +66,30 @@ public interface Vif {
     UnitOfMeasurement getUnitOfMeasurement();
 
     /**
-     * Name of the vif i.e. ascii, primary extention FB, extention FD
+     * Type of the vif i.e. ascii, primary extention FB, extention FD
      * @return
      */
-    String getVifTypeName();
+    VifTypes getVifType();
+
+    final static class VifToString {
+        final static String vifToString(Vif vif) {
+                        StringBuilder sb = new StringBuilder();
+            sb.append(vif.getLabel());
+            if (vif.getExponent() != null) {
+                sb.append(" * 10^").append(vif.getExponent());
+            }
+            if ((vif.getSiPrefix() != null) || (vif.getUnitOfMeasurement() != null)) {
+                sb.append('[');
+                if (vif.getSiPrefix() != null) {
+                    sb.append(vif.getSiPrefix());
+                }
+                if (vif.getUnitOfMeasurement() != null) {
+                    sb.append(vif.getUnitOfMeasurement());
+                }
+                sb.append(']');
+            }
+            return sb.toString();
+        }
+    }
 
 }

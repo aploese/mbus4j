@@ -34,26 +34,47 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.jdesktop</groupId>
+            <artifactId>appframework</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mbus4j-slaves</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdesktop</groupId>
+            <artifactId>swing-worker</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 
-    <!--build>
-  <plugins>
-    <plugin>
-      <groupId>org.easytesting</groupId>
-      <artifactId>fest-javafx-maven</artifactId>
-      <version>0.1</version>
-      <executions>
-        <execution>
-          <phase>compile</phase>
-          <goals>
-            <goal>desktopCompile</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-  </plugins>
-</build-->
+    <build>
+        <plugins>
+            <plugin>
+                <!-- mvn package appassembler:assemble -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <configuration>
+                    <programs>
+                        <program>
+                            <mainClass>net.sf.mbus4j.slaves.ui.SlavesUI</mainClass>
+                            <name>mbus-slaves-ui</name>
+                        </program>
+                    </programs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
 
 </project>
+
 
 

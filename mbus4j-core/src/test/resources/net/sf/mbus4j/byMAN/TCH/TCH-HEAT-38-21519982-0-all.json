@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "TCH",
  "medium": "Heat",
- "version": 38,
+ "version": "0x26",
  "identNumber": 21519982,
- "address": 78,
+ "address": "0x4e",
  "accessNumber": 133,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -185,9 +185,6 @@
    },
    "data": 64
   },
-    {
-   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}},
-   "data": []
-  }
+  {"drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}}}
  ]
 }

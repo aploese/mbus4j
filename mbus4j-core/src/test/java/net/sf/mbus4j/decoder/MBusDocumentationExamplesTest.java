@@ -21,7 +21,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -35,6 +34,7 @@ import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.json.JSONFactory;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -192,7 +192,7 @@ public class MBusDocumentationExamplesTest {
     }
 
         private void testJSON(Frame frame, String chapter, int exampleIndex) throws Exception {
-        JSONObject json = frame.toJSON(false);
+        JSONObject json = frame.toJSON(JsonSerializeType.ALL);
 //        System.out.println(json.toString(1));
         Frame jsonFrame = JSONFactory.createFrame(json);
         jsonFrame.fromJSON(json);

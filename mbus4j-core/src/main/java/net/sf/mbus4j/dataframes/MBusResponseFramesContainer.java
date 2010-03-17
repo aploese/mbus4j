@@ -24,25 +24,52 @@ import java.io.Serializable;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public interface MBusResponseFramesContainer extends  Iterable<ResponseFrame>, Serializable {
+public interface MBusResponseFramesContainer extends Iterable<ResponseFrameContainer>, Serializable {
 
-    void setAddress(int address);
-    void setId(int id);
-    void setVersion(int version);
+    void setAddress(byte address);
+
+    void setIdentNumber(int identNumber);
+
+    void setVersion(byte version);
+
     boolean isAcd();
-    void setAcd(boolean acd);
-    boolean isDfc();
-    void setDfc(boolean dfc);
-    String getMan();
-    void setMan(String man);
-    MBusMedium getMedium();
-    void setMedium(MBusMedium medium);
-    int getAddress();
-    int getId();
-    int getVersion();
 
-    ResponseFrame getResponseFrame(int index);
-    ResponseFrame[] getResponseFrames();
-    int getResponseFrameCount();
+    void setAcd(boolean acd);
+
+    boolean isDfc();
+
+    void setDfc(boolean dfc);
+
+    String getManufacturer();
+
+    void setManufacturer(String manufacturer);
+
+    MBusMedium getMedium();
+
+    void setMedium(MBusMedium medium);
+
+    byte getAddress();
+
+    int getIdentNumber();
+
+    byte getVersion();
+
+    UserDataResponse.StatusCode[] getStatus();
+
+    void setStatus(UserDataResponse.StatusCode[] status);
+
+    short getSignature();
+
+    void setSignature(short signature);
+
+    short getAccessnumber();
+
+    void setAccessnumber(short accessnumber);
+
+    ResponseFrameContainer getResponseFrameContainer(int index);
+
+    ResponseFrameContainer[] getResponseFrameContainers();
+
+    int getResponseFrameContainerCount();
 
 }

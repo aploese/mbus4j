@@ -58,18 +58,19 @@ public class RealDataBlock extends DataBlock {
         this.value = value;
     }
 
-        @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-             if (!isTemplate) {
-    result.accumulate("data", getValue());
-             }        return result;
+    @Override
+    protected void accumulateDatatoJSON(JSONObject json) {
+        json.accumulate("data", getValue());
     }
 
     @Override
     public void fromJSON(JSONObject json) {
         super.fromJSON(json);
-        setValue((float)json.getDouble("data"));
+        setValue((float) json.getDouble("data"));
     }
 
+    @Override
+    public void setValue(String text) {
+        value = Float.parseFloat(text);
+    }
 }

@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "ABB",
  "medium": "Heat",
- "version": 8,
+ "version": "0x08",
  "identNumber": 3476,
- "address": 1,
+ "address": "0x01",
  "accessNumber": 178,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -168,9 +168,6 @@
     "res3": false
    }
   },
-    {
-   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}},
-   "data": []
-  }
+  {"drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}}}
  ]
 }

@@ -184,7 +184,6 @@ public enum VifPrimary implements Vif {
     ASCII_EXTENTION(0x7C, "ASCII EXT"),
     EXTENSION_OF_VIF_CODES_FD(0x7D, "true VIF is given in the first VIFE FD extention"),
     READOUT_SELECTION(0x7E, "Readout selection of all storage numbers, all tariffs and all VIF");
-    public final static String PRIMARY = "primary";
 
     public static VifPrimary valueOfTableIndex(int vifCode) {
         if (map == null) {
@@ -273,16 +272,7 @@ public enum VifPrimary implements Vif {
 
     @Override
     public String toString() {
-        if (exponent != null) {
-            return String.format("10^%d %s%s", exponent, siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        } else {
-            return String.format("%s%s", siPrefix != null ? siPrefix : "", unit != null ? unit : "");
-        }
-    }
-
-    @Override
-    public String getVifTypeName() {
-        return PRIMARY;
+        return VifToString.vifToString(this);
     }
 
     public static VifPrimary assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
@@ -293,4 +283,9 @@ public enum VifPrimary implements Vif {
         }
         return valueOf(label);
     }
+
+    @Override
+    public VifTypes getVifType() {
+         return VifTypes.PRIMARY;
+   }
 }

@@ -25,6 +25,7 @@ import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.json.JSONFactory;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -104,15 +105,17 @@ public class SendUserData implements LongFrame {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
         result.accumulate("controlCode", getControlCode());
         result.accumulate("subType", SEND_USER_DATA_SUBTYPE);
-        result.accumulate("fcb", isFcb());
-        result.accumulate("address", address & 0xFF);
+        if (JsonSerializeType.ALL == jsonSerializeType) {
+            result.accumulate("fcb", isFcb());
+            result.accumulate("address", address & 0xFF);
+        }
         JSONArray jsonDataBlocks = new JSONArray();
         for (DataBlock db : this) {
-            jsonDataBlocks.add(db.toJSON(isTemplate));
+            jsonDataBlocks.add(db.toJSON(jsonSerializeType));
         }
         result.accumulate("dataBlocks", jsonDataBlocks);
         return result;
@@ -121,14 +124,14 @@ public class SendUserData implements LongFrame {
     @Override
     public void fromJSON(JSONObject json) {
         fcb = json.getBoolean("fcb");
-        address = (byte)json.getInt("address");
+        address = (byte) json.getInt("address");
 
         JSONArray jsonDataBlocks = json.getJSONArray("dataBlocks");
-            for (int i = 0; i < jsonDataBlocks.size(); i++) {
-                DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
-                db.fromJSON(jsonDataBlocks.getJSONObject(i));
-                addDataBlock(db);
-            }
+        for (int i = 0; i < jsonDataBlocks.size(); i++) {
+            DataBlock db = JSONFactory.createDataBlock(jsonDataBlocks.getJSONObject(i));
+            db.fromJSON(jsonDataBlocks.getJSONObject(i));
+            addDataBlock(db);
+        }
 
     }
 }

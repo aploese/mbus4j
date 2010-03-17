@@ -27,8 +27,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  * @version $Id$
  */
 public class StringDataBlock extends DataBlock {
-    public final static String STRING = "string";
 
+    public final static String STRING = "string";
     private String data;
 
     public StringDataBlock(DataBlock dataBlock) {
@@ -57,12 +57,8 @@ public class StringDataBlock extends DataBlock {
     }
 
     @Override
-    public JSONObject toJSON(boolean isTemplate) {
-        JSONObject result = super.toJSON(isTemplate);
-        if (!isTemplate) {
-            result.accumulate("data", getValue());
-        }
-        return result;
+    protected void accumulateDatatoJSON(JSONObject json) {
+        json.accumulate("data", getValue());
     }
 
     @Override

@@ -67,4 +67,4 @@ datablock[5]:
   subUnit = 0
 datablock[6]:
   dataType = Special Function Manufacturer specific data
-  value = (hex)[1C0C]
+  value = 1C0C

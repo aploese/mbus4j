@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "ACW",
  "medium": "Heat",
- "version": 11,
+ "version": "0x0b",
  "identNumber": 8772050,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 45,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -235,10 +235,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    0,
-    0
-   ]
+   "data": "0x[0000]"
   }
  ]
 }

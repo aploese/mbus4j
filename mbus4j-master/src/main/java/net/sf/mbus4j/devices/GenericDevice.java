@@ -18,15 +18,19 @@
 package net.sf.mbus4j.devices;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.dataframes.ResponseFrame;
+import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
+import net.sf.mbus4j.dataframes.UserDataResponse.StatusCode;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
@@ -36,152 +40,152 @@ import net.sf.mbus4j.dataframes.datablocks.DataBlock;
  */
 class GenericDevice implements MBusResponseFramesContainer, ProxyDevice {
 
-    private int address;
+    private byte address;
+    private List<ResponseFrameContainer> responseFrameContainers = new ArrayList<ResponseFrameContainer>();
+    private int identNumber;
+    private byte version;
+    private boolean acd;
+    private boolean dfc;
+    private StatusCode[] status;
+    private short accessnumber;
+    private short signature;
+    private String manufacturer;
+    private MBusMedium medium;
 
     @Override
-    public void setAddress(int address) {
+    public void setAddress(byte address) {
         this.address = address;
     }
 
     @Override
-    public void setId(int id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setIdentNumber(int identNumber) {
+        this.identNumber = identNumber;
     }
 
     @Override
-    public void setVersion(int version) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setVersion(byte version) {
+        this.version = version;
     }
 
     @Override
     public boolean isAcd() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return acd;
     }
 
     @Override
     public void setAcd(boolean acd) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.acd = acd;
     }
 
     @Override
     public boolean isDfc() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return dfc;
     }
 
     @Override
     public void setDfc(boolean dfc) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.dfc = dfc;
     }
 
     @Override
-    public void setMan(String man) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     @Override
     public void setMedium(MBusMedium medium) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.medium = medium;
     }
 
     @Override
-    public int getAddress() {
+    public byte getAddress() {
         return address;
     }
 
     @Override
-    public int getId() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public int getIdentNumber() {
+        return identNumber;
     }
 
     @Override
-    public int getVersion() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public byte getVersion() {
+        return version;
     }
 
     @Override
-    public ResponseFrame getResponseFrame(int index) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Iterator<ResponseFrameContainer> iterator() {
+        return responseFrameContainers.iterator();
     }
 
     @Override
-    public ResponseFrame[] getResponseFrames() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public StatusCode[] getStatus() {
+        return status;
     }
 
     @Override
-    public int getResponseFrameCount() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setStatus(StatusCode[] status) {
+        this.status = status;
     }
 
     @Override
-    public Iterator<ResponseFrame> iterator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public short getSignature() {
+        return signature;
     }
 
     @Override
-    public Map<ResponseFrame, Collection<DataBlock>> readValues(Sender sender, ResponseFrame... responseFrames) throws IOException, InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void setSignature(short signature) {
+        this.signature = signature;
     }
 
-    private class GenericResponseFrame extends  ResponseFrame {
-
-        @Override
-        public Iterable<DataBlock> getDataBlocksIterable() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public int getDataBlockCount() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Frame[] getinitFrames() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public DataBlock getDataBlock(int i) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        @Override
-        public Iterator<DataBlock> iterator() {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
-
-        private void addDataBlock(DataBlock db) {
-            throw new UnsupportedOperationException("Not yet implemented");
-        }
-
+    @Override
+    public short getAccessnumber() {
+        return accessnumber;
     }
 
-    private String man;
-    private MBusMedium medium;
-    private GenericResponseFrame responseFrame;
+    @Override
+    public void setAccessnumber(short accessnumber) {
+        this.accessnumber = accessnumber;
+    }
+
+    @Override
+    public ResponseFrameContainer getResponseFrameContainer(int index) {
+        return responseFrameContainers.get(index);
+    }
+
+    @Override
+    public ResponseFrameContainer[] getResponseFrameContainers() {
+        return responseFrameContainers.toArray(new ResponseFrameContainer[responseFrameContainers.size()]);
+    }
+
+    @Override
+    public int getResponseFrameContainerCount() {
+        return responseFrameContainers.size();
+    }
 
     public GenericDevice() {
-
     }
 
-    public GenericDevice(int primaryAddress, String man, MBusMedium medium, int version, int id) {
+    public GenericDevice(byte address, String manufacturer, MBusMedium medium, byte version, int identNumber) {
         super();
-        this.man = man;
+        this.manufacturer = manufacturer;
         this.medium = medium;
+        this.address = address;
+        this.version = version;
+        this.identNumber = identNumber;
 
     }
 
-    public GenericDevice(UserDataResponse udResp) {
+    public GenericDevice(UserDataResponse udResp, Frame requestFrame) {
         this(udResp.getAddress(), udResp.getManufacturer(), udResp.getMedium(), udResp.getVersion(), udResp.getIdentNumber());
-        responseFrame = new GenericResponseFrame();
-        for (DataBlock db : udResp) {
-            responseFrame.addDataBlock(db);
-        }
+        ResponseFrameContainer rfc = new ResponseFrameContainer();
+        rfc.setResponseFrame(udResp);
+        rfc.setRequestFrame(requestFrame);
+        responseFrameContainers.add(rfc);
     }
 
     @Override
-    public String getMan() {
-        return man;
+    public String getManufacturer() {
+        return manufacturer;
     }
 
     @Override
@@ -189,39 +193,9 @@ class GenericDevice implements MBusResponseFramesContainer, ProxyDevice {
         return medium;
     }
 
-    /**
-     * TODO move up and impement finding of response freame if nothing is given ???
-     * @param sender
-     * @param responseFrames
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    /*
     @Override
-    public Map<ResponseFrame, Map<DataBlock, DataBlock>> readValues(Sender sender, ResponseFrame... responseFrames) {
-        if ((responseFrames != null) && (responseFrames.length > 1)) {
-            throw new IllegalArgumentException("responseFrame must be null or only one frame allowed");
-        }
-        if ((responseFrames.length == 1) && (responseFrames[0] != getResponseFrame(0))) {
-            throw new IllegalArgumentException("responseFrame and default frame mismatch");
-        }
-        Frame received = sender.send(new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) getAddress()));
-        Map<ResponseFrame, Map<DataTag, DataBlock>> result = new HashMap<ResponseFrame, Map<DataTag, DataBlock>>();
-        if (received instanceof UserDataResponse) {
-            Map<DataTag, DataBlock> valueMap = new HashMap<DataTag, DataBlock>();
-            result.put(getResponseFrame(0), valueMap);
-            for (DataBlock db : (UserDataResponse) received) {
-                for (DataTag dt : getResponseFrame(0)) {
-                    if (dt.isKeyOf(db)) {
-                        valueMap.put(dt, db);
-                    }
-                }
-            }
-        }
-
-        return result;
+    public Map<ResponseFrame, Collection<DataBlock>> readValues(Sender sender, ResponseFrame... responseFrames) throws IOException, InterruptedException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-*/
 
 }

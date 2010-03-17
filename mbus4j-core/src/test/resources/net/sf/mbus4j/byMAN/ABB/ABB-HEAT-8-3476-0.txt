@@ -83,4 +83,4 @@ datablock[7]:
   res3 = false
 datablock[8]:
   dataType = Special Function Manufacturer specific data more records follow in next telegram
-  value = (hex)[]
+  value = 

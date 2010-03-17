@@ -196,24 +196,24 @@ public class MasterTest {
         log.info("widcardSearch finished");
         assertEquals(4, master.deviceCount());
         assertEquals(1, master.getDevice(0).getAddress());
-        assertEquals(14491001, master.getDevice(0).getId());
-        assertEquals("DBW", master.getDevice(0).getMan());
-        assertEquals(MBusMedium.StdMedium.HOT_WATER, master.getDevice(0).getMedium());
+        assertEquals(14491001, master.getDevice(0).getIdentNumber());
+        assertEquals("DBW", master.getDevice(0).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(0).getMedium());
         assertEquals(1, master.getDevice(0).getVersion());
         assertEquals(1, master.getDevice(1).getAddress());
-        assertEquals(14491008, master.getDevice(1).getId());
-        assertEquals("QKG", master.getDevice(1).getMan());
-        assertEquals(MBusMedium.StdMedium.HOT_WATER, master.getDevice(1).getMedium());
+        assertEquals(14491008, master.getDevice(1).getIdentNumber());
+        assertEquals("QKG", master.getDevice(1).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(1).getMedium());
         assertEquals(1, master.getDevice(1).getVersion());
         assertEquals(1, master.getDevice(2).getAddress());
-        assertEquals(32104833, master.getDevice(2).getId());
-        assertEquals("H@P", master.getDevice(2).getMan());
-        assertEquals(MBusMedium.StdMedium.ELECTRICITY, master.getDevice(2).getMedium());
+        assertEquals(32104833, master.getDevice(2).getIdentNumber());
+        assertEquals("H@P", master.getDevice(2).getManufacturer());
+        assertEquals(MBusMedium.ELECTRICITY, master.getDevice(2).getMedium());
         assertEquals(1, master.getDevice(2).getVersion());
         assertEquals(1, master.getDevice(3).getAddress());
-        assertEquals(76543210, master.getDevice(3).getId());
-        assertEquals("H@P", master.getDevice(3).getMan());
-        assertEquals(MBusMedium.StdMedium.GAS, master.getDevice(3).getMedium());
+        assertEquals(76543210, master.getDevice(3).getIdentNumber());
+        assertEquals("H@P", master.getDevice(3).getManufacturer());
+        assertEquals(MBusMedium.GAS, master.getDevice(3).getMedium());
         assertEquals(1, master.getDevice(3).getVersion());
     }
 

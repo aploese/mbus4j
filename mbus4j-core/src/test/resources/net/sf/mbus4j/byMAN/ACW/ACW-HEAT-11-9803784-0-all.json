@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "ACW",
  "medium": "Heat",
- "version": 11,
+ "version": "0x0b",
  "identNumber": 9803784,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 49,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {

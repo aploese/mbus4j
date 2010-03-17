@@ -331,4 +331,4 @@ datablock[38]:
   res3 = false
 datablock[39]:
   dataType = Special Function Manufacturer specific data
-  value = (hex)[0302000022]
+  value = 0302000022

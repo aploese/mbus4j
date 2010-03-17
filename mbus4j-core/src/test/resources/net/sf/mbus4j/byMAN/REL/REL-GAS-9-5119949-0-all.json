@@ -2,13 +2,13 @@
  "controlCode": "RSP_UD",
  "manufacturer": "REL",
  "medium": "Gas",
- "version": 9,
+ "version": "0x09",
  "identNumber": 5119949,
- "address": 0,
+ "address": "0x00",
  "accessNumber": 142,
  "acd": false,
  "dfc": false,
- "signature": 0,
+ "signature": "0x0000",
  "status": ["No application error"],
  "dataBlocks":  [
     {
@@ -32,11 +32,7 @@
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data":    [
-    1,
-    1,
-    1
-   ]
+   "data": "0x[010101]"
   }
  ]
 }

@@ -17,9 +17,9 @@
  */
 package net.sf.mbus4j.devices;
 
+import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
-import net.sf.mbus4j.devices.acw.AcwDeviceFactory;
 
 /**
  *
@@ -28,15 +28,11 @@ import net.sf.mbus4j.devices.acw.AcwDeviceFactory;
  */
 public class DeviceFactory {
 
-    public static MBusResponseFramesContainer createDevice(UserDataResponse udResp) {
-        if (AcwDeviceFactory.ACW.equals(udResp.getManufacturer())) {
-            return AcwDeviceFactory.createDevice(udResp);
-        } else {
-            return createGenericDevice(udResp);
-        }
+    public static MBusResponseFramesContainer createDevice(UserDataResponse udResp, Frame requestFrame) {
+            return createGenericDevice(udResp, requestFrame);
     }
 
-    public static MBusResponseFramesContainer createGenericDevice(UserDataResponse udResp) {
-        return new GenericDevice(udResp);
+    public static MBusResponseFramesContainer createGenericDevice(UserDataResponse udResp, Frame requestFrame) {
+        return new GenericDevice(udResp, requestFrame);
     }
 }
