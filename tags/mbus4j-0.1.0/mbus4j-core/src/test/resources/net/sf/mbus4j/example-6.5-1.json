@@ -1,0 +1,26 @@
+{
+ "controlCode": "SND_UD",
+ "subType": "send user data",
+ "fcb": false,
+ "address": 1,
+ "dataBlocks": [ {
+  "drh":   {
+   "dib":    {
+    "action": "add value",
+    "dataFieldCode": "8 digit BCD",
+    "functionField": "Instantaneous value",
+    "storageNumber": 0,
+    "subUnit": 0,
+    "tariff": 0
+   },
+   "vib": {"vif":    {
+    "vifType": "primary",
+    "description": "Energy",
+    "unitOfMeasurement": "Wh",
+    "siPrefix": "k",
+    "exponent": 0
+   }}
+  },
+  "data": 10
+ }]
+}
