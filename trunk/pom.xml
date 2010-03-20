@@ -20,7 +20,7 @@
     <!-- Developers and Contributors -->
     <organization>
         <name>MBus4J</name>
-        <url>http://sourceforge.net/projects/openv4j/</url>
+        <url>http://sourceforge.net/projects/mbus4j/</url>
     </organization>
     <developers>
         <developer>
@@ -51,7 +51,7 @@
     </licenses>
     <issueManagement>
         <system>Sourceforge</system>
-        <url>http://sourceforge.net/tracker/?group_id=294247&amp;atid=1242940</url>
+        <url>http://sourceforge.net/tracker/?group_id=269266&amp;atid=1145513</url>
     </issueManagement>
 
     <distributionManagement>
