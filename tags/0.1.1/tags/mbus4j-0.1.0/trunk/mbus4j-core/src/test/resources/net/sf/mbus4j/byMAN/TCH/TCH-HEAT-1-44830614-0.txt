@@ -1,0 +1,107 @@
+684D4D6808FD721406834468500104043000000CFD11140683440C06941700000C14792000000C2D000000000C3D000000000B5A0018000B5E0018000B610000000422C3010000046D2E2B900301FD17030516
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0xFD
+ident number = 44830614
+manufacturer = TCH
+version = 0x01
+accessnumber = 4
+status = [No application error, Temporary error, Specific to manufacturer 0x20]
+signature = 0x0000
+medium = Heat
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Customer
+  value = 44830614
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00001794 [kWh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 00002079 * 10 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 8 digit BCD
+  description = Power
+  value = 00000000 * 100 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 8 digit BCD
+  description = Volume Flow
+  value = 00000000 * 100 [l/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 6 digit BCD
+  description = Flow Temperature
+  value = 001800 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 6 digit BCD
+  description = Return Temperature
+  value = 001800 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 6 digit BCD
+  description = Temperature Difference
+  value = 000000 * 0.01 [K]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = On Time
+  value = 451 [h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 16.03.2004 11:46:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = true
+datablock[10]:
+  dataType = 8 Bit Integer
+  description = Error flags (binary)
+  value = 3
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0

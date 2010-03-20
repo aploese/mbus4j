@@ -1,0 +1,38 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "REL",
+ "medium": "Gas",
+ "version": "0x08",
+ "identNumber": 3043269,
+ "address": "0x00",
+ "accessNumber": 127,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 558861
+  },
+    {
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
+   "data": "0x[010101]"
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+{
+ "controlCode": "SND_UD",
+ "subType": "send user data",
+ "fcb": false,
+ "address": 254,
+ "dataBlocks": [ {
+  "drh":   {
+   "dib":    {
+    "dataFieldCode": "8 Bit Integer",
+    "functionField": "Instantaneous value",
+    "storageNumber": 0,
+    "subUnit": 0,
+    "tariff": 0
+   },
+   "vib": {"vif":    {
+    "vifType": "primary",
+    "description": "Bus Address"
+   }}
+  },
+  "data": 8
+ }]
+}
