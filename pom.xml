@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.1</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>mbus4j</name>
     <url>http://maven.apache.org</url>
 
@@ -86,9 +87,9 @@
     </mailingLists>
     -->
     <scm>
-        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/tags/0.1.1</developerConnection>
-        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/tags/0.1.1</connection>
-        <url>http://mbus4j.svn.sourceforge.net/svn/svnweb-index.cgi/tags/0.1.1</url>
+        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j</developerConnection>
+        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j</connection>
+        <url>http://mbus4j.svn.sourceforge.net/svn/svnweb-index.cgi</url>
     </scm>
 
 
