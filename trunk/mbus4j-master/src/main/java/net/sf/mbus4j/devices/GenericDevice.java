@@ -17,28 +17,23 @@
  */
 package net.sf.mbus4j.devices;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
-import net.sf.mbus4j.dataframes.ResponseFrame;
 import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.UserDataResponse.StatusCode;
-import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-class GenericDevice implements MBusResponseFramesContainer, ProxyDevice {
+public class GenericDevice implements MBusResponseFramesContainer {
 
     private byte address;
     private List<ResponseFrameContainer> responseFrameContainers = new ArrayList<ResponseFrameContainer>();
@@ -191,11 +186,6 @@ class GenericDevice implements MBusResponseFramesContainer, ProxyDevice {
     @Override
     public MBusMedium getMedium() {
         return medium;
-    }
-
-    @Override
-    public Map<ResponseFrame, Collection<DataBlock>> readValues(Sender sender, ResponseFrame... responseFrames) throws IOException, InterruptedException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

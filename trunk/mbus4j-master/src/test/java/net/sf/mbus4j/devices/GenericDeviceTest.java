@@ -11,7 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Map;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.dataframes.ResponseFrame;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -86,11 +85,8 @@ public class GenericDeviceTest {
     public void testReadValues() throws Exception {
         System.out.println("readValues");
         Sender sender = null;
-        ResponseFrame[] responseFrames = null;
         GenericDevice instance = null;
         Map expResult = null;
-        Map result = instance.readValues(sender, responseFrames);
-        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

@@ -162,10 +162,10 @@ public class Encoder {
     }
 
     private boolean needVIFE(DataBlock db, int index) {
-        if (db.getVifes() == null) {
+        if (db.getVifes().length == 0) {
             return db.getAction() == null ? false : index == 0;
         } else {
-            return db.getVifes().size() > index;
+            return db.getVifes().length > index;
         }
     }
 
@@ -597,12 +597,12 @@ public class Encoder {
 
     private void pushVIFE(DataBlock db, int index) {
         data[currentPos] = needVIFE(db, index + 1) ? Decoder.EXTENTION_BIT : 0x00;
-        if (db.getVifes().get(index) instanceof VifePrimary) {
-            data[currentPos++] |= ((VifePrimary) db.getVifes().get(index)).getTableIndex();
-        } else if (db.getVifes().get(index) instanceof VifeError) {
-            data[currentPos++] |= ((VifeError) db.getVifes().get(index)).getTableIndex();
-        } else if (db.getVifes().get(index) instanceof VifeManufacturerSpecific) {
-            data[currentPos++] |= ((VifeManufacturerSpecific) db.getVifes().get(index)).getVifeValue();
+        if (db.getVifes()[index] instanceof VifePrimary) {
+            data[currentPos++] |= ((VifePrimary) db.getVifes()[index]).getTableIndex();
+        } else if (db.getVifes()[index] instanceof VifeError) {
+            data[currentPos++] |= ((VifeError) db.getVifes()[index]).getTableIndex();
+        } else if (db.getVifes()[index] instanceof VifeManufacturerSpecific) {
+            data[currentPos++] |= ((VifeManufacturerSpecific) db.getVifes()[index]).getVifeValue();
 //        } else if (db.getVifes().get(index) instanceof VifeObjectAction) {
             //TODO
         }
