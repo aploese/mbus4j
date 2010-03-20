@@ -3,7 +3,7 @@
     <parent>
         <groupId>net.sf.mbus4j</groupId>
         <artifactId>mbus4j</artifactId>
-        <version>0.1.0</version>
+        <version>0.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>mbus4j-slaves-ui</artifactId>
