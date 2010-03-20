@@ -1,19 +1,27 @@
 /*
- * mbus4j - Open source drivers for mbus protocol see <http://www.m-bus.com/ > - http://mbus4j.sourceforge.net/
- * Copyright (C) 2009  Arne Plöse
+ * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
+ * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/ >.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ *
+ * @author Arne Plöse
+ *
  */
 package net.sf.mbus4j.dataframes;
 
@@ -24,52 +32,53 @@ import java.io.Serializable;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public interface MBusResponseFramesContainer extends Iterable<ResponseFrameContainer>, Serializable {
+public interface MBusResponseFramesContainer
+    extends Iterable<ResponseFrameContainer>,
+            Serializable
+{
+    void setAddress( byte address );
 
-    void setAddress(byte address);
+    void setIdentNumber( int identNumber );
 
-    void setIdentNumber(int identNumber);
+    void setVersion( byte version );
 
-    void setVersion(byte version);
+    boolean isAcd(  );
 
-    boolean isAcd();
+    void setAcd( boolean acd );
 
-    void setAcd(boolean acd);
+    boolean isDfc(  );
 
-    boolean isDfc();
+    void setDfc( boolean dfc );
 
-    void setDfc(boolean dfc);
+    String getManufacturer(  );
 
-    String getManufacturer();
+    void setManufacturer( String manufacturer );
 
-    void setManufacturer(String manufacturer);
+    MBusMedium getMedium(  );
 
-    MBusMedium getMedium();
+    void setMedium( MBusMedium medium );
 
-    void setMedium(MBusMedium medium);
+    byte getAddress(  );
 
-    byte getAddress();
+    int getIdentNumber(  );
 
-    int getIdentNumber();
+    byte getVersion(  );
 
-    byte getVersion();
+    UserDataResponse.StatusCode[] getStatus(  );
 
-    UserDataResponse.StatusCode[] getStatus();
+    void setStatus( UserDataResponse.StatusCode[] status );
 
-    void setStatus(UserDataResponse.StatusCode[] status);
+    short getSignature(  );
 
-    short getSignature();
+    void setSignature( short signature );
 
-    void setSignature(short signature);
+    short getAccessnumber(  );
 
-    short getAccessnumber();
+    void setAccessnumber( short accessnumber );
 
-    void setAccessnumber(short accessnumber);
+    ResponseFrameContainer getResponseFrameContainer( int index );
 
-    ResponseFrameContainer getResponseFrameContainer(int index);
+    ResponseFrameContainer[] getResponseFrameContainers(  );
 
-    ResponseFrameContainer[] getResponseFrameContainers();
-
-    int getResponseFrameContainerCount();
-
+    int getResponseFrameContainerCount(  );
 }
