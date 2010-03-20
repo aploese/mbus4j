@@ -87,8 +87,8 @@
     </mailingLists>
     -->
     <scm>
-        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j</developerConnection>
-        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j</connection>
+        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/trunk</developerConnection>
+        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/trunk</connection>
         <url>http://mbus4j.svn.sourceforge.net/svn/svnweb-index.cgi</url>
     </scm>
 
