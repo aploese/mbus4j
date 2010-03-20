@@ -21,22 +21,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.sf.mbus4j.MBusConstants;
 
 import net.sf.mbus4j.dataframes.Frame;
+import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.dataframes.RequestClassXData;
-import net.sf.mbus4j.dataframes.ResponseFrame;
+import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.decoder.Decoder;
 import net.sf.mbus4j.devices.DeviceFactory;
+import net.sf.mbus4j.devices.GenericDevice;
 import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.encoder.Encoder;
 
@@ -51,13 +60,48 @@ import org.slf4j.LoggerFactory;
  *
  * TODO: Handle multi Resoṕonses ClassXData (connect or chaon them together)
  */
-public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender {
-
-    public static interface MBusDeviceTreeMap extends Map<MBusResponseFramesContainer, ResponseFrame.MBusResponsesTreeMap> {}
-
+public class MBusMaster implements Iterable<GenericDevice>, Sender {
 
     public void cancel() {
 //TODO impement        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static GenericDevice getDevice(Iterable<GenericDevice> deviceList, ValueRequestPointLocator locator) {
+        for (GenericDevice dev : deviceList) {
+            if ((dev.getAddress() == locator.getAddress())
+                    && (dev.getIdentNumber() == locator.getIdentnumber())
+                    && dev.getManufacturer().equals(locator.getManufacturer())
+                    && dev.getMedium().equals(locator.getMedium())
+                    && (dev.getVersion() == locator.getVersion())) {
+                return dev;
+            }
+        }
+        return null;
+    }
+
+    public static DataBlock getDataBlock(Frame frame, ValueRequestPointLocator locator) {
+            if (frame instanceof UserDataResponse) {
+                for (DataBlock db : (UserDataResponse)frame) {
+                    if (db.getDataFieldCode().equals(locator.getDifCode()) &&
+                            db.getVif().equals(locator.getVif()) &&
+                            db.getFunctionField().equals(locator.getFunctionField()) &&
+                            (db.getStorageNumber() == locator.getStorageNumber()) &&
+                            (db.getSubUnit() == locator.getDeviceUnit()) &&
+                            (db.getTariff() == locator.getTariff()) &&
+                            Arrays.equals(db.getVifes(), locator.getVifes())) {
+                            return db;
+                    }
+                }
+
+            } else {
+                    throw new RuntimeException("Response is not a UserDataResponse but: " + frame);
+               }
+        throw new RuntimeException("can't find datablock of locator");
+    }
+
+    private DataBlock getTimeStampDB(GenericDevice dev, ValueRequestPointLocator locator) {
+        // TODO implement
+        return null;
     }
 
     private class StreamListener implements Runnable {
@@ -104,8 +148,7 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
         }
     }
     private final static Logger log = LoggerFactory.getLogger(MBusMaster.class);
-
-    private List<MBusResponseFramesContainer> devices = new ArrayList<MBusResponseFramesContainer>();
+    private List<GenericDevice> devices = new ArrayList<GenericDevice>();
     private InputStream is;
     private OutputStream os;
     private Encoder encoder = new Encoder();
@@ -119,7 +162,7 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
         super();
     }
 
-    public boolean addDevice(MBusResponseFramesContainer device) {
+    public boolean addDevice(GenericDevice device) {
         return devices.add(device);
     }
 
@@ -188,7 +231,7 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
     }
 
     @Override
-    public Iterator<MBusResponseFramesContainer> iterator() {
+    public Iterator<GenericDevice> iterator() {
         return devices.iterator();
     }
 
@@ -203,7 +246,7 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
     }
 
     public void searchDevicesBySecondaryAddressing() throws IOException, InterruptedException {
-        widcardSearch(0x00, 7, (short)0xFFFF, (byte)0xFF, (byte)0xFF);
+        widcardSearch(0x00, 7, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF);
     }
 
     /**
@@ -267,10 +310,12 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
         return send(req);
     }
 
-    public void sendRequestUserData(Iterable<MBusResponseFramesContainer> devices) throws IOException, InterruptedException {
-        for (MBusResponseFramesContainer dev : devices) {
-            sendRequestUserData(dev.getAddress());
+    public Map<GenericDevice, Frame> sendRequestUserData(Iterable<GenericDevice> devices) throws IOException, InterruptedException {
+        Map<GenericDevice, Frame> result = new HashMap<GenericDevice, Frame>();
+        for (GenericDevice dev : devices) {
+            result.put(dev, sendRequestUserData(dev.getAddress()));
         }
+        return result;
     }
 
     public void sendSlaveSelect(byte[] idWithMask, short manWithMask, byte versionWithMask) {
@@ -367,4 +412,30 @@ public class MBusMaster implements Iterable<MBusResponseFramesContainer>, Sender
             leadingBcdDigitsId++;
         }
     }
-}
+
+    public void readValues(ValueRequest<?> requests) throws IOException, InterruptedException {
+        //Create devices if neccecary
+        Set<GenericDevice> deviceSet = new HashSet<GenericDevice>();
+        for (ValueRequestPointLocator locator : requests) {
+            GenericDevice myDevice = getDevice(devices, locator);
+
+            if (myDevice == null) {
+                myDevice = DeviceFactory.createDevice(locator.getAddress(), locator.getManufacturer(), locator.getMedium(), locator.getVersion(), locator.getIdentnumber());
+                devices.add(myDevice);
+            }
+            deviceSet.add(myDevice);
+        }
+        //get data from devices
+        //TODO hounor frames and addressing
+        Map<GenericDevice, Frame> responses = sendRequestUserData(deviceSet);
+        //pack response
+        for (ValueRequestPointLocator locator : requests) {
+            GenericDevice dev = getDevice(deviceSet, locator);
+            DataBlock db = getDataBlock(responses.get(dev), locator);
+            locator.setDb(db);
+            db = getTimeStampDB(dev, locator);
+            locator.setTimestampDb(db);
+        }
+    }
+
+    }

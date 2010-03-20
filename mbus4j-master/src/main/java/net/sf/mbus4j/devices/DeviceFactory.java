@@ -18,7 +18,7 @@
 package net.sf.mbus4j.devices;
 
 import net.sf.mbus4j.dataframes.Frame;
-import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
+import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
 /**
@@ -28,11 +28,20 @@ import net.sf.mbus4j.dataframes.UserDataResponse;
  */
 public class DeviceFactory {
 
-    public static MBusResponseFramesContainer createDevice(UserDataResponse udResp, Frame requestFrame) {
+    public static GenericDevice createDevice(UserDataResponse udResp, Frame requestFrame) {
             return createGenericDevice(udResp, requestFrame);
     }
 
-    public static MBusResponseFramesContainer createGenericDevice(UserDataResponse udResp, Frame requestFrame) {
+    public static GenericDevice createGenericDevice(UserDataResponse udResp, Frame requestFrame) {
         return new GenericDevice(udResp, requestFrame);
     }
+
+    public static GenericDevice createDevice(byte address, String manufacturer, MBusMedium medium, byte version, int identNumber) {
+        return createGenericDevice(address, manufacturer, medium, version, identNumber);
+    }
+
+    private static GenericDevice createGenericDevice(byte address, String manufacturer, MBusMedium medium, byte version, int identNumber) {
+        return new GenericDevice(address, manufacturer, medium, version, identNumber);
+    }
+
 }

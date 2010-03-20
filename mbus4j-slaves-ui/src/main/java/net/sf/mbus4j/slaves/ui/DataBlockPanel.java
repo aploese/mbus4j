@@ -354,16 +354,16 @@ public class DataBlockPanel extends javax.swing.JPanel {
 
     }
 
-    private void selectVifes(List<Vife> vifes) {
-        if (vifes == null) {
+    private void selectVifes(Vife[] vifes) {
+        if (vifes.length == 0) {
             vifesList.setSelectedIndex(-1);
             return;
         }
         DefaultListModel listModel =  (DefaultListModel)vifesList.getModel();
-        int[] selected = new int[vifes.size()];
+        int[] selected = new int[vifes.length];
         int selIndex = 0;
-        for (int i = 0; i < vifes.size(); i++) {
-            int idx =listModel.indexOf(vifes.get(i));
+        for (int i = 0; i < vifes.length; i++) {
+            int idx =listModel.indexOf(vifes[i]);
             if (idx > -1) {
                 selected[selIndex++] = idx;
             }

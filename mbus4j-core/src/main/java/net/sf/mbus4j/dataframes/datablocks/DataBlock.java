@@ -19,6 +19,7 @@ package net.sf.mbus4j.dataframes.datablocks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -50,6 +51,8 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @version $Id$
  */
 public abstract class DataBlock implements Serializable, JSONSerializable, Cloneable {
+
+    public final static Vife[] EMPTY_VIFE = new Vife[0];
 
     public static Vif getVif(String vifTypeLabel, String vifLabel, String unitOfMeasurementLabel, String siPrefixLabel, Integer exponent) {
         VifTypes vifType = VifTypes.fromLabel(vifTypeLabel);
@@ -113,7 +116,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
      * Extend paramdescription by VIFE value from table 8.4.5
      * @param vife
      */
-    private List<Vife> vifes;
+    private Vife[] vifes = EMPTY_VIFE;
     private FunctionField functionField;
     private long storageNumber;
     private int tariff;
@@ -143,11 +146,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         this.tariff = tariff;
         this.storageNumber = storageNumber;
         this.vif = vif;
-        if (vifes != null && vifes.length > 0) {
-            this.vifes = new ArrayList<Vife>(vifes.length);
-            for (Vife vife : vifes) {
-                this.vifes.add(vife);
-            }
+        if (vifes.length > 0) {
+            this.vifes = Arrays.copyOf(vifes, vifes.length);
         }
     }
 
@@ -156,19 +156,15 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         this.dataFieldCode = dif;
         functionField = FunctionField.INSTANTANEOUS_VALUE;
         this.vif = vif;
-        if (vifes != null && vifes.length > 0) {
-            this.vifes = new ArrayList<Vife>(vifes.length);
-            for (Vife vife : vifes) {
-                this.vifes.add(vife);
-            }
+        if (vifes.length > 0) {
+            this.vifes = Arrays.copyOf(vifes, vifes.length);
         }
     }
 
     public boolean addVife(Vife vife) {
-        if (vifes == null) {
-            vifes = new ArrayList<Vife>(1);
-        }
-        return vifes.add(vife);
+        vifes = Arrays.copyOf(vifes, vifes.length + 1);
+        vifes[vifes.length - 1] = vife;
+        return true;
     }
 
     /**
@@ -232,7 +228,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         return vif;
     }
 
-    public List<Vife> getVifes() {
+    public Vife[] getVifes() {
         return vifes;
     }
 
@@ -366,7 +362,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
             }
 
             vib.accumulate("vif", jsonVif);
-            if (getVifes() != null) {
+            if (getVifes().length > 0) {
                 JSONArray jsonVifes = new JSONArray();
                 for (Vife value : vifes) {
                     JSONObject jsonVife = new JSONObject();
@@ -407,16 +403,12 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
                     Vife[] parsedVifes = vifesFromJSON(vif.getVifType(), vib.getJSONArray("vifes"));
                     if (parsedVifes.length > 0) {
-
-                        vifes = new ArrayList<Vife>(parsedVifes.length);
-                        for (Vife vife : parsedVifes) {
-                            vifes.add(vife);
-                        }
+                        this.vifes = Arrays.copyOf(parsedVifes, parsedVifes.length);
                     } else {
-                        vifes = null;
+                        vifes = EMPTY_VIFE;
                     }
                 } else {
-                    vifes = null;
+                    vifes = EMPTY_VIFE;
                 }
             }
         }

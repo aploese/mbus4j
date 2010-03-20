@@ -18,14 +18,14 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  *
  * @author aploese
  */
-public class ValueRequestPointLocator {
+public class ValueRequestPointLocator<T> {
 
         private MBusAddressing addressing;
         private byte address;
         private String manufacturer;
         private int identnumber;
         private MBusMedium medium;
-        private int version;
+        private byte version;
 
         private String responseFrameName;
 
@@ -35,11 +35,12 @@ public class ValueRequestPointLocator {
         private int tariff;
         private long storageNumber;
         private Vif vif;
-        private Vife[] vifes;
+        private Vife[] vifes = DataBlock.EMPTY_VIFE;
 
         private DataBlock db;
         private DataBlock timestampDb;
         private UserDataResponse fullResponse;
+        private T reference;
 
     /**
      * @return the addressing
@@ -114,14 +115,14 @@ public class ValueRequestPointLocator {
     /**
      * @return the version
      */
-    public int getVersion() {
+    public byte getVersion() {
         return version;
     }
 
     /**
      * @param version the version to set
      */
-    public void setVersion(int version) {
+    public void setVersion(byte version) {
         this.version = version;
     }
 
@@ -277,6 +278,20 @@ public class ValueRequestPointLocator {
      */
     public void setFullResponse(UserDataResponse fullResponse) {
         this.fullResponse = fullResponse;
+    }
+
+    /**
+     * @return the reference
+     */
+    public T getReference() {
+        return reference;
+    }
+
+    /**
+     * @param reference the reference to set
+     */
+    public void setReference(T reference) {
+        this.reference = reference;
     }
 
 }
