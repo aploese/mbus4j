@@ -46,7 +46,7 @@
     </dependencies>
 
 
-    <build>
+    <!--build>
         <plugins>
             <plugin>
                 <!-- mvn package appassembler:assemble -->
@@ -62,6 +62,6 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>
+    </build-->
 
 </project>
