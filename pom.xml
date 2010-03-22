@@ -210,7 +210,7 @@
                 </dependencies>
             </plugin-->
 
-            <plugin>
+            <!--plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
                 <executions>
@@ -223,7 +223,7 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        </plugins-->
     </build>
 
     <profiles>
