@@ -204,11 +204,9 @@
                     <artifactId>appassembler-maven-plugin</artifactId>
                     <version>1.0</version>
                 </plugin>
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.0</version>
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
@@ -219,6 +217,7 @@
                         </execution>
                     </executions>
                 </plugin>
+                
                 <!--plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jalopy-maven-plugin</artifactId>
@@ -258,6 +257,26 @@
             </plugin-->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <!-- Reporting -->
     <reporting>
