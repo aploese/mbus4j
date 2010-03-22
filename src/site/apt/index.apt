@@ -1,0 +1,15 @@
+ ------
+ MBus4j
+ ------
+ Arne Plöse
+ <arnep@users.sf.net>
+ ------
+ December 18, 2009
+
+MBus4J
+
+  * Some components to access M-Bus devices.
+
+  * A master to control a m-bus network.
+
+  * A configurabe slaves for testing.
