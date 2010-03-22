@@ -158,43 +158,68 @@
         </dependencies>
     </dependencyManagement>
 
-    <build>
-    <!-- Plugin Configurations -->
 
-    <plugins>
-    <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-            <maxmem>512m</maxmem>
-            <source>1.6</source>
-            <target>1.6</target>
-            <encoding>UTF-8</encoding>
-        </configuration>
-    </plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>2.0</version>
-    </plugin>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>2.1</version>
-        <configuration>
-            <generateReports>${site.generateReports}</generateReports>
-            <port>${site.run.port}</port>
-            <stagingDirectory>${java.io.tmpdir}/mbus4j</stagingDirectory>
-        </configuration>
-    </plugin>
-    <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.2</version>
-        <configuration>
-            <encoding>UTF-8</encoding>
-        </configuration>
-    </plugin>
-    <!--plugin>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.1</version>
+                    <configuration>
+                        <maxmem>512m</maxmem>
+                        <source>1.6</source>
+                        <target>1.6</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>2.1</version>
+                    <configuration>
+                        <generateReports>${site.generateReports}</generateReports>
+                        <port>${site.run.port}</port>
+                        <stagingDirectory>${java.io.tmpdir}/mbus4j</stagingDirectory>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.4.2</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3</version>
+                </plugin>
+                <plugin>
+                    <!-- mvn package appassembler:assemble -->
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>appassembler-maven-plugin</artifactId>
+                    <version>1.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.0</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!--plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jalopy-maven-plugin</artifactId>
                 <version>1.0-alpha-1</version>
@@ -209,51 +234,30 @@
                     </dependency>
                 </dependencies>
             </plugin-->
+            </plugins>
+        </pluginManagement>
 
-            <!--plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <artifactId>maven-release-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+            <!--plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jalopy-maven-plugin</artifactId>
             </plugin-->
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>release-sign-artifacts</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <!-- Reporting -->
     <reporting>
