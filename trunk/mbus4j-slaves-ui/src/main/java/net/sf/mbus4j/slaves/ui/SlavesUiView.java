@@ -402,9 +402,9 @@ public class SlavesUiView
     } // </editor-fold>//GEN-END:initComponents
 
     private void commitChanges( java.awt.event.ActionEvent evt )
-    { //GEN-FIRST:event_commitChanges
+    {//GEN-FIRST:event_commitChanges
         commitChanges(  );
-    } //GEN-LAST:event_commitChanges
+    }//GEN-LAST:event_commitChanges
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton commitButton;
@@ -448,16 +448,11 @@ public class SlavesUiView
     public void refreshPorts(  )
     {
         portComboBox.removeAllItems(  );
-
-        @SuppressWarnings( "unchecked" ) // NOI18N
-
         Enumeration<CommPortIdentifier> en = CommPortIdentifier.getPortIdentifiers(  );
-
         // iterate through the ports.
         while ( en.hasMoreElements(  ) )
         {
             CommPortIdentifier portId = en.nextElement(  );
-
             if ( portId.getPortType(  ) == CommPortIdentifier.PORT_SERIAL )
             {
                 portComboBox.addItem( portId.getName(  ) );

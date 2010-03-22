@@ -93,90 +93,108 @@
 
 
     <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.8.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.rxtx</groupId>
-            <artifactId>rxtx</artifactId>
-            <version>2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.15</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.3</version>
-            <classifier>jdk15</classifier>
-        </dependency>
-                <dependency>
-            <groupId>org.jdesktop</groupId>
-            <artifactId>appframework</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-    </dependencies>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.5.8</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>log4j</artifactId>
+                        <groupId>log4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.rxtx</groupId>
+                <artifactId>rxtx</artifactId>
+                <version>2.1.7</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.15</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>jmxri</artifactId>
+                        <groupId>com.sun.jmx</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jmxtools</artifactId>
+                        <groupId>com.sun.jdmk</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>mail</artifactId>
+                        <groupId>javax.mail</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>jms</artifactId>
+                        <groupId>javax.jms</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.json-lib</groupId>
+                <artifactId>json-lib</artifactId>
+                <version>2.3</version>
+                <classifier>jdk15</classifier>
+            </dependency>
+            <dependency>
+                <groupId>org.jdesktop</groupId>
+                <artifactId>appframework</artifactId>
+                <version>1.0.3</version>
+            </dependency>
+        </dependencies>
     </dependencyManagement>
 
     <build>
-        <!-- Plugin Configurations -->
+    <!-- Plugin Configurations -->
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <maxmem>512m</maxmem>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <generateReports>${site.generateReports}</generateReports>
-                    <port>${site.run.port}</port>
-                    <stagingDirectory>${java.io.tmpdir}/mbus4j</stagingDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.4.2</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
+    <plugins>
+    <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+            <maxmem>512m</maxmem>
+            <source>1.6</source>
+            <target>1.6</target>
+            <encoding>UTF-8</encoding>
+        </configuration>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0</version>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+            <generateReports>${site.generateReports}</generateReports>
+            <port>${site.run.port}</port>
+            <stagingDirectory>${java.io.tmpdir}/mbus4j</stagingDirectory>
+        </configuration>
+    </plugin>
+    <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.2</version>
+        <configuration>
+            <encoding>UTF-8</encoding>
+        </configuration>
+    </plugin>
+    <!--plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jalopy-maven-plugin</artifactId>
                 <version>1.0-alpha-1</version>
@@ -190,9 +208,52 @@
                         <version>1.5-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
+            </plugin-->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <!-- Reporting -->
     <reporting>
