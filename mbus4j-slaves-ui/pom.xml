@@ -55,7 +55,7 @@
     <!--build>
         <plugins>
             <plugin>
-                <!-- mvn package appassembler:assemble -->
+                <!- - mvn package appassembler:assemble - ->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
                 <configuration>
