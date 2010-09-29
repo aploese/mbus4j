@@ -26,7 +26,6 @@
 package net.sf.mbus4j.dataframes.datablocks;
 
 import net.sf.json.JSONObject;
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.json.JSONFactory;
 
 /**
@@ -38,8 +37,8 @@ public class RawDataBlock extends DataBlock {
 
     private byte[] value;
 
-    public RawDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public RawDataBlock() {
+        super();
     }
 
     /**

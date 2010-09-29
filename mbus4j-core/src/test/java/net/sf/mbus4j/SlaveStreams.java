@@ -25,6 +25,7 @@
  */
 package net.sf.mbus4j;
 
+import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +34,13 @@ import org.slf4j.LoggerFactory;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SlaveStreams extends MockStreams {
+public class SlaveStreams extends MockConnection {
 
     private final static Logger log = LoggerFactory.getLogger(SlaveStreams.class);
+
+    public SlaveStreams() {
+        super(115200 / 4, 0);
+    }
 
     @Override
     protected synchronized void lastByteReading(final long endWaitTime) {
@@ -58,7 +63,7 @@ public class SlaveStreams extends MockStreams {
 
     @Override
     protected synchronized void lastByteWriting() {
-        is.releaseReadLock();
+        getMockIs().releaseReadLock();
         if (data.get(0).response == null) {
             setNextData(true);
         }
@@ -97,7 +102,8 @@ public class SlaveStreams extends MockStreams {
             }
             return;
         }
-        os.setData(data.get(0).request);
-        is.setData(data.get(0).response, data.get(0).noResponseWaitTime);
+        getMockOs().setData(data.get(0).request);
+        getMockIs().setData(data.get(0).response, data.get(0).noResponseWaitTime);
     }
+
 }

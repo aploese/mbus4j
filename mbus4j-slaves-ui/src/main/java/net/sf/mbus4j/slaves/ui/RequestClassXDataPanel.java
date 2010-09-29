@@ -27,6 +27,7 @@ package net.sf.mbus4j.slaves.ui;
 
 import net.sf.mbus4j.dataframes.Frame.ControlCode;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 
 /**
  *
@@ -54,49 +55,48 @@ public class RequestClassXDataPanel
      */
     @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents(  )
-    {
-        controlCodeLabel = new javax.swing.JLabel(  );
-        controlCodeComboBox = new javax.swing.JComboBox(  );
+    private void initComponents() {
 
-        controlCodeLabel.setText( "ControlCode:" );
-        controlCodeLabel.setName( "controlCodeLabel" ); // NOI18N
+        controlCodeLabel = new javax.swing.JLabel();
+        controlCodeComboBox = new javax.swing.JComboBox();
 
-        controlCodeComboBox.setName( "controlCodeComboBox" ); // NOI18N
+        controlCodeLabel.setText("ControlCode:");
+        controlCodeLabel.setName("controlCodeLabel"); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout( this );
-        this.setLayout( layout );
-        layout.setHorizontalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                         .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                          .addComponent( controlCodeLabel )
-                                                          .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.RELATED )
-                                                          .addComponent( controlCodeComboBox,
-                                                                         javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                         javax.swing.GroupLayout.PREFERRED_SIZE )
-                                                          .addContainerGap( 264, Short.MAX_VALUE ) ) );
-        layout.setVerticalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                       .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.BASELINE )
-                                                                         .addComponent( controlCodeLabel )
-                                                                         .addComponent( controlCodeComboBox,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                        .addContainerGap( 264, Short.MAX_VALUE ) ) );
-    } // </editor-fold>//GEN-END:initComponents
+        controlCodeComboBox.setName("controlCodeComboBox"); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(controlCodeLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(controlCodeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(60, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(controlCodeLabel)
+                    .addComponent(controlCodeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox controlCodeComboBox;
     private javax.swing.JLabel controlCodeLabel;
-
     // End of variables declaration//GEN-END:variables
     void setRequestClassXData( RequestClassXData rcd )
     {
         controlCodeComboBox.setSelectedItem( rcd.getControlCode(  ) );
     }
 
-    public void commitChanges(  )
+    public void commitChanges(ResponseFrameContainer rfc)
     {
     }
 }

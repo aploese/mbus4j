@@ -30,10 +30,49 @@ package net.sf.mbus4j;
  * @author aploese
  */
 public class MBusConstants {
+
     public final static int UNCONFIGURED_PRIMARY_ADDRESS = 0x00;
     public final static int FIRST_REGULAR_PRIMARY_ADDRESS = 0x01;
     public final static int LAST_REGULAR_PRIMARY_ADDRESS = 0xFA;// 250
     public final static int SLAVE_SELECT_PRIMARY_ADDRESS = 0xFD; // 253
     public final static int BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS = 0xFE;// 254
     public final static int BROADCAST_NO_ANSWER_PRIMARY_ADDRESS = 0xFF;//255
+
+    public static String int2Man(short value) {
+        if (value == -1) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append((char) ((value / 1024) + 64));
+        value %= 1024; // 32*32 = 1024
+        sb.append((char) ((value / (32)) + 64));
+        value %= 32;
+        sb.append((char) (value + 64));
+
+        return sb.toString();
+    }
+
+    /**
+     * convert the man string to 2 byte binary representation
+     * @param man
+     * @return
+     */
+    public static short man2Short(String man) {
+        if (man == null) {
+            return -1;
+        } else {
+            byte[] bytes = man.getBytes();
+            return (short) (bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024);
+        }
+    }
+
+    public static long String2Bcd(String value) {
+        long result = 0;
+        for (int i = 0; i < value.length(); i++) {
+            result <<= 4;
+            result |= (byte)(Short.parseShort(value.substring(i, i + 1), 16) & 0x0F);
+        }
+        return result;
+    }
 }

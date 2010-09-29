@@ -28,9 +28,6 @@ package net.sf.mbus4j.dataframes.datablocks;
 import java.math.BigDecimal;
 import net.sf.json.JSONObject;
 
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
-import net.sf.mbus4j.json.JsonSerializeType;
-
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -40,12 +37,8 @@ public class BigDecimalDataBlock extends DataBlock {
 
     private BigDecimal value;
 
-    public BigDecimalDataBlock(DataBlock dataBlock) {
-        super(dataBlock);
-    }
-
-    BigDecimalDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public BigDecimalDataBlock() {
+        super();
     }
 
     @Override

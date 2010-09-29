@@ -49,49 +49,51 @@ public class SlaveStreamTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    private SlaveStreams salves;
+    private SlaveStreams slaves;
 
     public SlaveStreamTest() {
     }
 
     @Test(timeout = 10000)
     public void respondToRequest() throws Exception {
-        salves.respondToRequest("0102", "0201");
-        salves.respondToRequest("0304", "0403");
-        salves.respondToRequest("0506", 1);
-        salves.respondToRequest("0708", "0807");
-        salves.replay();
-        assertFalse(salves.isOK());
-        salves.os.write(0x01);
-        salves.os.write(0x02);
-        assertFalse(salves.isOK());
-        assertEquals(0x02, salves.is.read());
-        assertEquals(0x01, salves.is.read());
-        assertFalse(salves.isOK());
-        salves.os.write(0x03);
-        salves.os.write(0x04);
-        assertFalse(salves.isOK());
-        assertEquals(0x04, salves.is.read());
-        assertEquals(0x03, salves.is.read());
-        assertFalse(salves.isOK());
-        salves.os.write(0x05);
-        salves.os.write(0x06);
-        assertFalse(salves.isOK());
-        salves.os.write(0x07);
-        salves.os.write(0x08);
-        assertFalse(salves.isOK());
-        assertEquals(0x08, salves.is.read());
-        assertEquals(0x07, salves.is.read());
-        assertTrue(salves.isOK());
+        slaves.respondToRequest("0102", "0201");
+        slaves.respondToRequest("0304", "0403");
+        slaves.respondToRequest("0506", 1);
+        slaves.respondToRequest("0708", "0807");
+        slaves.replay();
+        assertFalse(slaves.isOK());
+        slaves.os.write(0x01);
+        slaves.os.write(0x02);
+        assertFalse(slaves.isOK());
+        assertEquals(0x02, slaves.is.read());
+        assertEquals(0x01, slaves.is.read());
+        assertFalse(slaves.isOK());
+        slaves.os.write(0x03);
+        slaves.os.write(0x04);
+        assertFalse(slaves.isOK());
+        assertEquals(0x04, slaves.is.read());
+        assertEquals(0x03, slaves.is.read());
+        assertFalse(slaves.isOK());
+        slaves.os.write(0x05);
+        slaves.os.write(0x06);
+        assertFalse(slaves.isOK());
+        slaves.os.write(0x07);
+        slaves.os.write(0x08);
+        assertFalse(slaves.isOK());
+        assertEquals(0x08, slaves.is.read());
+        assertEquals(0x07, slaves.is.read());
+        assertTrue(slaves.isOK());
     }
 
     @Before
-    public void setUp() {
-        salves = new SlaveStreams();
+    public void setUp() throws Exception {
+        slaves = new SlaveStreams();
+        slaves.open();
     }
 
     @After
-    public void tearDown() {
-        salves = null;
+    public void tearDown() throws Exception {
+        slaves.close();
+        slaves = null;
     }
 }

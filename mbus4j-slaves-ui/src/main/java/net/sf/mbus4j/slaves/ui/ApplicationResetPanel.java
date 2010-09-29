@@ -26,6 +26,7 @@
 package net.sf.mbus4j.slaves.ui;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
+import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 
 /**
  *
@@ -53,83 +54,77 @@ public class ApplicationResetPanel
      */
     @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents(  )
-    {
-        telegramTypeLabel = new javax.swing.JLabel(  );
-        telegramTypeComboBox = new javax.swing.JComboBox(  );
-        subTypeLabel = new javax.swing.JLabel(  );
-        subTypeTextField = new javax.swing.JFormattedTextField(  );
+    private void initComponents() {
 
-        telegramTypeLabel.setText( "TelegramType:" );
-        telegramTypeLabel.setName( "telegramTypeLabel" ); // NOI18N
+        telegramTypeLabel = new javax.swing.JLabel();
+        telegramTypeComboBox = new javax.swing.JComboBox();
+        subTypeLabel = new javax.swing.JLabel();
+        subTypeTextField = new javax.swing.JFormattedTextField();
 
-        telegramTypeComboBox.setModel( new javax.swing.DefaultComboBoxModel( new String[]
-                                                                             {
-                                                                                 "Item 1", "Item 2", "Item 3", "Item 4"
-                                                                             } ) );
-        telegramTypeComboBox.setName( "telegramTypeComboBox" ); // NOI18N
+        telegramTypeLabel.setText("TelegramType:");
+        telegramTypeLabel.setName("telegramTypeLabel"); // NOI18N
 
-        subTypeLabel.setText( "Subtype:" );
-        subTypeLabel.setName( "subTypeLabel" ); // NOI18N
+        telegramTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        telegramTypeComboBox.setName("telegramTypeComboBox"); // NOI18N
 
-        subTypeTextField.setText( "jFormattedTextField1" );
-        subTypeTextField.setName( "subTypeTextField" ); // NOI18N
+        subTypeLabel.setText("Subtype:");
+        subTypeLabel.setName("subTypeLabel"); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout( this );
-        this.setLayout( layout );
-        layout.setHorizontalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                         .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                          .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                                                           .addComponent( telegramTypeLabel )
-                                                                           .addComponent( subTypeLabel ) )
-                                                          .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.RELATED )
-                                                          .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                                                           .addComponent( telegramTypeComboBox,
-                                                                                          javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                          javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                          javax.swing.GroupLayout.PREFERRED_SIZE )
-                                                                           .addComponent( subTypeTextField,
-                                                                                          javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                          javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                          javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                          .addContainerGap( 163, Short.MAX_VALUE ) ) );
-        layout.setVerticalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                       .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.BASELINE )
-                                                                         .addComponent( telegramTypeLabel )
-                                                                         .addComponent( telegramTypeComboBox,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                        .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.RELATED )
-                                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.BASELINE )
-                                                                         .addComponent( subTypeLabel )
-                                                                         .addComponent( subTypeTextField,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                        .addContainerGap( 234, Short.MAX_VALUE ) ) );
-    } // </editor-fold>//GEN-END:initComponents
+        subTypeTextField.setText("jFormattedTextField1");
+        subTypeTextField.setName("subTypeTextField"); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(telegramTypeLabel)
+                    .addComponent(subTypeLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(telegramTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(subTypeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(telegramTypeLabel)
+                    .addComponent(telegramTypeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(subTypeLabel)
+                    .addComponent(subTypeTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel subTypeLabel;
     private javax.swing.JFormattedTextField subTypeTextField;
     private javax.swing.JComboBox telegramTypeComboBox;
     private javax.swing.JLabel telegramTypeLabel;
-
     // End of variables declaration//GEN-END:variables
-    ApplicationReset appReset;
 
     void setApplicationReste( ApplicationReset appReset )
     {
-        this.appReset = appReset;
         telegramTypeComboBox.setSelectedItem( appReset.getTelegramType(  ) );
         subTypeTextField.setText( String.valueOf( appReset.getSubTelegram(  ) ) );
     }
 
-    public void commitChanges(  )
+    public ApplicationReset createAppReset()
     {
-        appReset.setTelegramType( (ApplicationReset.TelegramType) telegramTypeComboBox.getSelectedItem(  ) );
-        appReset.setSubTelegram( Integer.parseInt( subTypeTextField.getText(  ) ) );
+        ApplicationReset result = new ApplicationReset((ApplicationReset.TelegramType) telegramTypeComboBox.getSelectedItem(), Integer.parseInt( subTypeTextField.getText() ) );
+        return result;
     }
+
+    public void commitChanges(ResponseFrameContainer rfc)
+    {
+    }
+
+
 }

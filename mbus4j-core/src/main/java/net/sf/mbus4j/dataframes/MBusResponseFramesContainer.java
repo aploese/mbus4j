@@ -76,9 +76,15 @@ public interface MBusResponseFramesContainer
 
     void setAccessnumber( short accessnumber );
 
+    boolean addResponseFrameContainer( ResponseFrameContainer rfc );
+
+    ResponseFrameContainer removeResponseFrameContainer(int i);
+
     ResponseFrameContainer getResponseFrameContainer( int index );
 
     ResponseFrameContainer[] getResponseFrameContainers(  );
 
     int getResponseFrameContainerCount(  );
+
+    int responseFrameContainerIndexOf(ResponseFrameContainer rfc);
 }

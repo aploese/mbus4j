@@ -39,10 +39,11 @@ public class RealDataBlock extends DataBlock {
 
     private float value;
 
-    public RealDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public RealDataBlock() {
+        super();
     }
 
+    @Deprecated
     public RealDataBlock(DataFieldCode dataFieldCode, Vif vif, Vife... vifes) {
         super(dataFieldCode, vif, vifes);
     }

@@ -3,7 +3,7 @@
   "portname": "/dev/ttyUSB0",
   "baudrate": 2400
  },
- "slaves":  [
+ "devices":  [
     {
    "manufacturer": "ACW",
    "medium": "Heat",
@@ -3842,7 +3842,7 @@
        "drh":        {
         "dib":         {
          "dataFieldCode": "variable length",
-         "variableLengthType": "string",
+         "variableLengthType": "String",
          "functionField": "Instantaneous value",
          "storageNumber": 0,
          "subUnit": 0,

@@ -48,10 +48,11 @@ public class DateAndTimeDataBlock extends DataBlock {
     private boolean res2;
     private boolean res3;
 
-    public DateAndTimeDataBlock(DataBlock dataBlock) {
-        super(dataBlock);
+    public DateAndTimeDataBlock() {
+        super();
     }
 
+    @Deprecated
     public DateAndTimeDataBlock(Vif vif, Vife... vifes) {
         super(DataFieldCode._32_BIT_INTEGER, vif, vifes);
     }

@@ -34,13 +34,14 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 
 import java.awt.Component;
+import net.sf.mbus4j.slaves.Slave;
 
 /**
  *
  * @author aploese
  */
 public class ResponseFramePanel
-    extends javax.swing.JScrollPane
+    extends javax.swing.JPanel
 {
     /** Creates new form ResponseFramePanel */
     public ResponseFramePanel(  )
@@ -55,43 +56,68 @@ public class ResponseFramePanel
      */
     @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents(  )
-    {
-        jTabbedPane1 = new javax.swing.JTabbedPane(  );
-        responsePanel = new javax.swing.JPanel(  );
-        requestPanel = new javax.swing.JPanel(  );
-        selectPanel = new javax.swing.JPanel(  );
+    private void initComponents() {
 
-        jTabbedPane1.setName( "jTabbedPane1" ); // NOI18N
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        responsePanel = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        requestPanel = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        selectPanel = new javax.swing.JPanel();
 
-        responsePanel.setName( "responsePanel" ); // NOI18N
-        responsePanel.setLayout( new javax.swing.BoxLayout( responsePanel, javax.swing.BoxLayout.PAGE_AXIS ) );
-        jTabbedPane1.addTab( "Response", responsePanel );
+        setLayout(new java.awt.BorderLayout());
 
-        requestPanel.setName( "requestPanel" ); // NOI18N
-        requestPanel.setLayout( new javax.swing.BoxLayout( requestPanel, javax.swing.BoxLayout.PAGE_AXIS ) );
-        jTabbedPane1.addTab( "Request", requestPanel );
+        jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        jTabbedPane1.setToolTipText("List of responses");
+        jTabbedPane1.setName("jTabbedPane1"); // NOI18N
 
-        selectPanel.setName( "selectPanel" ); // NOI18N
-        selectPanel.setLayout( new javax.swing.BoxLayout( selectPanel, javax.swing.BoxLayout.PAGE_AXIS ) );
-        jTabbedPane1.addTab( "Select", selectPanel );
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        setViewportView( jTabbedPane1 );
-    } // </editor-fold>//GEN-END:initComponents
-      // Variables declaration - do not modify//GEN-BEGIN:variables
+        responsePanel.setName("responsePanel"); // NOI18N
+        responsePanel.setLayout(new javax.swing.BoxLayout(responsePanel, javax.swing.BoxLayout.PAGE_AXIS));
+        jScrollPane1.setViewportView(responsePanel);
 
+        jTabbedPane1.addTab("Response", jScrollPane1);
+
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        requestPanel.setName("requestPanel"); // NOI18N
+        requestPanel.setLayout(new javax.swing.BoxLayout(requestPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        jScrollPane2.setViewportView(requestPanel);
+
+        jTabbedPane1.addTab("Request", jScrollPane2);
+
+        jScrollPane3.setName("jScrollPane3"); // NOI18N
+
+        selectPanel.setName("selectPanel"); // NOI18N
+        selectPanel.setLayout(new javax.swing.BoxLayout(selectPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        jScrollPane3.setViewportView(selectPanel);
+
+        jTabbedPane1.addTab("Select", jScrollPane3);
+
+        add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jTabbedPane1.getAccessibleContext().setAccessibleName("Response");
+    }// </editor-fold>//GEN-END:initComponents
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel requestPanel;
     private javax.swing.JPanel responsePanel;
     private javax.swing.JPanel selectPanel;
-
     // End of variables declaration//GEN-END:variables
+    private String frameName;
     private ResponseFrameContainer rfc;
 
     void setResponseFrameContainer( ResponseFrameContainer rfc )
     {
-//        if (true) return;
         this.rfc = rfc;
+
+        frameName = rfc.getName();
+
+//        if (true) return;
         responsePanel.removeAll(  );
 
         if ( rfc.getResponseFrame(  ) instanceof UserDataResponse )
@@ -139,45 +165,54 @@ public class ResponseFramePanel
         }
     }
 
-    void commitChanges(  )
+    ResponseFrameContainer getResponseFrameContainer() {
+        return rfc;
+    }
+
+    void commitChanges(Slave s, int index)
     {
-        for ( Component c : responsePanel.getComponents(  ) )
+        int dbIndex = 0;
+         for ( int i = 0; i < responsePanel.getComponentCount(); i++ )
         {
+            final Component c = responsePanel.getComponent(i);
             if ( c instanceof UserDataResponsePanel )
             {
-                ( (UserDataResponsePanel) c ).commitChanges(  );
+                ( (UserDataResponsePanel)  c).commitChanges(rfc);
                 rfc.setName( ( (UserDataResponsePanel) c ).getFrameName(  ) );
             } else if ( c instanceof DataBlockPanel )
             {
-                ( (DataBlockPanel) c ).commitChanges(  );
+                ( (DataBlockPanel)  c).commitChanges((UserDataResponse)rfc.getResponseFrame(), dbIndex++);
             }
         }
 
-        for ( Component c : requestPanel.getComponents(  ) )
+        for ( int i = 0; i < requestPanel.getComponentCount(); i++ )
         {
+            final Component c = requestPanel.getComponent(i);
             if ( c instanceof RequestClassXDataPanel )
             {
-                ( (RequestClassXDataPanel) c ).commitChanges(  );
-            } else if ( c instanceof DataBlockPanel )
-            {
-                ( (DataBlockPanel) c ).commitChanges(  );
+                ( (RequestClassXDataPanel) c ).commitChanges(rfc);
             }
         }
 
-        for ( Component c : selectPanel.getComponents(  ) )
+      dbIndex = 0;
+      for ( int i = 0; i < selectPanel.getComponentCount(); i++ )
         {
-            if ( c instanceof ApplicationResetPanel )
+            final Component c = selectPanel.getComponent(i);
+              if ( c instanceof ApplicationResetPanel )
             {
-                ( (ApplicationResetPanel) c ).commitChanges(  );
+                ( (ApplicationResetPanel) c ).commitChanges(rfc);
             } else if ( c instanceof DataBlockPanel )
             {
-                ( (DataBlockPanel) c ).commitChanges(  );
+                ( (DataBlockPanel) c ).commitChanges((UserDataResponse)rfc.getSelectFrame(), dbIndex++);
             }
         }
     }
 
-    public String getFrameName(  )
-    {
-        return rfc.getName(  );
+    /**
+     * @return the frameName
+     */
+    public String getFrameName() {
+        return frameName;
     }
+
 }

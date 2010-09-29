@@ -34,6 +34,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import net.sf.mbus4j.MBusConstants;
 
 /**
  *
@@ -232,7 +233,7 @@ public class SelectionOfSlaves
 
     private boolean matchMan( String man )
     {
-        int hexBcdMan = (int) toBcd( Encoder.man2Short( man ),
+        int hexBcdMan = (int) toBcd( MBusConstants.man2Short( man ),
                                      4 );
         int hexMask = bcdMan;
 

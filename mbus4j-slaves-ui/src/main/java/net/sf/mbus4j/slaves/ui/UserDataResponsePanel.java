@@ -26,6 +26,7 @@
 package net.sf.mbus4j.slaves.ui;
 
 import net.sf.mbus4j.dataframes.Frame.ControlCode;
+import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 
 /**
@@ -54,73 +55,68 @@ public class UserDataResponsePanel
      */
     @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents(  )
-    {
-        controlCodeLabel = new javax.swing.JLabel(  );
-        controlCodeComboBox = new javax.swing.JComboBox(  );
-        nameLabel = new javax.swing.JLabel(  );
-        nameTextField = new javax.swing.JTextField(  );
+    private void initComponents() {
 
-        controlCodeLabel.setText( "ControlCode:" );
-        controlCodeLabel.setName( "controlCodeLabel" ); // NOI18N
+        controlCodeLabel = new javax.swing.JLabel();
+        controlCodeComboBox = new javax.swing.JComboBox();
+        nameLabel = new javax.swing.JLabel();
+        nameTextField = new javax.swing.JTextField();
 
-        controlCodeComboBox.setEnabled( false );
-        controlCodeComboBox.setName( "controlCodeComboBox" ); // NOI18N
+        controlCodeLabel.setText("ControlCode:");
+        controlCodeLabel.setName("controlCodeLabel"); // NOI18N
 
-        nameLabel.setText( "Name:" );
-        nameLabel.setName( "nameLabel" ); // NOI18N
+        controlCodeComboBox.setEnabled(false);
+        controlCodeComboBox.setName("controlCodeComboBox"); // NOI18N
 
-        nameTextField.setName( "nameTextField" ); // NOI18N
+        nameLabel.setText("Name:");
+        nameLabel.setName("nameLabel"); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout( this );
-        this.setLayout( layout );
-        layout.setHorizontalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                         .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                          .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                                                           .addComponent( nameLabel )
-                                                                           .addComponent( controlCodeLabel ) )
-                                                          .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.RELATED )
-                                                          .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING,
-                                                                                                 false )
-                                                                           .addComponent( controlCodeComboBox, 0,
-                                                                                          javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                          Short.MAX_VALUE )
-                                                                           .addComponent( nameTextField,
-                                                                                          javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                          241, Short.MAX_VALUE ) )
-                                                          .addContainerGap( 61, Short.MAX_VALUE ) ) );
-        layout.setVerticalGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
-                                       .addGroup( layout.createSequentialGroup(  ).addContainerGap(  )
-                                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.BASELINE )
-                                                                         .addComponent( nameLabel )
-                                                                         .addComponent( nameTextField,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                        .addGap( 18, 18, 18 )
-                                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.BASELINE )
-                                                                         .addComponent( controlCodeLabel )
-                                                                         .addComponent( controlCodeComboBox,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                        javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                        javax.swing.GroupLayout.PREFERRED_SIZE ) )
-                                                        .addContainerGap( 222, Short.MAX_VALUE ) ) );
-    } // </editor-fold>//GEN-END:initComponents
+        nameTextField.setName("nameTextField"); // NOI18N
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(nameLabel)
+                    .addComponent(controlCodeLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(controlCodeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(nameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 241, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(nameLabel)
+                    .addComponent(nameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(controlCodeLabel)
+                    .addComponent(controlCodeComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox controlCodeComboBox;
     private javax.swing.JLabel controlCodeLabel;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JTextField nameTextField;
-
     // End of variables declaration//GEN-END:variables
+
     public void setUserDataResponse( UserDataResponse response, String frameName )
     {
         nameTextField.setText( frameName );
         controlCodeComboBox.setSelectedItem( response.getControlCode(  ) );
     }
 
-    public void commitChanges(  )
+    public void commitChanges(ResponseFrameContainer rfc)
     {
     }
 

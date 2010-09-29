@@ -39,11 +39,15 @@ import org.slf4j.LoggerFactory;
  *  2. Masterstream wenn letztes Byte gelesen, dann lesen oder timeout triggern und nicht dfdas lesen des letzten Bytes verzögern, das bringt nix ....
  *
  */
-public class MasterStreams extends MockStreams {
+public class MasterStreams extends MockConnection {
 
     private static final Logger log = LoggerFactory.getLogger(MasterStreams.class);
     private int handledData;
     private boolean dataReaded;
+
+    public MasterStreams(int bitPerSecond, int responseTimeoutOffset) {
+        super(bitPerSecond, responseTimeoutOffset);
+    }
 
     @Override
     protected synchronized void lastByteReading(final long endWaitTime) throws IOException {
@@ -116,10 +120,11 @@ public class MasterStreams extends MockStreams {
             }
             return;
         }
-        os.setData(data.get(0).response);
-        is.setData(data.get(0).request, data.get(0).noResponseWaitTime);
+        getMockOs().setData(data.get(0).response);
+        getMockIs().setData(data.get(0).request, data.get(0).noResponseWaitTime);
         log.info(String.format("Setup data record: %04d data records left: %04d", handledData, data.size() - 1));
         handledData++;
-        is.releaseReadLock();
+        getMockIs().releaseReadLock();
     }
+
 }

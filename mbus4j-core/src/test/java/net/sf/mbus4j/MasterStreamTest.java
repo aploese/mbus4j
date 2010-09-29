@@ -99,12 +99,14 @@ public class MasterStreamTest {
 
 
     @Before
-    public void setUp() {
-        master = new MasterStreams();
+    public void setUp() throws Exception {
+        master = new MasterStreams(115200 / 4, 0);
+        master.open();
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
+        master.close();
         master = null;
     }
 }

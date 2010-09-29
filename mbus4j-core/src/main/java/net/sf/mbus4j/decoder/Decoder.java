@@ -25,6 +25,7 @@
  */
 package net.sf.mbus4j.decoder;
 
+import java.util.Arrays;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -52,6 +53,16 @@ import org.slf4j.LoggerFactory;
  */
 public class Decoder
 {
+
+    public void reset() {
+        setState(DecodeState.EXPECT_START);
+    }
+
+    private void printLoggedData() {
+      log.debug("Parsed Data: " + bytes2Ascii(loggedPackage));
+      loggedPackage = new byte[0];
+    }
+
     public enum DecodeState
     {EXPECT_START,
         LONG_LENGTH_1,
@@ -112,13 +123,16 @@ public class Decoder
     private byte start;
     private VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder(  );
     private DecodeState state = DecodeState.EXPECT_START;
-
+    private byte[] loggedPackage = new byte[0];
+    
     public Decoder(  )
     {
     }
 
     public Frame addByte( final byte b )
     {
+        loggedPackage = Arrays.copyOf(loggedPackage, loggedPackage.length + 1);
+        loggedPackage[loggedPackage.length -1] = b;
         checksum += b;
         dataPos++;
 
@@ -147,7 +161,7 @@ public class Decoder
                 } else if ( ( b & 0xFF ) == 0xE5 )
                 {
                     parsingFrame = SingleCharFrame.SINGLE_CHAR_FRAME;
-
+                    printLoggedData();
                     return parsingFrame;
                 } else
                 {
@@ -515,7 +529,7 @@ public class Decoder
                 if ( b == 0x16 )
                 {
                     setState( DecodeState.EXPECT_START );
-
+                    printLoggedData();
                     return parsingFrame;
                 } else
                 {
@@ -706,6 +720,9 @@ public class Decoder
         DecodeState oldState = this.state;
         this.state = state;
 
+        if (DecodeState.ERROR.equals(state) ) {
+          printLoggedData();
+        } 
         if ( log.isDebugEnabled(  ) )
         {
             log.debug( String.format( "DecodeState change from: %20s => %s", oldState, state ) );

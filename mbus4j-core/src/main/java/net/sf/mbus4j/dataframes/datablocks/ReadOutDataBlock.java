@@ -25,8 +25,6 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
-
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -34,8 +32,8 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
  */
 public class ReadOutDataBlock extends DataBlock {
 
-    public ReadOutDataBlock(DataFieldCode dfc) {
-        super(dfc);
+    public ReadOutDataBlock() {
+        super();
     }
 
     @Override

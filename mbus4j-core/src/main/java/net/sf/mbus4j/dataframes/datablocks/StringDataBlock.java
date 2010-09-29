@@ -36,17 +36,12 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  */
 public class StringDataBlock extends DataBlock {
 
-    public final static String STRING = "string";
     private String data;
 
-    public StringDataBlock(DataBlock dataBlock) {
-        super(dataBlock);
+    public StringDataBlock() {
     }
 
-    StringDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
-    }
-
+    @Deprecated
     public StringDataBlock(DataFieldCode dfc, Vif vif) {
         super(dfc, vif);
     }
@@ -60,6 +55,7 @@ public class StringDataBlock extends DataBlock {
         return data;
     }
 
+    @Override
     public void setValue(String data) {
         this.data = data;
     }

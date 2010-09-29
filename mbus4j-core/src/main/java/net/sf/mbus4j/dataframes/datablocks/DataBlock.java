@@ -34,6 +34,7 @@ import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
+import net.sf.mbus4j.dataframes.datablocks.dif.VariableLengthType;
 import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.SiPrefix;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
@@ -61,6 +62,151 @@ import net.sf.mbus4j.json.JsonSerializeType;
 public abstract class DataBlock implements Serializable, JSONSerializable, Cloneable {
 
     public final static Vife[] EMPTY_VIFE = new Vife[0];
+
+    public static Class<? extends DataBlock> getDataBlockClass(Vif vif, Vife[] vifes, DataFieldCode dfc, VariableLengthType variableLengthType) {
+        if (vifes != null) {
+            for (Vife vife : vifes) {
+                if (vife instanceof VifePrimary) {
+                    switch ((VifePrimary) vife) {
+                        case START_DATE_TIME_OF:
+                        case TIMESTAMP_OF_BEGIN_FIRST_LOWER:
+                        case TIMESTAMP_OF_END_FIRST_LOWER:
+                        case TIMESTAMP_BEGIN_LAST_LOWER:
+                        case TIMESTAMP_END_LAST_LOWER:
+                        case TIMESTAMP_BEGIN_FIRST_UPPER:
+                        case TIMESTAMP_END_FIRST_UPPER:
+                        case TIMESTAMP_BEGIN_LAST_UPPER:
+                        case TIMESTAMP_END_LAST_UPPER:
+                            return DateAndTimeDataBlock.class;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_S:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_MIN:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_H:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_D:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_S:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_MIN:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_H:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_D:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_S:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_MIN:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_H:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_D:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_S:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_MIN:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_H:
+                            break;
+                        case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_D:
+                            break;
+                        case DURATION_OF_FIRST_S:
+                            break;
+                        case DURATION_OF_FIRST_MIN:
+                            break;
+                        case DURATION_OF_FIRST_H:
+                            break;
+                        case DURATION_OF_FIRST_D:
+                            break;
+                        case DURATION_OF_LAST_S:
+                            break;
+                        case DURATION_OF_LAST_MIN:
+                            break;
+                        case DURATION_OF_LAST_H:
+                            break;
+                        case DURATION_OF_LAST_D:
+                            break;
+                        case TIMESTAMP_BEGIN_OF_FIRST:
+                        case TIMESTAMP_END_OF_FIRST:
+                        case TIMESTAMP_BEGIN_OF_LAST:
+                        case TIMESTAMP_END_OF_LAST:
+                            return DateAndTimeDataBlock.class;
+
+                        default:
+                    }
+                } else {
+                    vifes = null;
+                }
+            }
+        }
+
+        switch (dfc) {
+            case NO_DATA:
+                return EmptyDataBlock.class;
+            case SELECTION_FOR_READOUT:
+                return ReadOutDataBlock.class;
+            case SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST:
+                return ReadOutDataBlock.class;
+            case SPECIAL_FUNCTION_IDLE_FILLER:
+                return EmptyDataBlock.class;
+            case SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET:
+                return RawDataBlock.class;
+            case SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS:
+                return RawDataBlock.class;
+            case VARIABLE_LENGTH:
+                switch (variableLengthType) {
+                    case STRING : 
+                        return StringDataBlock.class;
+                    case BIG_DECIMAL:
+                        return BigDecimalDataBlock.class;
+                    default:
+                        return VariableLengthDataBlock.class;
+                }
+            case _12_DIGIT_BCD:
+                return LongDataBlock.class;
+            case _16_BIT_INTEGER:
+                if (VifPrimary.TIMEPOINT_DATE.equals(vif)) {
+                    return DateDataBlock.class;
+                } else {
+                    return ShortDataBlock.class;
+                }
+            case _24_BIT_INTEGER:
+                return IntegerDataBlock.class;
+            case _2_DIGIT_BCD:
+                return ByteDataBlock.class;
+            case _32_BIT_INTEGER:
+                if (VifPrimary.TIMEPOINT_TIME_AND_DATE.equals(vif)) {
+                    return DateAndTimeDataBlock.class;
+                } else {
+                    return IntegerDataBlock.class;
+                }
+            case _32_BIT_REAL:
+                return RealDataBlock.class;
+            case _48_BIT_INTEGER:
+                return LongDataBlock.class;
+            case _4_DIGIT_BCD:
+                return ShortDataBlock.class;
+            case _64_BIT_INTEGER:
+                if (VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
+                    return EnhancedIdentificationDataBlock.class;
+                } else {
+                    return LongDataBlock.class;
+                }
+            case _6_DIGIT_BCD:
+                return IntegerDataBlock.class;
+            case _8_BIT_INTEGER:
+                return ByteDataBlock.class;
+            case _8_DIGIT_BCD:
+                if (VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals(vif)) {
+                    return EnhancedIdentificationDataBlock.class;
+                } else {
+                    return IntegerDataBlock.class;
+                }
+            default:
+                throw new UnsupportedOperationException("Unknown ControlCode");
+        }
+
+    }
 
     public static Vif getVif(String vifTypeLabel, String vifLabel, String unitOfMeasurementLabel, String siPrefixLabel, Integer exponent) {
         VifTypes vifType = VifTypes.fromLabel(vifTypeLabel);
@@ -128,24 +274,14 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     private FunctionField functionField;
     private long storageNumber;
     private int tariff;
-    private final DataFieldCode dataFieldCode;
+    private DataFieldCode dataFieldCode;
     private short subUnit;
 
-    public DataBlock(DataBlock dataBlock) {
-        this(dataBlock.dataFieldCode);
-        this.vif = dataBlock.getVif();
-        this.vifes = dataBlock.getVifes();
-        this.storageNumber = dataBlock.getStorageNumber();
-        this.functionField = dataBlock.getFunctionField();
-        this.subUnit = dataBlock.getSubUnit();
-        this.tariff = dataBlock.getTariff();
-    }
-
-    public DataBlock(DataFieldCode dataFieldCode) {
+    public DataBlock() {
         super();
-        this.dataFieldCode = dataFieldCode;
     }
 
+    @Deprecated
     public DataBlock(DataFieldCode dif, FunctionField functionField, short subUnit, int tariff, long storageNumber, Vif vif, Vife... vifes) {
         super();
         this.dataFieldCode = dif;
@@ -159,6 +295,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         }
     }
 
+    @Deprecated
     public DataBlock(DataFieldCode dif, Vif vif, Vife... vifes) {
         super();
         this.dataFieldCode = dif;
@@ -251,10 +388,6 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         this.functionField = functionField;
     }
 
-    public void setObjectAction(ObjectAction action) {
-        this.action = action;
-    }
-
     public void setStorageNumber(long storageNumber) {
         this.storageNumber = storageNumber;
     }
@@ -343,7 +476,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         dib.accumulate("dataFieldCode", getDataFieldCode().getLabel());
         if (dataFieldCode.VARIABLE_LENGTH.equals(getDataFieldCode())) {
             if (this instanceof StringDataBlock) {
-                dib.accumulate("variableLengthType", "string");
+                dib.accumulate("variableLengthType", VariableLengthType.STRING.getLabel());
             } else {
                 throw new UnsupportedOperationException("Varoable datablock:" + this.getClass().getName());
             }
@@ -398,7 +531,10 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
             setAction(ObjectAction.fromLabel(dib.getString("action")));
         }
 
-        if (DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET.equals(dataFieldCode) || DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS.equals(dataFieldCode) || DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals(dataFieldCode)) {
+        setDataFieldCode(DataFieldCode.fromLabel(dib.getString("dataFieldCode")));
+        if ((DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET == dataFieldCode) ||
+                (DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS == dataFieldCode) ||
+                (DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST == dataFieldCode)) {
         } else {
             setFunctionField(FunctionField.fromLabel(dib.getString("functionField")));
             setStorageNumber(dib.getLong("storageNumber"));
@@ -423,4 +559,15 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     }
 
     public abstract void setValue(String text);
+
+    /**
+     * @param dataFieldCode the dataFieldCode to set
+     */
+    public void setDataFieldCode(DataFieldCode dataFieldCode) {
+        this.dataFieldCode = dataFieldCode;
+    }
+
+    public void clearVifes() {
+        vifes = EMPTY_VIFE;
+    }
 }

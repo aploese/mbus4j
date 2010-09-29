@@ -40,7 +40,19 @@ import org.slf4j.Logger;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public abstract class MockStreams {
+public abstract class MockConnection extends Connection {
+
+    public MockConnection(int bitPerSecond, int responseTimeoutOffset) {
+        super(bitPerSecond, responseTimeoutOffset);
+    }
+
+    protected MBusTestInputStream getMockIs() {
+        return (MBusTestInputStream)is;
+    }
+
+    protected MBusTestOutputStream getMockOs() {
+        return (MBusTestOutputStream)os;
+    }
 
     class Data {
 
@@ -169,30 +181,31 @@ public abstract class MockStreams {
         }
     }
     List<Data> data = new ArrayList<Data>();
-    MBusTestInputStream is = new MBusTestInputStream();
-    MBusTestOutputStream os = new MBusTestOutputStream();
 
+    @Override
     public void close() throws IOException {
+        setConnState(State.CLOSING);
         os.close();
         is.close();
+        setConnState(State.CLOSED);
+    }
+
+    @Override
+    public void open() throws IOException {
+        setConnState(State.OPENING);
+        is = new MBusTestInputStream();
+        os = new MBusTestOutputStream();
+        setConnState(State.OPEN);
     }
 
     protected abstract void lastByteReading(long endWaitTime) throws IOException;
 
     protected abstract void lastByteWriting() throws IOException;
 
-    public InputStream getInputStream() {
-        return is;
-    }
-
     protected abstract Logger getLog();
 
-    public OutputStream getOutputStream() {
-        return os;
-    }
-
     public boolean isOK() {
-        return data.isEmpty() && is.isOK() && os.isOK();
+        return data.isEmpty() && getMockIs().isOK() && getMockOs().isOK();
     }
 
     public void replay() {

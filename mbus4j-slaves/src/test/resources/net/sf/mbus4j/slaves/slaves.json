@@ -1,9 +1,11 @@
 {
- "serialPort":  {
-  "portname": "/dev/ttyUSB0",
-  "baudrate": 2400
+ "tcpIpConnection":  {
+  "bitPerSecond": 2400,
+  "responseTimeOutOffset": 600,
+  "hostname": "127.0.0.1",
+  "port": 65031
  },
- "slaves":  [
+ "devices":  [
     {
    "manufacturer": "ACW",
    "medium": "Heat",
@@ -3842,7 +3844,7 @@
        "drh":        {
         "dib":         {
          "dataFieldCode": "variable length",
-         "variableLengthType": "string",
+         "variableLengthType": "String",
          "functionField": "Instantaneous value",
          "storageNumber": 0,
          "subUnit": 0,

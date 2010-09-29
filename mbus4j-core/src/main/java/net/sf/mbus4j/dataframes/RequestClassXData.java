@@ -108,7 +108,7 @@ public class RequestClassXData implements ShortFrame {
         if (JsonSerializeType.ALL == jsonSerializeType) {
             result.accumulate("fcb", isFcb());
             result.accumulate("fcv", isFcv());
-            result.accumulate("address", address);
+            result.accumulate("address", JSONFactory.encodeHexByte(getAddress()));
         }
         return result;
     }

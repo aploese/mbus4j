@@ -43,10 +43,11 @@ public class ShortDataBlock extends DataBlock {
         return bcdError != null;
     }
 
-    public ShortDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public ShortDataBlock() {
+        super();
     }
 
+    @Deprecated
     public ShortDataBlock(DataFieldCode dif, Vif vif) {
         super(dif, vif);
     }

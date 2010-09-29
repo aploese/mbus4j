@@ -36,7 +36,7 @@
    "drh":    {
     "dib":     {
      "dataFieldCode": "variable length",
-     "variableLengthType": "string",
+     "variableLengthType": "String",
      "functionField": "Instantaneous value",
      "storageNumber": 0,
      "subUnit": 0,

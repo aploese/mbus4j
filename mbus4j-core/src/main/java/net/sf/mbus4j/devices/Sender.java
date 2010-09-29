@@ -36,4 +36,8 @@ public interface Sender {
 
     Frame send(Frame frame) throws IOException, InterruptedException;
 
+    Frame send(Frame frame, int maxTries) throws IOException, InterruptedException;
+
+    public final static int DEFAULT_MAY_TRIES = 3;
+
 }
