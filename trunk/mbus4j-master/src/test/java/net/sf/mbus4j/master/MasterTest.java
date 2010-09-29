@@ -25,8 +25,10 @@
  */
 package net.sf.mbus4j.master;
 
+import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.devices.Sender;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -76,9 +78,8 @@ public class MasterTest
         System.out.println( "setUp" );
         slaves = new SlaveStreams(  );
         master = new MBusMaster(  );
-        master.setStreams( slaves.getInputStream(  ),
-                           slaves.getOutputStream(  ),
-                           115200 / 4 ); // speedup things
+        master.setConnection( slaves);
+        master.open();
     }
 
     @After
@@ -86,7 +87,7 @@ public class MasterTest
                   throws Exception
     {
         System.out.println( "tearDown" );
-        master.releaseStreams(  );
+        master.close();
         master = null;
         slaves.close(  );
     }
@@ -217,7 +218,7 @@ public class MasterTest
         slaves.respondToRequest( "680B0B6853FD52FFFFFF8FFFFFFFFF2A16", 3 );
         slaves.respondToRequest( "680B0B6853FD52FFFFFF9FFFFFFFFF3A16", 3 );
         slaves.replay(  );
-        master.widcardSearch( leadingBcdDigitsId, maskLength, maskedMan, maskedVersion, maskedMedium );
+        master.widcardSearch( leadingBcdDigitsId, maskLength, maskedMan, maskedVersion, maskedMedium, Sender.DEFAULT_MAY_TRIES);
         assertTrue( slaves.isOK(  ) );
         log.info( "widcardSearch finished" );
         assertEquals( 4,

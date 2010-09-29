@@ -28,50 +28,110 @@ package net.sf.mbus4j.slaves.ui;
 import net.sf.mbus4j.slaves.Slaves;
 
 import javax.swing.AbstractListModel;
+import net.sf.mbus4j.slaves.Slave;
+import org.aspectj.lang.Aspects;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 
 /**
  *
  * @author aploese
  */
 class SlavesListModel
-    extends AbstractListModel
-{
+        extends AbstractListModel {
+
     private Slaves slaves;
 
     @Override
-    public int getSize(  )
-    {
-        return ( slaves == null ) ? 0 : slaves.getSalvesSize(  );
+    public int getSize() {
+        return (slaves == null) ? 0 : slaves.getSalvesSize();
     }
 
     @Override
-    public Object getElementAt( int index )
-    {
-        return slaves.getSlave( index );
+    public Object getElementAt(int index) {
+        return slaves.getSlave(index);
     }
 
-    public void setSlaves( Slaves slaves )
-    {
-        final int oldSize = getSize(  );
+    public void setSlaves(Slaves slaves) {
+
+        SlavesChangeAspect.unregister(this.slaves, this);
+        
+        final int oldSize = getSize();
         this.slaves = null;
 
-        if ( oldSize > 0 )
-        {
-            fireIntervalRemoved( this, 0, oldSize );
+        if (oldSize > 0) {
+            fireIntervalRemoved(this, 0, oldSize);
         }
 
         this.slaves = slaves;
 
-        if ( getSize(  ) > 0 )
-        {
-            fireIntervalAdded( this,
-                               0,
-                               getSize(  ) );
+        if (getSize() > 0) {
+            fireIntervalAdded(this,
+                    0,
+                    getSize());
         }
+
+        SlavesChangeAspect.register(this.slaves, this);
     }
 
-    public Slaves getSlaves(  )
-    {
+    public Slaves getSlaves() {
         return slaves;
+    }
+
+    @Aspect("pertarget(target(net.sf.mbus4j.slaves.Slaves))")
+    public static class SlavesChangeAspect {
+
+        public final static void unregister(Slaves slaves, SlavesListModel slm) {
+            if (slaves != null){
+                SlavesChangeAspect sca = Aspects.aspectOf(SlavesChangeAspect.class, slaves);
+                if (sca.slm == slm) {
+                    sca.slm = null;
+                }
+            }
+        }
+        
+        public final static void register(Slaves slaves, SlavesListModel slm) {
+            if (slaves != null) {
+                Aspects.aspectOf(SlavesChangeAspect.class, slaves).slm = slm;
+            }
+        }
+
+        public SlavesListModel slm;
+
+        @Pointcut("execution(* net.sf.mbus4j.slaves.Slaves.addSlave(..))")
+        public void addSlave() {
+        }
+
+        @Pointcut("execution(* net.sf.mbus4j.slaves.Slaves.removeSlave(..))")
+        public void removeSlave() {
+        }
+
+
+        @Around("addSlave()")
+        public Object addSlaveImpl(ProceedingJoinPoint pjp) throws Throwable {
+            Object ret = pjp.proceed();
+            if (slm != null) {
+                final Slave s = (Slave) pjp.getArgs()[0];
+                final Slaves sl = (Slaves) pjp.getTarget();
+                slm.fireIntervalAdded(slm, sl.slaveIndexOf(s), sl.slaveIndexOf(s));
+            }
+            return ret;
+        }
+
+        @Around("removeSlave()")
+        public Object removeSlaveImpl(ProceedingJoinPoint pjp) throws Throwable {
+            if (slm == null) {
+                return pjp.proceed();
+            }
+            final Slave s = (Slave) pjp.getArgs()[0];
+            final Slaves sl = (Slaves) pjp.getTarget();
+            final int i = sl.slaveIndexOf(s);
+            final Object ret = pjp.proceed();
+            slm.fireIntervalRemoved(slm, i, i);
+            return ret;
+        }
+
     }
 }

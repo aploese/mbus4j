@@ -135,14 +135,7 @@ public class UserDataResponse
             }
         }
 
-        JSONArray jsonDataBlocks = json.getJSONArray( "dataBlocks" );
-
-        for ( int i = 0; i < jsonDataBlocks.size(  ); i++ )
-        {
-            DataBlock db = JSONFactory.createDataBlock( jsonDataBlocks.getJSONObject( i ) );
-            db.fromJSON( jsonDataBlocks.getJSONObject( i ) );
-            addDataBlock( db );
-        }
+        JSONFactory.readDataBlocks(this, json);
     }
 
     public static enum StatusCode
@@ -374,8 +367,7 @@ public class UserDataResponse
     public void replaceDataBlock( DataBlock oldDataBlock, DataBlock newDataBlock )
     {
         final int pos = dataBlocks.indexOf( oldDataBlock );
-        dataBlocks.remove( pos );
-        dataBlocks.add( pos, newDataBlock );
+        dataBlocks.set(pos, newDataBlock);
     }
 
     public void setAccessNumber( short accessNumber )

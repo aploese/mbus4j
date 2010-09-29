@@ -69,4 +69,5 @@ public class SlavesUI
     {
         launch( SlavesUI.class, args );
     }
+
 }

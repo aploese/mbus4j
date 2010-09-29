@@ -284,4 +284,19 @@ public class ApplicationReset
 
         return sb.toString(  );
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if ( o instanceof ApplicationReset )
+        {
+            ApplicationReset other = (ApplicationReset) o;
+
+            return ( getTelegramType() == other.getTelegramType() ) &&
+                   (getSubTelegram() == other.getSubTelegram());
+        } else
+        {
+            return false;
+        }
+    }
+
 }

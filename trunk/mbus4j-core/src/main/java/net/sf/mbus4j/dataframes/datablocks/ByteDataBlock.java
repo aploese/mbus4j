@@ -43,10 +43,11 @@ public class ByteDataBlock extends DataBlock {
         return bcdError != null;
     }
 
-    public ByteDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public ByteDataBlock() {
+        super();
     }
 
+    @Deprecated
     public ByteDataBlock(DataFieldCode dif, Vif vif) {
         super(dif, vif);
     }

@@ -27,6 +27,7 @@ package net.sf.mbus4j.encoder;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import net.sf.mbus4j.MBusConstants;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.ControlFrame;
@@ -497,22 +498,8 @@ public class Encoder {
         }
     }
 
-    /**
-     * convert the man string to 2 byte binary representation
-     * @param man
-     * @return
-     */
-    public static short man2Short(String man) {
-        if (man == null) {
-            return -1;
-        } else {
-            byte[] bytes = man.getBytes();
-            return (short)(bytes[2] - 64 + (bytes[1] - 64) * 32 + (bytes[0] - 64) * 1024);
-        }
-    }
-
     private void pushManufacturer(String man) {
-        pushInteger(man2Short(man), 2);
+        pushInteger(MBusConstants.man2Short(man), 2);
     }
 
     private void pushObjectAction(DataBlock db) {

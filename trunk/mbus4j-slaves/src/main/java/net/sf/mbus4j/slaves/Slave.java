@@ -68,6 +68,20 @@ public class Slave
 {
     private final static Logger log = LoggerFactory.getLogger( Slave.class );
 
+    public static Slave fromResponse(UserDataResponse udr) {
+        Slave result = new Slave(udr.getAddress(), udr.getIdentNumber(), udr.getManufacturer(), udr.getVersion(), udr.getMedium());
+        result.setAccessnumber(udr.getAccessNumber());
+        result.setAcd(udr.isAcd());
+        result.setDfc(udr.isDfc());
+        result.setSignature(udr.getSignature());
+        result.setStatus(udr.getStatus());
+        ResponseFrameContainer rfc = new ResponseFrameContainer();
+        rfc.setRequestFrame(new  RequestClassXData(Frame.ControlCode.REQ_UD2));
+        rfc.setResponseFrame(udr);
+        result.addResponseFrameContainer(rfc);
+        return result;
+    }
+
     /**
      * Template for creating a valid udr - no datablocks.
      */
@@ -159,6 +173,13 @@ public class Slave
 
     public Frame handleApplicationReset( ApplicationReset applicationReset )
     {
+        for (int i = 0; i < responseFrameContainers.size(); i++) {
+            if (applicationReset.equals(responseFrameContainers.get(i).getSelectFrame())) {
+                selectedIndex = i;
+                log.debug(String.format("Set selected response container to %d \"%s\"", i, getResponseFrameContainer(i).getName()));
+                break;
+            }
+        }
         return SingleCharFrame.SINGLE_CHAR_FRAME;
     }
 
@@ -356,6 +377,17 @@ public class Slave
         {
             return false;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.version;
+        hash = 79 * hash + (this.medium != null ? this.medium.hashCode() : 0);
+        hash = 79 * hash + this.address;
+        hash = 79 * hash + this.identNumber;
+        hash = 79 * hash + (this.manufacturer != null ? this.manufacturer.hashCode() : 0);
+        return hash;
     }
 
     /**
@@ -558,5 +590,20 @@ public class Slave
         {
             return null;
         }
+    }
+
+    @Override
+    public boolean addResponseFrameContainer(ResponseFrameContainer rfc) {
+        return responseFrameContainers.add(rfc);
+    }
+
+    @Override
+    public ResponseFrameContainer removeResponseFrameContainer(int i) {
+        return responseFrameContainers.remove(i);
+    }
+
+    @Override
+    public int responseFrameContainerIndexOf(ResponseFrameContainer rfc) {
+        return responseFrameContainers.indexOf(rfc);
     }
 }

@@ -25,6 +25,8 @@
  */
 package net.sf.mbus4j.master;
 
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import net.sf.mbus4j.MBusConstants;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
@@ -44,7 +46,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +59,14 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.mbus4j.Connection;
+import net.sf.mbus4j.SerialPortConnection;
+import net.sf.mbus4j.TcpIpConnection;
+import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.json.JSONSerializable;
+import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  * Handles the MBus devices connected via inputStream/OutputStream.
@@ -65,24 +77,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * TODO: Handle multi Resoṕonses ClassXData (connect or chaon them together)
  */
 public class MBusMaster
-    implements Iterable<GenericDevice>,
-               Sender
-{
-    public void cancel(  )
-    {
+        implements Iterable<GenericDevice>,
+        Sender,
+        JSONSerializable {
+
+    public void cancel() {
 //TODO impement        throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public static GenericDevice getDevice( Iterable<GenericDevice> deviceList, ValueRequestPointLocator locator )
-    {
-        for ( GenericDevice dev : deviceList )
-        {
-            if ( ( dev.getAddress(  ) == locator.getAddress(  ) ) &&
-                     ( dev.getIdentNumber(  ) == locator.getIdentnumber(  ) ) &&
-                     dev.getManufacturer(  ).equals( locator.getManufacturer(  ) ) &&
-                     dev.getMedium(  ).equals( locator.getMedium(  ) ) &&
-                     ( dev.getVersion(  ) == locator.getVersion(  ) ) )
-            {
+    public static GenericDevice getDevice(Iterable<GenericDevice> deviceList, ValueRequestPointLocator locator) {
+        for (GenericDevice dev : deviceList) {
+            if ((dev.getAddress() == locator.getAddress())
+                    && (dev.getIdentNumber() == locator.getIdentnumber())
+                    && dev.getManufacturer().equals(locator.getManufacturer())
+                    && dev.getMedium().equals(locator.getMedium())
+                    && (dev.getVersion() == locator.getVersion())) {
                 return dev;
             }
         }
@@ -90,198 +99,201 @@ public class MBusMaster
         return null;
     }
 
-    public static DataBlock getDataBlock( Frame frame, ValueRequestPointLocator locator )
-    {
-        if ( frame instanceof UserDataResponse )
-        {
-            for ( DataBlock db : (UserDataResponse) frame )
-            {
-                if ( db.getDataFieldCode(  ).equals( locator.getDifCode(  ) ) &&
-                         db.getVif(  ).equals( locator.getVif(  ) ) &&
-                         db.getFunctionField(  ).equals( locator.getFunctionField(  ) ) &&
-                         ( db.getStorageNumber(  ) == locator.getStorageNumber(  ) ) &&
-                         ( db.getSubUnit(  ) == locator.getDeviceUnit(  ) ) &&
-                         ( db.getTariff(  ) == locator.getTariff(  ) ) &&
-                         Arrays.equals( db.getVifes(  ),
-                                            locator.getVifes(  ) ) )
-                {
+    public static DataBlock getDataBlock(Frame frame, ValueRequestPointLocator locator) {
+        if (frame instanceof UserDataResponse) {
+            for (DataBlock db : (UserDataResponse) frame) {
+                if (db.getDataFieldCode().equals(locator.getDifCode())
+                        && db.getVif().equals(locator.getVif())
+                        && db.getFunctionField().equals(locator.getFunctionField())
+                        && (db.getStorageNumber() == locator.getStorageNumber())
+                        && (db.getSubUnit() == locator.getDeviceUnit())
+                        && (db.getTariff() == locator.getTariff())
+                        && Arrays.equals(db.getVifes(),
+                        locator.getVifes())) {
                     return db;
                 }
             }
-        } else
-        {
-            throw new RuntimeException( "Response is not a UserDataResponse but: " + frame );
+        } else {
+            throw new RuntimeException("Response is not a UserDataResponse but: " + frame);
         }
 
-        throw new RuntimeException( "can't find datablock of locator" );
+        throw new RuntimeException("can't find datablock of locator");
     }
 
-    private DataBlock getTimeStampDB( GenericDevice dev, ValueRequestPointLocator locator )
-    {
+    private DataBlock getTimeStampDB(GenericDevice dev, ValueRequestPointLocator locator) {
         // TODO implement
         return null;
     }
 
+    public Connection getConnection() {
+        return conn;
+    }
+
+    public void writeJsonStream(FileOutputStream os) throws UnsupportedEncodingException, IOException {
+        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
+        JSONObject json = toJSON(JsonSerializeType.SLAVE_CONFIG);
+        String text = json.toString(1);
+        osw.write(text, 0, text.length());
+        osw.flush();
+        osw.close();
+    }
+
     private class StreamListener
-        implements Runnable
-    {
+            implements Runnable {
+
+        private Decoder parser = new Decoder();
+
         @Override
-        public void run(  )
-        {
-            try
-            {
+        public void run() {
+            try {
                 int theData;
-                Decoder parser = new Decoder(  );
-
-                try
-                {
-                    while ( ! closed )
-                    {
-                        try
-                        {
-                            if ( ( theData = is.read(  ) ) == -1 )
-                            {
-                                if ( log.isTraceEnabled(  ) )
-                                {
-                                    log.trace( "Thread interrupted or eof on waiting occured" );
+                try {
+                    while (!isClosed()) {
+                        try {
+                            if ((theData = conn.getInputStream().read()) == -1) {
+                                if (log.isTraceEnabled()) {
+                                    log.trace("Thread interrupted or eof on waiting occured");
                                 }
-                            } else
-                            {
-                                if ( log.isTraceEnabled(  ) )
-                                {
-                                    log.trace( String.format( "Data received 0x%02x", theData ) );
+                            } else {
+                                if (log.isTraceEnabled()) {
+                                    log.trace(String.format("Data received 0x%02x", theData));
                                 }
 
-                                try
-                                {
-                                    if ( parser.addByte( (byte) theData ) != null )
-                                    {
-                                        setLastFrame( parser.getFrame(  ) );
+                                try {
+                                    if (parser.addByte((byte) theData) != null) {
+                                        setLastFrame(parser.getFrame());
                                     }
-                                } catch ( Exception e )
-                                {
-                                    log.error( "Error during createPackage()", e );
+                                } catch (Exception e) {
+                                    log.error("Error during createPackage()", e);
                                 }
                             }
-                        } catch ( NullPointerException npe )
-                        {
-                            if ( ! closed )
-                            {
-                                throw new RuntimeException( npe );
+                        } catch (NullPointerException npe) {
+                            if (!isClosed()) {
+                                throw new RuntimeException(npe);
                             }
                         }
                     }
 
-                    log.info( "closing down - finish waiting for new data" );
-                } catch ( IOException e )
-                {
-                    log.error( "run()", e );
-                } catch ( Exception e )
-                {
-                    log.info( "finished waiting for packages", e );
+                    log.info("closing down - finish waiting for new data");
+                } catch (IOException e) {
+                    if (isClosed()) {
+                        log.debug("Port Closed", e);
+                    } else {
+                        log.error("run()", e);
+                    }
+                } catch (Exception e) {
+                    if (isClosed()) {
+                        log.debug("Port Closed", e);
+                    } else {
+                        log.info("finished waiting for packages", e);
+                    }
                 }
-            } finally
-            {
+            } finally {
+                parser.reset();
             }
         }
-    }
 
-    private final static Logger log = LoggerFactory.getLogger( MBusMaster.class );
-    private List<GenericDevice> devices = new ArrayList<GenericDevice>(  );
-    private InputStream is;
-    private OutputStream os;
-    private Encoder encoder = new Encoder(  );
-    private boolean closed;
+        private boolean isClosed() {
+            return conn == null ? true : conn.getConnState().equals(Connection.State.CLOSED) || conn.getConnState().equals(Connection.State.CLOSING);
+        }
+    }
+    private final static Logger log = LoggerFactory.getLogger(MBusMaster.class);
+    private List<GenericDevice> devices = new ArrayList<GenericDevice>();
+    private Encoder encoder = new Encoder();
     private Thread t;
-    private StreamListener streamListener = new StreamListener(  );
-    private int bitPerSecond;
-    private final Queue<Frame> frameQueue = new ConcurrentLinkedQueue<Frame>(  );
+    private StreamListener streamListener = new StreamListener();
+    private final Queue<Frame> frameQueue = new ConcurrentLinkedQueue<Frame>();
+    private Connection conn;
 
-    public MBusMaster(  )
-    {
-        super(  );
+    public MBusMaster() {
+        super();
     }
 
-    public boolean addDevice( GenericDevice device )
-    {
-        return devices.add( device );
+    /**
+     *
+     * @param device
+     * @return true if the device is not Already in the List Identnumber, Manufacturer and Medium
+     * @TODO refresh devicedata???
+     */
+    public boolean addDevice(GenericDevice device) {
+        for (GenericDevice dev : devices) {
+            if (dev.getIdentNumber() == device.getIdentNumber()) {
+                if (dev.getManufacturer().equals(device.getManufacturer()) && dev.getMedium().equals(device.getMedium())) {
+                    return false;
+                }
+            }
+        }
+        return devices.add(device);
     }
 
-    public void addSlaveByAddress( int address )
-                           throws InterruptedException, IOException
-    {
-        Frame f = sendRequestUserData( address );
-
-        if ( f instanceof UserDataResponse )
-        {
+    public GenericDevice addDeviceByAddress(int address)
+            throws InterruptedException, IOException {
+        Frame f = sendRequestUserData(address);
+        GenericDevice result = null;
+        if (f instanceof UserDataResponse) {
             UserDataResponse udr = (UserDataResponse) f;
             //TODO detect dev and create
-            log.info( String.format( "add device: address = 0x%02X, id = = %08d, man = %s, medium = %s, version = 0x%02X",
-                                     udr.getAddress(  ),
-                                     udr.getIdentNumber(  ),
-                                     udr.getManufacturer(  ),
-                                     udr.getMedium(  ),
-                                     udr.getVersion(  ) ) );
-            devices.add( DeviceFactory.createDevice( udr,
-                                                     new RequestClassXData( Frame.ControlCode.REQ_UD2, (byte) address ) ) );
-
+            result = DeviceFactory.createDevice(udr, new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address));
+            addDevice(result);
+            log.info(String.format("added device: address = 0x%02X, id = = %08d, man = %s, medium = %s, version = 0x%02X",
+                    udr.getAddress(),
+                    udr.getIdentNumber(),
+                    udr.getManufacturer(),
+                    udr.getMedium(),
+                    udr.getVersion()));
             //TODO check wenn dev braucht mehr ( falsces udr)
-        } else
-        {
-            log.info( String.format( "no device at address = 0x%02X", address ) );
+        } else {
+            log.info(String.format("no device at address = 0x%02X", address));
+        }
+        return result;
+    }
+
+    public int deviceIndexOf(GenericDevice d) {
+        return devices.indexOf(d);
+    }
+    
+    public void clearDevices() {
+        devices.clear();
+    }
+
+    private void clearFrameQueue() {
+        synchronized (frameQueue) {
+            frameQueue.clear();
         }
     }
 
-    public void clear(  )
-    {
-        devices.clear(  );
-    }
-
-    private void clearFrameQueue(  )
-    {
-        synchronized ( frameQueue )
-        {
-            frameQueue.clear(  );
+    public void close() throws InterruptedException, IOException {
+        if (conn != null) {
+            conn.close();
+            Thread.sleep(100);
+            t.interrupt();
         }
-    }
-
-    public void close(  )
-               throws InterruptedException
-    {
-        closed = true;
-        Thread.sleep( 100 ); //TODO wait?
-        t.interrupt(  );
     }
 
     /**
      * @TODO implement
      */
-    public void deselectBySecondaryAddress(  )
-    {
+    public void deselectBySecondaryAddress() {
     }
 
-    public int deviceCount(  )
-    {
-        return devices.size(  );
+    public int deviceCount() {
+        return devices.size();
     }
 
-    public MBusResponseFramesContainer getDevice( int i )
-    {
-        return devices.get( i );
+    public GenericDevice getDevice(int i) {
+        return devices.get(i);
     }
 
-    public MBusResponseFramesContainer[] getDevices(  )
-    {
-        return devices.toArray( new MBusResponseFramesContainer[deviceCount(  )] );
+    public GenericDevice[] getDevices() {
+        return devices.toArray(new GenericDevice[deviceCount()]);
     }
 
     /**
      * Idle time is 33 bit periods see M-Bus doc chaper 5.4
      * @return
      */
-    private long getIdleTime(  )
-    {
-        return 33000 / bitPerSecond;
+    private long getIdleTime() {
+        return 33000 / conn.getBitPerSecond();
     }
 
     /**
@@ -289,33 +301,21 @@ public class MBusMaster
      * 2 times max (256) packet size added
      * @return
      */
-    private long getResponseTimeout(  )
-    {
-        return ( ( ( ( 512 * 11 ) + 330 ) * 1000 ) / bitPerSecond ) + 50;
+    private long getResponseTimeout() {
+        return ((((512 * 11) + 330) * 1000) / conn.getBitPerSecond()) + conn.getResponseTimeOutOffset();
     }
 
     @Override
-    public Iterator<GenericDevice> iterator(  )
-    {
-        return devices.iterator(  );
+    public Iterator<GenericDevice> iterator() {
+        return devices.iterator();
     }
 
-    public void releaseStreams(  )
-    {
-        closed = true;
-        is = null;
-        os = null;
+    private Frame removeFrame() {
+        return frameQueue.remove();
     }
 
-    private Frame removeFrame(  )
-    {
-        return frameQueue.remove(  );
-    }
-
-    public void searchDevicesBySecondaryAddressing(  )
-                                            throws IOException, InterruptedException
-    {
-        widcardSearch( 0x00, 7, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF );
+    public GenericDevice[] searchDevicesBySecondaryAddressing(int maxTries) throws IOException, InterruptedException {
+        return widcardSearch(0x00, 7, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF, maxTries);
     }
 
     /**
@@ -325,67 +325,63 @@ public class MBusMaster
      *
      * @return
      */
-    public MBusResponseFramesContainer[] searchDevicesByPrimaryAddress(  )
-        throws IOException, InterruptedException
-    {
-        return searchDevicesByPrimaryAddress( 0, MBusConstants.LAST_REGULAR_PRIMARY_ADDRESS );
+    public GenericDevice[] searchDevicesByPrimaryAddress()
+            throws IOException, InterruptedException {
+        return searchDevicesByPrimaryAddress(0, MBusConstants.LAST_REGULAR_PRIMARY_ADDRESS);
     }
 
-    public MBusResponseFramesContainer[] searchDevicesByPrimaryAddress( int first, int last )
-        throws IOException, InterruptedException
-    {
-        clear(  );
-
-        for ( int i = first; i <= last; i++ )
-        {
-            addSlaveByAddress( i );
+    public GenericDevice[] searchDevicesByPrimaryAddress(int first, int last)
+            throws IOException, InterruptedException {
+        List<GenericDevice> result = new ArrayList<GenericDevice>();
+        for (int i = first; i <= last; i++) {
+            GenericDevice c = addDeviceByAddress(i);
+            if (c != null) {
+                result.add(c);
+            }
         }
-
-        return getDevices(  );
+        return result.toArray(new GenericDevice[result.size()]);
     }
 
     //TODO
-    public void selectBySecondaryAddress(  )
-    {
+    public void selectBySecondaryAddress() {
     }
 
     @Override
-    public Frame send( Frame frame )
-               throws IOException, InterruptedException
-    {
-        for ( int trys = 0; trys <= 2; trys++ )
-        {
-            clearFrameQueue(  );
+    public Frame send(Frame frame)
+            throws IOException, InterruptedException {
+        return send(frame, DEFAULT_MAY_TRIES);
+    }
 
-            final byte[] b = encoder.encode( frame );
-            os.write( b );
-            os.flush(  );
+    @Override
+    public Frame send(Frame frame, int maxTries)
+            throws IOException, InterruptedException {
+        for (int tries = 0; tries <= maxTries; tries++) {
+            clearFrameQueue();
 
-            final long time = System.currentTimeMillis(  );
+            final byte[] b = encoder.encode(frame);
+            conn.getOutputStrteam().write(b);
+            conn.getOutputStrteam().flush();
 
-            if ( log.isDebugEnabled(  ) )
-            {
-                log.debug( String.format( "Data Sent (try: %d): %s ",
-                                          trys,
-                                          Decoder.bytes2Ascii( b ) ) );
+            final long time = System.currentTimeMillis();
+
+            if (log.isDebugEnabled()) {
+                log.debug(String.format("Data Sent (try: %d): %s ",
+                        tries,
+                        Decoder.bytes2Ascii(b)));
             }
 
-            Frame result = waitAndPollFrame( getResponseTimeout(  ) );
-            log.info( String.format( "Answer took %d ms", System.currentTimeMillis(  ) - time ) );
+            Frame result = waitAndPollFrame(getResponseTimeout());
+            log.info(String.format("Answer took %d ms", System.currentTimeMillis() - time));
 
-            if ( result != null )
-            {
+            if (result != null) {
                 return result;
-            } else
-            {
-                Thread.sleep( getIdleTime(  ) );
+            } else {
+                Thread.sleep(getIdleTime());
 
-                if ( trys < 2 )
-                {
-                    log.warn( "Timeout Reply" );
-                } else
-                {
-                    log.error( "Timeout Reply" );
+                if (tries < 2) {
+                    log.warn("Timeout Reply");
+                } else {
+                    log.error("Timeout Reply");
 
                     //TODO throw Ex?
                     return null;
@@ -396,106 +392,88 @@ public class MBusMaster
         return null;
     }
 
-    public void sendRequestUserData(  )
-                             throws IOException, InterruptedException
-    {
-        sendRequestUserData( devices );
+    public void sendRequestUserData()
+            throws IOException, InterruptedException {
+        sendRequestUserData(devices);
     }
 
-    public Frame sendRequestUserData( int address )
-                              throws IOException, InterruptedException
-    {
-        RequestClassXData req = new RequestClassXData( Frame.ControlCode.REQ_UD2, (byte) address );
+    public Frame sendRequestUserData(int address)
+            throws IOException, InterruptedException {
+        RequestClassXData req = new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address);
 
-        return send( req );
+        return send(req);
     }
 
-    public Map<GenericDevice, Frame> sendRequestUserData( Iterable<GenericDevice> devices )
-                                                  throws IOException, InterruptedException
-    {
-        Map<GenericDevice, Frame> result = new HashMap<GenericDevice, Frame>(  );
+    public Map<GenericDevice, Frame> sendRequestUserData(Iterable<GenericDevice> devices)
+            throws IOException, InterruptedException {
+        Map<GenericDevice, Frame> result = new HashMap<GenericDevice, Frame>();
 
-        for ( GenericDevice dev : devices )
-        {
-            result.put( dev,
-                        sendRequestUserData( dev.getAddress(  ) ) );
+        for (GenericDevice dev : devices) {
+            result.put(dev,
+                    sendRequestUserData(dev.getAddress()));
         }
 
         return result;
     }
 
-    public void sendSlaveSelect( byte[] idWithMask, short manWithMask, byte versionWithMask )
-    {
+    public void sendSlaveSelect(byte[] idWithMask, short manWithMask, byte versionWithMask) {
         //TODO search...
     }
 
-    public void sendSlaveSelect( MBusResponseFramesContainer dev )
-    {
+    public void sendSlaveSelect(MBusResponseFramesContainer dev) {
         //TODO search...
     }
 
-    private synchronized void setLastFrame( Frame frame )
-    {
-        log.debug( String.format( "New frame parsed %s", frame ) );
+    private synchronized void setLastFrame(Frame frame) {
+        log.debug(String.format("New frame parsed %s", frame));
 
-        synchronized ( frameQueue )
-        {
-            frameQueue.add( frame );
-            frameQueue.notifyAll(  );
+        synchronized (frameQueue) {
+            frameQueue.add(frame);
+            frameQueue.notifyAll();
         }
     }
 
-    public void setStreams( InputStream is, OutputStream os, int bitPerSecond )
-    {
-        this.is = is;
-        this.os = os;
-        this.bitPerSecond = bitPerSecond;
-        closed = false;
-        start(  );
+    public void setConnection(Connection conn) {
+        this.conn = conn;
     }
 
-    private void start(  )
-    {
-        closed = false;
-        t = new Thread( streamListener );
-        t.setDaemon( true );
-        t.start(  );
+    public void open() throws IOException {
+        conn.open();
+        t = new Thread(streamListener);
+        t.setDaemon(true);
+        t.start();
     }
 
-    private Frame waitAndPollFrame( long timeout )
-                            throws InterruptedException
-    {
-        System.out.println( "TIMEOUT: " + timeout );
+    private Frame waitAndPollFrame(long timeout)
+            throws InterruptedException {
+        log.debug("timeout: " + timeout);
 
-        synchronized ( frameQueue )
-        {
-            if ( frameQueue.peek(  ) == null )
-            {
-                if ( timeout > 0 )
-                {
-                    frameQueue.wait( timeout );
+        synchronized (frameQueue) {
+            if (frameQueue.peek() == null) {
+                if (timeout > 0) {
+                    frameQueue.wait(100 + conn.getResponseTimeOutOffset());
+                    //TODO apl 100ms is enought???  
+                    //If there is nothing until now, there will be nothing in the future
+                    if (this.streamListener.parser.getState() != Decoder.DecodeState.EXPECT_START) {
+                        frameQueue.wait(timeout - 100 - conn.getResponseTimeOutOffset());
+                    }
                 }
             }
-
-            return frameQueue.poll(  );
+            return frameQueue.poll();
         }
     }
 
-    private int waitForSingleChars( long timeout )
-                            throws InterruptedException
-    {
+    private int waitForSingleChars(long timeout)
+            throws InterruptedException {
         int result = 0;
-        final long time = System.currentTimeMillis(  );
+        final long time = System.currentTimeMillis();
 
-        while ( ( System.currentTimeMillis(  ) - time ) <= timeout )
-        {
-            Frame frame = waitAndPollFrame( time - System.currentTimeMillis(  ) + timeout );
+        while ((System.currentTimeMillis() - time) <= timeout) {
+            Frame frame = waitAndPollFrame(time - System.currentTimeMillis() + timeout);
 
-            if ( frame instanceof SingleCharFrame )
-            {
+            if (frame instanceof SingleCharFrame) {
                 result++;
-            } else
-            {
+            } else {
                 return result;
             }
         }
@@ -504,99 +482,183 @@ public class MBusMaster
     }
 
     //TODO all BCD
-    public void widcardSearch( int leadingBcdDigitsId, int maskLength, short bcdMan, byte bcdVersion, byte bcdMedium )
-                       throws IOException, InterruptedException
-    {
-        clear(  );
-        log.debug( String.format( "widcardSearch leadingBcdDigitsId: 0x%08X, maskLength: %d", leadingBcdDigitsId,
-                                  maskLength ) );
+    public GenericDevice[] widcardSearch(int leadingBcdDigitsId, int maskLength, short bcdMan, byte bcdVersion, byte bcdMedium, int maxTries)
+            throws IOException, InterruptedException {
+        List<GenericDevice> result = new ArrayList<GenericDevice>();
+        log.debug(String.format("widcardSearch leadingBcdDigitsId: 0x%08X, maskLength: %d", leadingBcdDigitsId,
+                maskLength));
 
-        SelectionOfSlaves sud = new SelectionOfSlaves( (byte) MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS );
+        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
         int idMask = 0;
 
-        for ( int i = 1; i <= maskLength; i++ )
-        {
+        for (int i = 1; i <= maskLength; i++) {
             idMask <<= 4;
             idMask |= 0x0F;
         }
 
-        for ( int i = 0; i <= 9; i++ )
-        {
-            sud.setBcdId( ( leadingBcdDigitsId << ( maskLength * 4 ) ) + idMask );
-            sud.setBcdMan( bcdMan );
-            sud.setBcdVersion( bcdVersion );
-            sud.setBcdMedium( bcdMedium );
+        for (int i = 0; i <= 9; i++) {
+            selOfSl.setBcdId((leadingBcdDigitsId << (maskLength * 4)) + idMask);
+            selOfSl.setBcdMan(bcdMan);
+            selOfSl.setBcdVersion(bcdVersion);
+            selOfSl.setBcdMedium(bcdMedium);
 
-            Frame result = send( sud );
+            Frame resultFrame = send(selOfSl, maxTries);
 
-            if ( result instanceof SingleCharFrame )
-            {
-                log.debug( String.format( "got answer with mask: 0x%08X", leadingBcdDigitsId ) );
+            if (resultFrame instanceof SingleCharFrame) {
+                log.debug(String.format("got answer with mask: 0x%08X", leadingBcdDigitsId));
 
-                int answers = waitForSingleChars( getResponseTimeout(  ) );
+                int answers = waitForSingleChars(getResponseTimeout());
 
-                if ( answers == 0 )
-                {
-                    log.debug( String.format( "detect slave with mask: 0x%08X", leadingBcdDigitsId ) );
-                    addSlaveByAddress( MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS );
-                } else
-                {
-                    if ( maskLength > 0 )
-                    {
-                        log.debug( String.format( "multiple slaves (%d) with mask: 0x%08X", answers, leadingBcdDigitsId ) );
-                        widcardSearch( leadingBcdDigitsId << 4, maskLength - 1, bcdMan, bcdVersion, bcdMedium );
-                    } else
-                    { // wenn idMask == 8 man ver und medium ???
-                        log.error( String.format( "Cant separate slaves (%d) with id: 0x%08X", answers,
-                                                  leadingBcdDigitsId ) );
+                if (answers == 0) {
+                    log.debug(String.format("detect slave with mask: 0x%08X", leadingBcdDigitsId));
+                    GenericDevice dev = addDeviceByAddress(MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
+                    result.add(dev);
+                } else {
+                    if (maskLength > 0) {
+                        log.debug(String.format("multiple slaves (%d) with mask: 0x%08X", answers, leadingBcdDigitsId));
+                        GenericDevice[] devs = widcardSearch(leadingBcdDigitsId << 4, maskLength - 1, bcdMan, bcdVersion, bcdMedium, maxTries);
+                        result.addAll(Arrays.asList(devs));
+                    } else { // wenn idMask == 8 man ver und medium ???
+                        log.error(String.format("Cant separate slaves (%d) with id: 0x%08X", answers,
+                                leadingBcdDigitsId));
                     }
                 }
-            } else
-            {
-                log.debug( String.format( "no slave with mask: 0x%08X", leadingBcdDigitsId ) );
+            } else {
+                log.debug(String.format("no slave with mask: 0x%08X", leadingBcdDigitsId));
             }
 
             leadingBcdDigitsId++;
         }
+        return result.toArray(new GenericDevice[result.size()]);
     }
 
-    public void readValues( ValueRequest<?> requests )
-                    throws IOException, InterruptedException
-    {
+    public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium, int maxTries) throws IOException, InterruptedException {
+        final short bcdMan = (man == null || man.length() == 0) ? (short)0xFFFF : MBusConstants.man2Short(man);
+        byte bcdVersion = (version == null) ? (byte)0xFF : version;
+        byte bcdMedium = (medium == null) ? (byte) 0xFF : (byte) medium.getId();
+
+        if (selectDevice(bcdId, bcdMan, bcdVersion, bcdMedium, maxTries)) {
+            return readResponse(MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
+        } else {
+            return null;
+        }
+    }
+
+    public UserDataResponse readResponse(int address) throws IOException, InterruptedException {
+       Frame f = sendRequestUserData(address);
+        if (f instanceof UserDataResponse) {
+            return (UserDataResponse) f;
+        } else {
+//TODO Ex??
+           return null;
+        }
+     }
+
+    public boolean selectDevice(int bcdId, short bcdMan, byte bcdVersion, byte bcdMedium, int maxTries) throws IOException, InterruptedException {
+        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
+        selOfSl.setBcdId(bcdId);
+        selOfSl.setBcdMan(bcdMan);
+        selOfSl.setBcdVersion(bcdVersion);
+        selOfSl.setBcdMedium(bcdMedium);
+            Frame resultFrame = send(selOfSl, maxTries);
+
+            if (resultFrame instanceof SingleCharFrame) {
+                int answers = waitForSingleChars(getResponseTimeout());
+                return answers == 0;
+            } else {
+                return false;
+            }
+    }
+
+    public void readValues(ValueRequest<?> requests)
+            throws IOException, InterruptedException {
         //Create devices if neccecary
-        Set<GenericDevice> deviceSet = new HashSet<GenericDevice>(  );
+        Set<GenericDevice> deviceSet = new HashSet<GenericDevice>();
 
-        for ( ValueRequestPointLocator locator : requests )
-        {
-            GenericDevice myDevice = getDevice( devices, locator );
+        for (ValueRequestPointLocator locator : requests) {
+            GenericDevice myDevice = getDevice(devices, locator);
 
-            if ( myDevice == null )
-            {
+            if (myDevice == null) {
                 myDevice =
-                    DeviceFactory.createDevice( locator.getAddress(  ),
-                                                locator.getManufacturer(  ),
-                                                locator.getMedium(  ),
-                                                locator.getVersion(  ),
-                                                locator.getIdentnumber(  ) );
-                devices.add( myDevice );
+                        DeviceFactory.createDevice(locator.getAddress(),
+                        locator.getManufacturer(),
+                        locator.getMedium(),
+                        locator.getVersion(),
+                        locator.getIdentnumber());
+                addDevice(myDevice);
             }
 
-            deviceSet.add( myDevice );
+            deviceSet.add(myDevice);
         }
 
         //get data from devices
         //TODO hounor frames and addressing
-        Map<GenericDevice, Frame> responses = sendRequestUserData( deviceSet );
+        Map<GenericDevice, Frame> responses = sendRequestUserData(deviceSet);
 
         //pack response
-        for ( ValueRequestPointLocator locator : requests )
-        {
-            GenericDevice dev = getDevice( deviceSet, locator );
-            DataBlock db = getDataBlock( responses.get( dev ),
-                                         locator );
-            locator.setDb( db );
-            db = getTimeStampDB( dev, locator );
-            locator.setTimestampDb( db );
+        for (ValueRequestPointLocator locator : requests) {
+            GenericDevice dev = getDevice(deviceSet, locator);
+            DataBlock db = getDataBlock(responses.get(dev),
+                    locator);
+            locator.setDb(db);
+            db = getTimeStampDB(dev, locator);
+            locator.setTimestampDb(db);
         }
+    }
+
+    public static MBusMaster readJsonStream(InputStream is)
+            throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        StringBuilder sb = new StringBuilder();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+
+        MBusMaster result = new MBusMaster();
+        result.fromJSON(JSONObject.fromObject(sb.toString()));
+
+        return result;
+    }
+
+    @Override
+    public void fromJSON(JSONObject json) {
+        if (json.containsKey("serialConnection")) {
+            conn = new SerialPortConnection();
+            conn.fromJSON(json.getJSONObject("serialConnection"));
+        } else if (json.containsKey("tcpIpConnection")) {
+            conn = new TcpIpConnection();
+            conn.fromJSON(json.getJSONObject("tcpIpConnection"));
+        }
+
+        JSONArray jsonDevices = json.getJSONArray("devices");
+
+        for (int i = 0; i < jsonDevices.size(); i++) {
+            GenericDevice device = new GenericDevice();
+            device.fromJSON(jsonDevices.getJSONObject(i));
+            addDevice(device);
+        }
+    }
+
+    @Override
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
+        JSONObject result = new JSONObject();
+
+        if (conn instanceof SerialPortConnection) {
+            result.accumulate("serialConnection", conn.toJSON(jsonSerializeType));
+        } else if (conn instanceof TcpIpConnection) {
+            result.accumulate("tcpIpConnection", conn.toJSON(jsonSerializeType));
+        }
+
+        JSONArray jsonDevices = new JSONArray();
+
+        for (GenericDevice device : devices) {
+            jsonDevices.add(device.toJSON(jsonSerializeType));
+        }
+
+        result.accumulate("devices", jsonDevices);
+
+        return result;
     }
 }

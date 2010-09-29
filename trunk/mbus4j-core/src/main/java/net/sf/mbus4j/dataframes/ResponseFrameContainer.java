@@ -38,10 +38,12 @@ import net.sf.mbus4j.json.JsonSerializeType;
 public class ResponseFrameContainer
     implements JSONSerializable
 {
+
+    public final static String DEFAULT_NAME = "default";
     private Frame selectFrame;
     private Frame requestFrame;
     private Frame responseFrame;
-    private String name = "default";
+    private String name = DEFAULT_NAME;
 
     @Override
     public JSONObject toJSON( JsonSerializeType jsonSerializeType )

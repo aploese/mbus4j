@@ -25,8 +25,6 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
-import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
-
 /**
  *
  * @author arnep@users.sourceforge.net
@@ -34,8 +32,8 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
  */
 public class EmptyDataBlock extends DataBlock {
 
-    public EmptyDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public EmptyDataBlock() {
+        super();
     }
 
     @Override

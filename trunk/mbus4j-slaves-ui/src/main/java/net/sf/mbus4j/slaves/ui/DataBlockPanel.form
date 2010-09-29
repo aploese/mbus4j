@@ -52,19 +52,19 @@
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Component id="clearActionButton" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="exponentTextField" alignment="0" pref="170" max="32767" attributes="1"/>
-                                  <Component id="functionFieldComboBox" alignment="0" pref="170" max="32767" attributes="1"/>
-                                  <Component id="storageNumberTextField" alignment="0" pref="170" max="32767" attributes="1"/>
-                                  <Component id="subunitTextField" alignment="0" pref="170" max="32767" attributes="1"/>
-                                  <Component id="tarifTextField" alignment="0" pref="170" max="32767" attributes="1"/>
-                                  <Component id="dataFieldCodeComboBox" alignment="0" pref="170" max="32767" attributes="1"/>
+                                  <Component id="exponentTextField" alignment="0" pref="177" max="32767" attributes="1"/>
+                                  <Component id="functionFieldComboBox" alignment="0" pref="177" max="32767" attributes="1"/>
+                                  <Component id="storageNumberTextField" alignment="0" pref="177" max="32767" attributes="1"/>
+                                  <Component id="subunitTextField" alignment="0" pref="177" max="32767" attributes="1"/>
+                                  <Component id="tarifTextField" alignment="0" pref="177" max="32767" attributes="1"/>
+                                  <Component id="dataFieldCodeComboBox" alignment="0" pref="177" max="32767" attributes="1"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="vifesLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jScrollPane1" min="-2" pref="544" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="valueTextField" alignment="0" pref="770" max="32767" attributes="0"/>
+                          <Component id="valueTextField" alignment="0" pref="780" max="32767" attributes="0"/>
                       </Group>
                   </Group>
               </Group>
@@ -157,7 +157,6 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="objectActionComboBox" noResource="true"/>
       </Properties>
     </Component>
@@ -166,14 +165,13 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="dataFieldCodeComboBox" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="clearActionButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Clear"/>
-        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="focusPainted" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="clearActionButton" noResource="true"/>
       </Properties>
       <Events>
@@ -200,7 +198,6 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="functionFieldComboBox" noResource="true"/>
       </Properties>
     </Component>
@@ -233,7 +230,6 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="vifTypeComboBox" noResource="true"/>
       </Properties>
       <Events>
@@ -260,7 +256,6 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="0"/>
         </Property>
-        <Property name="enabled" type="boolean" value="false"/>
         <Property name="name" type="java.lang.String" value="vifComboBox" noResource="true"/>
       </Properties>
     </Component>

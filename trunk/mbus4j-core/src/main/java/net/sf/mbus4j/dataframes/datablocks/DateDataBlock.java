@@ -45,10 +45,11 @@ public class DateDataBlock extends DataBlock {
 
     private Date value;
 
-    public DateDataBlock(DataBlock dataBlock) {
-        super(dataBlock);
+    public DateDataBlock() {
+        super();
     }
 
+    @Deprecated
     public DateDataBlock(Vif vif, Vife... vifes) {
         super(DataFieldCode._16_BIT_INTEGER, vif, vifes);
     }

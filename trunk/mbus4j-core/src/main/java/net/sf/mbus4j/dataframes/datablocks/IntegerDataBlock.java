@@ -25,7 +25,6 @@
  */
 package net.sf.mbus4j.dataframes.datablocks;
 
-import java.text.ParseException;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
@@ -46,14 +45,16 @@ public class IntegerDataBlock extends DataBlock {
         return bcdError != null;
     }
 
-    public IntegerDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public IntegerDataBlock() {
+        super();
     }
 
+    @Deprecated
     public IntegerDataBlock(DataFieldCode dif, FunctionField functionField, short subUnit, int tariff, long storageNumber, Vif vif, Vife... vifes) {
         super(dif, functionField, subUnit, tariff, storageNumber, vif, vifes);
     }
 
+    @Deprecated
     public IntegerDataBlock(DataFieldCode dif, Vif vif) {
         super(dif, vif);
     }

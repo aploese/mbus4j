@@ -25,6 +25,7 @@
  */
 package net.sf.mbus4j.decoder;
 
+import java.util.Arrays;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -45,8 +46,10 @@ import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.VariableLengthDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
+import net.sf.mbus4j.dataframes.datablocks.dif.VariableLengthType;
 import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
@@ -65,10 +68,35 @@ import org.slf4j.LoggerFactory;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class VariableDataBlockDecoder
-{
-    public enum DecodeState
-    {WAIT_FOR_INIT,
+public class VariableDataBlockDecoder {
+
+    private void createDataBlock() {
+        try {
+            db = DataBlock.getDataBlockClass(vif, vifes, dfc, variableLengthType).newInstance();
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (InstantiationException ex) {
+            throw new RuntimeException(ex);
+        }
+        db.setVif(vif);
+        db.setDataFieldCode(dfc);
+        if (vifes == null) {
+            db.clearVifes();
+        } else {
+            for (int i = 0; i < vifes.length; i++) {
+            db.addVife(vifes[i]);
+        }
+        }
+        db.setStorageNumber(storageNumber);
+        db.setTariff(tariff);
+        db.setSubUnit(subUnit);
+        db.setFunctionField(functionField);
+        db.setAction(objectAction);
+    }
+
+    public enum DecodeState {
+
+        WAIT_FOR_INIT,
         DIF,
         DIFE,
         VIF,
@@ -82,112 +110,109 @@ public class VariableDataBlockDecoder
         ERROR,
         RESULT_AVAIL;
     }
-
-    private final static Logger log = LoggerFactory.getLogger( VariableDataBlockDecoder.class );
+    private final static Logger LOG = LoggerFactory.getLogger(VariableDataBlockDecoder.class);
     private DecodeState ds;
     private int difePos;
+    private ObjectAction objectAction;
+    private DataFieldCode dfc;
+    private VariableLengthType variableLengthType;
+    private FunctionField functionField;
+    private long storageNumber;
+    private int tariff;
+    private short subUnit;
+    private Vif vif;
+    private Vife[] vifes;
     private DataBlock db;
     private LongFrame frame;
-    private Stack stack = new Stack(  );
+    private Stack stack = new Stack();
 
-    public VariableDataBlockDecoder(  )
-    {
-        super(  );
-        setState( DecodeState.WAIT_FOR_INIT );
+    public VariableDataBlockDecoder() {
+        super();
+        setState(DecodeState.WAIT_FOR_INIT);
     }
 
-    public DecodeState addByte( byte b, int bytesLeft )
-    {
-        switch ( ds )
-        {
+    public DecodeState addByte(byte b, int bytesLeft) {
+        switch (ds) {
             case DIF:
-                decodeDIF( b, bytesLeft );
+                decodeDif(b, bytesLeft);
                 difePos = 0;
 
                 break;
 
             case DIFE:
-                decodeDIFE( b, difePos++ );
+                decodeDIFE(b, difePos++);
 
                 break;
 
             case VIF:
-                decodeVIF( b );
+                decodeVIF(b);
 
                 break;
 
             case ASCII_VIF_LENGTH:
-                stack.init( b & 0xFF );
-                setState( DecodeState.ASCII_VIF_COLLECT );
+                stack.init(b & 0xFF);
+                setState(DecodeState.ASCII_VIF_COLLECT);
 
                 break;
 
             case ASCII_VIF_COLLECT:
-                stack.push( b );
+                stack.push(b);
 
-                if ( stack.isFull(  ) )
-                {
-                    ( (VifAscii) db.getVif(  ) ).setValue( stack.popString(  ) );
-                    startCollectingValue(  );
+                if (stack.isFull()) {
+                    ((VifAscii) vif).setValue(stack.popString());
+                    startCollectingValue();
                 }
 
                 break;
 
             case VIF_FB:
-                decodeVifExtention_FB( b );
+                decodeVifExtention_FB(b);
 
                 break;
 
             case VIF_FD:
-                decodeVifExtention_FD( b );
+                decodeVifExtention_FD(b);
 
                 break;
 
             case VIFE:
-                decodeVIFE( b );
+                decodeVIFE(b);
 
                 break;
 
             case COLLECTING_VALUE:
-                stack.push( b );
+                stack.push(b);
 
-                if ( stack.isFull(  ) )
-                {
-                    decodeValueFromStack(  );
+                if (stack.isFull()) {
+                    decodeValueFromStack();
                 }
 
                 break;
 
             case SET_VARIABLE_LENGTH:
 
-                if ( ( b & 0xFF ) < 0xBF )
-                {
-                    db = new StringDataBlock( db );
-                    startCollectingValue( ( b & 0xFF ) );
-                } else if ( ( b & 0xFF ) < 0xCF )
-                {
-                    db = new BigDecimalDataBlock( db );
-                    startCollectingValue( ( b & 0xFF ) - 0xC0 );
-                } else if ( ( b & 0xFF ) < 0xDF )
-                {
-                    db = new BigDecimalDataBlock( db );
-                    startCollectingValue( ( b & 0xFF ) - 0xD0 );
-                } else if ( ( b & 0xFF ) < 0xEF )
-                {
-                    throw new DecodeException( "binary number ???? how to decode" );
-                } else if ( ( b & 0xFF ) < 0xFA )
-                {
-                    throw new DecodeException( "floating point to be defined" );
-                } else
-                {
-                    throw new DecodeException( String.format( "reserved: 0x%02x ", b & 0xFF ) );
+                if ((b & 0xFF) < 0xBF) {
+                    variableLengthType = VariableLengthType.STRING;
+                    startCollectingValue((b & 0xFF));
+                } else if ((b & 0xFF) < 0xCF) {
+                    variableLengthType = VariableLengthType.BIG_DECIMAL;
+                    startCollectingValue((b & 0xFF) - 0xC0);
+                } else if ((b & 0xFF) < 0xDF) {
+                    variableLengthType = VariableLengthType.BIG_DECIMAL;
+                    startCollectingValue((b & 0xFF) - 0xD0);
+                } else if ((b & 0xFF) < 0xEF) {
+                    throw new DecodeException("binary number ???? how to decode");
+                } else if ((b & 0xFF) < 0xFA) {
+                    throw new DecodeException("floating point to be defined");
+                } else {
+                    throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF));
                 }
 
                 break;
 
             default:
-                log.error( "Unknown state: " + ds );
-                setState( DecodeState.ERROR );
+                LOG.error("Unknown state: " + ds);
+                setState(DecodeState.ERROR);
         }
 
         return ds;
@@ -197,114 +222,78 @@ public class VariableDataBlockDecoder
      *
      * @param dataField lengt encoding see table 5 chapter 6.3
      */
-    private void createDataBlock( final byte dataField )
-    {
-        switch ( dataField )
-        {
+    private void decodeDif(final byte dataField) {
+        switch (dataField) {
             case 0x00:
-                db = new EmptyDataBlock( DataFieldCode.NO_DATA );
-
+                dfc = DataFieldCode.NO_DATA;
                 break;
-
             case 0x01:
-                db = new ByteDataBlock( DataFieldCode._8_BIT_INTEGER );
-
+                dfc = DataFieldCode._8_BIT_INTEGER;
                 break;
-
             case 0x02:
-                db = new ShortDataBlock( DataFieldCode._16_BIT_INTEGER );
-
+                dfc = DataFieldCode._16_BIT_INTEGER;
                 break;
-
             case 0x03:
-                db = new IntegerDataBlock( DataFieldCode._24_BIT_INTEGER );
-
+                dfc = DataFieldCode._24_BIT_INTEGER;
                 break;
-
             case 0x04:
-                db = new IntegerDataBlock( DataFieldCode._32_BIT_INTEGER );
-
+                dfc = DataFieldCode._32_BIT_INTEGER;
                 break;
-
             case 0x05:
-                db = new RealDataBlock( DataFieldCode._32_BIT_REAL );
-
+                dfc = DataFieldCode._32_BIT_REAL;
                 break;
-
             case 0x06:
-                db = new LongDataBlock( DataFieldCode._48_BIT_INTEGER );
-
+                dfc = DataFieldCode._48_BIT_INTEGER;
                 break;
-
             case 0x07:
-                db = new LongDataBlock( DataFieldCode._64_BIT_INTEGER );
-
+                dfc = DataFieldCode._64_BIT_INTEGER;
                 break;
-
             case 0x08:
-                db = new ReadOutDataBlock( DataFieldCode.SELECTION_FOR_READOUT );
-
+                dfc = DataFieldCode.SELECTION_FOR_READOUT;
                 break;
-
             case 0x09:
-                db = new ByteDataBlock( DataFieldCode._2_DIGIT_BCD );
-
+                dfc = DataFieldCode._2_DIGIT_BCD;
                 break;
-
             case 0x0A:
-                db = new ShortDataBlock( DataFieldCode._4_DIGIT_BCD );
-
+                dfc = DataFieldCode._4_DIGIT_BCD;
                 break;
-
             case 0x0B:
-                db = new IntegerDataBlock( DataFieldCode._6_DIGIT_BCD );
-
+                dfc = DataFieldCode._6_DIGIT_BCD;
                 break;
-
             case 0x0C:
-                db = new IntegerDataBlock( DataFieldCode._8_DIGIT_BCD );
-
+                dfc = DataFieldCode._8_DIGIT_BCD;
                 break;
-
             case 0x0D:
-                db = new VariableLengthDataBlock( DataFieldCode.VARIABLE_LENGTH );
-
+                dfc = DataFieldCode.VARIABLE_LENGTH;
                 break;
-
             case 0x0E:
-                db = new LongDataBlock( DataFieldCode._12_DIGIT_BCD );
-
+                dfc = DataFieldCode._12_DIGIT_BCD;
                 break;
-
             case 0x0F:
-                setState( DecodeState.ERROR );
-                throw new NotSupportedException( "data field 0x0f not supported" );
-
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException("data field 0x0f not supported");
             default:
-                setState( DecodeState.ERROR );
-                throw new NotSupportedException( String.format( "data field 0x%02x not supported", dataField ) );
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format("data field 0x%02x not supported", dataField));
         }
     }
 
-    private void decodeDIF( final byte b, int bytesLeft )
-    {
-        switch ( b & 0xFF )
-        {
+    private void decodeDif(final byte b, int bytesLeft) {
+        switch (b & 0xFF) {
             case 0x0F:
-                db = new RawDataBlock( DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET );
-                startCollectingValue( bytesLeft );
+                dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET;
+                startCollectingValue(bytesLeft);
 
                 return;
 
             case 0x1F:
-                db = new RawDataBlock( DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS );
+                dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS;
 
-                if ( bytesLeft == 0 )
-                {
-                    setState( DecodeState.RESULT_AVAIL );
-                } else
-                {
-                    startCollectingValue( bytesLeft );
+                if (bytesLeft == 0) {
+                    createDataBlock();
+                    setState(DecodeState.RESULT_AVAIL);
+                } else {
+                    startCollectingValue(bytesLeft);
                 }
 
                 return;
@@ -318,262 +307,221 @@ public class VariableDataBlockDecoder
             case 0x4F:
             case 0x5F:
             case 0x6F:
-                setState( DecodeState.ERROR );
-                throw new DecodeException( "reserved" ); // Reserverd,
+                setState(DecodeState.ERROR);
+                throw new DecodeException("reserved"); // Reserverd,
 
             case 0x7F:
-                db = new ReadOutDataBlock( DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST );
+                dfc = DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST;
 
                 break;
 
             default:
 
-                try
-                {
-                    createDataBlock( (byte) ( b & 0x0F ) );
-                } catch ( Exception e )
-                {
-                    log.error( "HALLO: " + b );
-                    throw new RuntimeException( e );
+                try {
+                    decodeDif((byte) (b & 0x0F));
+                } catch (Exception e) {
+                    LOG.error("HALLO: " + b);
+                    throw new RuntimeException(e);
                 }
 
-                switch ( ( b >> 4 ) & 0x03 )
-                {
+                switch ((b >> 4) & 0x03) {
                     case 0x00:
-                        db.setFunctionField( FunctionField.INSTANTANEOUS_VALUE );
-
+                        functionField = FunctionField.INSTANTANEOUS_VALUE;
                         break;
-
                     case 0x01:
-                        db.setFunctionField( FunctionField.MAXIMUM_VALUE );
-
+                        functionField = FunctionField.MAXIMUM_VALUE;
                         break;
-
                     case 0x02:
-                        db.setFunctionField( FunctionField.MINIMUM_VALUE );
-
+                        functionField = FunctionField.MINIMUM_VALUE;
                         break;
-
                     case 0x03:
-                        db.setFunctionField( FunctionField.VALUE_DURING_ERROR_STATE );
-
+                        functionField = FunctionField.VALUE_DURING_ERROR_STATE;
                         break;
-
                     default:
-                        throw new NotSupportedException( "Function field" );
+                        throw new NotSupportedException("Function field");
                 }
         }
 
-        if ( ! DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST.equals( db.getDataFieldCode(  ) ) )
-        {
-            db.setStorageNumber( ( b >> 6 ) & 0x01 );
+        if (DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST != dfc) {
+            storageNumber = (b >> 6) & 0x01;
         }
 
-        if ( ( b & Decoder.EXTENTION_BIT ) == Decoder.EXTENTION_BIT )
-        {
-            setState( DecodeState.DIFE );
-        } else
-        {
-            if ( bytesLeft == 0 )
-            {
-                setState( DecodeState.RESULT_AVAIL );
-            } else
-            {
-                setState( DecodeState.VIF );
+        if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
+            setState(DecodeState.DIFE);
+        } else {
+            if (bytesLeft == 0) {
+                createDataBlock();
+                setState(DecodeState.RESULT_AVAIL);
+            } else {
+                setState(DecodeState.VIF);
             }
         }
     }
 
-    private void decodeDIFE( final byte b, int dFIEIndex )
-    {
-        db.setStorageNumber( db.getStorageNumber(  ) | ( (long) ( b & 0x0F ) << ( 1 + ( dFIEIndex * 4 ) ) ) );
-        db.setTariff( db.getTariff(  ) | ( ( ( b >> 4 ) & 0x03 ) << ( dFIEIndex * 2 ) ) );
-        db.setSubUnit( (short) ( db.getSubUnit(  ) | ( ( ( b >> 6 ) & 0x01 ) << dFIEIndex ) ) );
+    private void decodeDIFE(final byte b, int dFIEIndex) {
+        storageNumber |= (long) (b & 0x0F) << (1 + (dFIEIndex * 4));
+        tariff |= ((b >> 4) & 0x03) << (dFIEIndex * 2);
+        subUnit |= (short) (((b >> 6) & 0x01) << dFIEIndex);
 
-        if ( ( b & Decoder.EXTENTION_BIT ) != Decoder.EXTENTION_BIT )
-        {
-            setState( DecodeState.VIF );
+        if ((b & Decoder.EXTENTION_BIT) != Decoder.EXTENTION_BIT) {
+            setState(DecodeState.VIF);
         }
     }
 
-    private void decodeEnhancedIdentificationDataBlock(  )
-    {
-        final EnhancedIdentificationDataBlock b = (EnhancedIdentificationDataBlock) db;
-        b.setMedium( MBusMedium.valueOf( stack.popByte(  ) ) );
-        b.setVersion( stack.popByte(  ) );
-        b.setMan( stack.popMan(  ) );
-        b.setId( stack.popBcdInteger( 8 ) );
+    private void decodeEnhancedIdentificationDataBlock(EnhancedIdentificationDataBlock db) {
+        db.setMedium(MBusMedium.valueOf(stack.popByte()));
+        db.setVersion(stack.popByte());
+        db.setMan(stack.popMan());
+        db.setId(stack.popBcdInteger(8));
     }
 
-    private void decodeValueFromStack(  )
-    {
-        switch ( db.getDataFieldCode(  ) )
-        {
+    private void decodeValueFromStack() {
+       createDataBlock();
+        switch (dfc) {
             case NO_DATA:
                 break;
 
             case _8_BIT_INTEGER:
-                ( (ByteDataBlock) db ).setValue( stack.popByte(  ) );
+                ((ByteDataBlock) db).setValue(stack.popByte());
 
                 break;
 
             case _2_DIGIT_BCD:
-                ( (ByteDataBlock) db ).setBcdError( stack.peekBcdError( 2 ) );
+                ((ByteDataBlock) db).setBcdError(stack.peekBcdError(2));
 
-                if ( ( (ByteDataBlock) db ).getBcdError(  ) != null )
-                {
-                    stack.popBcdByte(  );
-                } else
-                {
-                    ( (ByteDataBlock) db ).setValue( stack.popBcdByte(  ) );
+                if (((ByteDataBlock) db).getBcdError() != null) {
+                    stack.popBcdByte();
+                } else {
+                    ((ByteDataBlock) db).setValue(stack.popBcdByte());
                 }
 
                 break;
 
             case _16_BIT_INTEGER:
 
-                if ( db instanceof DateDataBlock )
-                {
-                    ( (DateDataBlock) db ).setValue( stack.popDate(  ) );
-                } else
-                {
-                    ( (ShortDataBlock) db ).setValue( stack.popShort(  ) );
+                if (db instanceof DateDataBlock) {
+                    ((DateDataBlock) db).setValue(stack.popDate());
+                } else {
+                    ((ShortDataBlock) db).setValue(stack.popShort());
                 }
 
                 break;
 
             case _4_DIGIT_BCD:
-                ( (ShortDataBlock) db ).setBcdError( stack.peekBcdError( 4 ) );
+                ((ShortDataBlock) db).setBcdError(stack.peekBcdError(4));
 
-                if ( ( (ShortDataBlock) db ).getBcdError(  ) != null )
-                {
-                    stack.popBcdShort( 4 );
-                } else
-                {
-                    ( (ShortDataBlock) db ).setValue( stack.popBcdShort( 4 ) );
+                if (((ShortDataBlock) db).getBcdError() != null) {
+                    stack.popBcdShort(4);
+                } else {
+                    ((ShortDataBlock) db).setValue(stack.popBcdShort(4));
                 }
 
                 break;
 
             case _24_BIT_INTEGER:
-                ( (IntegerDataBlock) db ).setValue( stack.popInteger( 3 ) );
+                ((IntegerDataBlock) db).setValue(stack.popInteger(3));
 
                 break;
 
             case _6_DIGIT_BCD:
-                ( (IntegerDataBlock) db ).setBcdError( stack.peekBcdError( 6 ) );
+                ((IntegerDataBlock) db).setBcdError(stack.peekBcdError(6));
 
-                if ( ( (IntegerDataBlock) db ).getBcdError(  ) != null )
-                {
-                    stack.popBcdInteger( 6 );
-                } else
-                {
-                    ( (IntegerDataBlock) db ).setValue( stack.popBcdInteger( 6 ) );
+                if (((IntegerDataBlock) db).getBcdError() != null) {
+                    stack.popBcdInteger(6);
+                } else {
+                    ((IntegerDataBlock) db).setValue(stack.popBcdInteger(6));
                 }
 
                 break;
 
             case _32_BIT_INTEGER:
 
-                if ( db instanceof DateAndTimeDataBlock )
-                {
-                    DateAndTimeDataBlock d = ( (DateAndTimeDataBlock) db );
-                    d.setValid( stack.peekIsTimestampValid(  ) );
-                    d.setSummerTime( stack.peekIsTimestampSummertime(  ) );
-                    d.setRes1( stack.peekIsTimestampRes1(  ) );
-                    d.setRes2( stack.peekIsTimestampRes2(  ) );
-                    d.setRes3( stack.peekIsTimestampRes3(  ) );
-                    d.setValue( stack.popTimeStamp(  ) );
-                } else
-                {
-                    ( (IntegerDataBlock) db ).setValue( stack.popInteger(  ) );
+                if (db instanceof DateAndTimeDataBlock) {
+                    DateAndTimeDataBlock d = ((DateAndTimeDataBlock) db);
+                    d.setValid(stack.peekIsTimestampValid());
+                    d.setSummerTime(stack.peekIsTimestampSummertime());
+                    d.setRes1(stack.peekIsTimestampRes1());
+                    d.setRes2(stack.peekIsTimestampRes2());
+                    d.setRes3(stack.peekIsTimestampRes3());
+                    d.setValue(stack.popTimeStamp());
+                } else {
+                    ((IntegerDataBlock) db).setValue(stack.popInteger());
                 }
 
                 break;
 
             case _8_DIGIT_BCD:
 
-                if ( db instanceof EnhancedIdentificationDataBlock )
-                {
-                    ( (EnhancedIdentificationDataBlock) db ).setId( stack.popBcdInteger( 8 ) );
-                } else
-                {
-                    ( (IntegerDataBlock) db ).setBcdError( stack.peekBcdError( 8 ) );
+                if (db instanceof EnhancedIdentificationDataBlock) {
+                    ((EnhancedIdentificationDataBlock) db).setId(stack.popBcdInteger(8));
+                } else {
+                    ((IntegerDataBlock) db).setBcdError(stack.peekBcdError(8));
 
-                    if ( ( (IntegerDataBlock) db ).getBcdError(  ) != null )
-                    {
-                        stack.popBcdInteger( 8 );
-                    } else
-                    {
-                        ( (IntegerDataBlock) db ).setValue( stack.popBcdInteger( 8 ) );
+                    if (((IntegerDataBlock) db).getBcdError() != null) {
+                        stack.popBcdInteger(8);
+                    } else {
+                        ((IntegerDataBlock) db).setValue(stack.popBcdInteger(8));
                     }
                 }
 
                 break;
 
             case _32_BIT_REAL:
-                ( (RealDataBlock) db ).setValue( stack.popFloat(  ) );
+                ((RealDataBlock) db).setValue(stack.popFloat());
 
                 break;
 
             case _48_BIT_INTEGER:
-                ( (LongDataBlock) db ).setValue( stack.popLong( 6 ) );
+                ((LongDataBlock) db).setValue(stack.popLong(6));
 
                 break;
 
             case _12_DIGIT_BCD:
-                ( (LongDataBlock) db ).setBcdError( stack.peekBcdError( 12 ) );
+                ((LongDataBlock) db).setBcdError(stack.peekBcdError(12));
 
-                if ( ( (LongDataBlock) db ).getBcdError(  ) != null )
-                {
-                    stack.popBcdInteger( 12 );
-                } else
-                {
-                    ( (LongDataBlock) db ).setValue( stack.popBcdLong( 12 ) );
+                if (((LongDataBlock) db).getBcdError() != null) {
+                    stack.popBcdInteger(12);
+                } else {
+                    ((LongDataBlock) db).setValue(stack.popBcdLong(12));
                 }
 
                 break;
 
             case _64_BIT_INTEGER:
 
-                if ( db instanceof EnhancedIdentificationDataBlock )
-                {
-                    decodeEnhancedIdentificationDataBlock(  );
-                } else
-                {
-                    ( (LongDataBlock) db ).setValue( stack.popLong(  ) );
+                if (db instanceof EnhancedIdentificationDataBlock) {
+                    decodeEnhancedIdentificationDataBlock((EnhancedIdentificationDataBlock)db);
+                } else {
+                    ((LongDataBlock) db).setValue(stack.popLong());
                 }
 
                 break;
 
             case VARIABLE_LENGTH:
 
-                if ( db instanceof RawDataBlock )
-                {
-                    ( (RawDataBlock) db ).setValue( stack.popBytes(  ) );
-                } else if ( db instanceof StringDataBlock )
-                {
-                    ( (StringDataBlock) db ).setValue( stack.popString(  ) );
-                } else
-                {
+                if (db instanceof RawDataBlock) {
+                    ((RawDataBlock) db).setValue(stack.popBytes());
+                } else if (db instanceof StringDataBlock) {
+                    ((StringDataBlock) db).setValue(stack.popString());
+                } else {
                     // TODO BIG DECIMAL and binray
-                    throw new RuntimeException( "decode variable lenght " + db.getClass(  ).getName(  ) );
+                    throw new RuntimeException("decode variable lenght " + db.getClass().getName());
                 }
 
                 break;
 
             case SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET:
             case SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS:
-                ( (RawDataBlock) db ).setValue( stack.popBytes(  ) );
+                ((RawDataBlock) db).setValue(stack.popBytes());
 
                 break;
 
             default:
-                throw new RuntimeException( "decode data value" + db.getDataFieldCode(  ) );
+                throw new RuntimeException("decode data value" + db.getDataFieldCode());
         }
 
-        stack.clear(  );
-        setState( DecodeState.RESULT_AVAIL );
+        stack.clear();
+        setState(DecodeState.RESULT_AVAIL);
     }
 
     /**
@@ -581,40 +529,37 @@ public class VariableDataBlockDecoder
      * @param b
      * b will be expanded to int, so clear the sign, wich will be nagative in the case extention bit is set
      */
-    private void decodeVIF( final byte b )
-    {
-        switch ( b & ~ Decoder.EXTENTION_BIT )
-        {
+    private void decodeVIF(final byte b) {
+        switch (b & ~Decoder.EXTENTION_BIT) {
             case 0x7B:
                 // decode vife table 8.4.4 b
-                setState( DecodeState.VIF_FB );
+                setState(DecodeState.VIF_FB);
 
                 return;
 
             case 0x7C:
-                stack.clear(  );
-                db.setVif( new VifAscii(  ) );
-                setState( DecodeState.ASCII_VIF_LENGTH );
+                stack.clear();
+                vif = new VifAscii();
+                setState(DecodeState.ASCII_VIF_LENGTH);
 
                 return;
 
             case 0x7D:
                 // decode vife table 8.4.4 a
-                setState( DecodeState.VIF_FD );
+                setState(DecodeState.VIF_FD);
 
                 return;
 
             case 0x7E:
-                db.setVif( VifPrimary.READOUT_SELECTION );
+                vif = VifPrimary.READOUT_SELECTION;
 
                 break;
 
             case 0x7F:
-                db.setVif( new VifManufacturerSpecific( (byte) ( b & ~ Decoder.EXTENTION_BIT ) ) );
+                vif = new VifManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT));
 
-                if ( ( b & Decoder.EXTENTION_BIT ) == Decoder.EXTENTION_BIT )
-                {
-                    setState( DecodeState.VIFE );
+                if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
+                    setState(DecodeState.VIFE);
 
                     return;
                 }
@@ -622,289 +567,179 @@ public class VariableDataBlockDecoder
                 break;
 
             default:
-                db.setVif( VifPrimary.valueOfTableIndex( (byte) ( b & ~ Decoder.EXTENTION_BIT ) ) );
+                vif = VifPrimary.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
 
-                if ( UnitOfMeasurement.DATE.equals( db.getUnitOfMeasurement(  ) ) )
-                {
-                    db = new DateDataBlock( db );
-                } else if ( UnitOfMeasurement.TIME_AND_DATE.equals( db.getUnitOfMeasurement(  ) ) )
-                {
-                    db = new DateAndTimeDataBlock( db );
-                } else if ( VifPrimary.ENHANCED_IDENTIFICATION_RECORD.equals( db.getVif(  ) ) )
-                {
-                    db = new EnhancedIdentificationDataBlock( db );
-                }
         }
 
-        goFromVifOrVife( b );
+        goFromVifOrVife(b);
     }
 
-    private void decodeVIFE( final byte b )
-    {
+    private void decodeVIFE(final byte b) {
         // Extended VID chapter 8.4.5
-        switch ( frame.getControlCode(  ) )
-        {
+        switch (frame.getControlCode()) {
             case RSP_UD:
 
                 Vife vife;
 
                 // TODO last VidPrimary is Manspec ???
-                if ( ( db.getVif(  ) instanceof VifManufacturerSpecific ) )
-                {
-                    vife = new VifeManufacturerSpecific( (byte) ( b & ~ Decoder.EXTENTION_BIT ) );
-                } else
-                {
+                if ((vif instanceof VifManufacturerSpecific)) {
+                    vife = new VifeManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT));
+                } else {
                     // Error Codes  Table 7 Chapter 6.6 0x00 to
-                    vife = VifePrimary.valueOfTableIndex( (byte) ( b & ~ Decoder.EXTENTION_BIT ) );
+                    vife = VifePrimary.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
 
-                    if ( vife == null )
-                    {
-                        vife = VifeError.valueOfTableIndex( (byte) ( b & ~ Decoder.EXTENTION_BIT ) );
-                    }
-
-                    //TODO Throw unknown ...
-                    if ( vife instanceof VifePrimary )
-                    {
-                        switch ( (VifePrimary) vife )
-                        {
-                            case START_DATE_TIME_OF:
-                            case TIMESTAMP_OF_BEGIN_FIRST_LOWER:
-                            case TIMESTAMP_OF_END_FIRST_LOWER:
-                            case TIMESTAMP_BEGIN_LAST_LOWER:
-                            case TIMESTAMP_END_LAST_LOWER:
-                            case TIMESTAMP_BEGIN_FIRST_UPPER:
-                            case TIMESTAMP_END_FIRST_UPPER:
-                            case TIMESTAMP_BEGIN_LAST_UPPER:
-                            case TIMESTAMP_END_LAST_UPPER:
-                                db = new DateAndTimeDataBlock( db );
-
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_S:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_MIN:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_H:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_LOWER_D:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_S:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_MIN:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_H:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_LOWER_D:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_S:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_MIN:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_H:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_FIRST_UPPER_D:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_S:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_MIN:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_H:
-                                break;
-
-                            case DURATION_OF_LIMIT_EXCEED_LAST_UPPER_D:
-                                break;
-
-                            case DURATION_OF_FIRST_S:
-                                break;
-
-                            case DURATION_OF_FIRST_MIN:
-                                break;
-
-                            case DURATION_OF_FIRST_H:
-                                break;
-
-                            case DURATION_OF_FIRST_D:
-                                break;
-
-                            case DURATION_OF_LAST_S:
-                                break;
-
-                            case DURATION_OF_LAST_MIN:
-                                break;
-
-                            case DURATION_OF_LAST_H:
-                                break;
-
-                            case DURATION_OF_LAST_D:
-                                break;
-
-                            case TIMESTAMP_BEGIN_OF_FIRST:
-                            case TIMESTAMP_END_OF_FIRST:
-                            case TIMESTAMP_BEGIN_OF_LAST:
-                            case TIMESTAMP_END_OF_LAST:
-                                db = new DateAndTimeDataBlock( db );
-
-                                break;
-
-                            default:
-                        }
+                    if (vife == null) {
+                        vife = VifeError.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
                     }
                 }
 
-                db.addVife( vife );
+                if (vifes == null) {
+                    vifes = new Vife[1];
+                } else {
+                    vifes = Arrays.copyOf(vifes, vifes.length + 1);
+                }
+                vifes[vifes.length - 1] = vife;
 
                 break;
 
             case SND_UD:
-                db.setObjectAction( ObjectAction.valueOf( b ) );
+                objectAction = ObjectAction.valueOf(b);
 
                 break;
 
             default:
-                setState( DecodeState.ERROR );
-                throw new NotSupportedException( String.format( 
-                                                                "Dont know how to handele Control code %s ",
-                                                                frame.getControlCode(  ) ) );
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format(
+                        "Dont know how to handele Control code %s ",
+                        frame.getControlCode()));
         }
 
-        goFromVifOrVife( b );
+        goFromVifOrVife(b);
     }
 
-    private void decodeVifExtention_FB( final byte b )
-    {
+    private void decodeVifExtention_FB(final byte b) {
         // Extended VID chapter 8.4.4 table b
-        db.setVif( VifFB.valueOfTableIndex( (byte) ( b & ~ Decoder.EXTENTION_BIT ) ) );
-        goFromVifOrVife( b );
+        vif = VifFB.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+        goFromVifOrVife(b);
     }
 
-    private void decodeVifExtention_FD( final byte b )
-    {
+    private void decodeVifExtention_FD(final byte b) {
         // Extended VID chapter 8.4.4 table a
-        db.setVif( VifFD.valueOfTableIndex( (byte) ( b & ~ Decoder.EXTENTION_BIT ) ) );
-        goFromVifOrVife( b );
+        vif = VifFD.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+        goFromVifOrVife(b);
     }
 
-    public DataBlock getDataBlock(  )
-    {
+    public DataBlock getDataBlock() {
         return db;
     }
 
-    public DecodeState getState(  )
-    {
+    public DecodeState getState() {
         return ds;
     }
 
-    private void goFromVifOrVife( final byte b )
-    {
-        if ( ( b & Decoder.EXTENTION_BIT ) == Decoder.EXTENTION_BIT )
-        {
-            setState( DecodeState.VIFE );
-        } else
-        {
-            if ( db instanceof ReadOutDataBlock )
-            {
-                setState( DecodeState.RESULT_AVAIL );
-            } else
-            {
-                startCollectingValue(  );
+    private void goFromVifOrVife(final byte b) {
+        if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
+            setState(DecodeState.VIFE);
+        } else {
+            if ((dfc == DataFieldCode.SELECTION_FOR_READOUT) || (dfc == DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST)){
+                createDataBlock();
+                setState(DecodeState.RESULT_AVAIL);
+            } else {
+                startCollectingValue();
             }
         }
     }
 
-    public void init( LongFrame frame )
-    {
+    public void init(LongFrame frame) {
+
+        functionField = null;
+        storageNumber = 0;
+        dfc = null;
+        variableLengthType = null;
+        objectAction = null;
+        tariff = 0;
+        subUnit = 0;
+        vif = null;
+        vifes = null;
         db = null;
-        setState( DecodeState.DIF );
+
+        setState(DecodeState.DIF);
         this.frame = frame;
-        stack.clear(  );
+        stack.clear();
     }
 
-    public void setState( DecodeState ds )
-    {
+    public void setState(DecodeState ds) {
+        if ((ds == DecodeState.RESULT_AVAIL) && (db == null)) {
+            throw new RuntimeException("DB IST NULL");
+        }
+
         DecodeState oldState = this.ds;
         this.ds = ds;
 
-        if ( log.isDebugEnabled(  ) )
-        {
-            log.debug( String.format( "DecodeState change from: %20s => %s", oldState, ds ) );
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("DecodeState change from: %20s => %s", oldState, ds));
         }
     }
 
-    private void startCollectingValue(  )
-    {
-        switch ( db.getDataFieldCode(  ) )
-        {
+    private void startCollectingValue() {
+        switch (dfc) {
             case NO_DATA:
-                stack.clear(  );
-                setState( DecodeState.RESULT_AVAIL );
+                stack.clear();
+                createDataBlock();
+                setState(DecodeState.RESULT_AVAIL);
 
                 return;
 
             case _8_BIT_INTEGER:
             case _2_DIGIT_BCD:
-                stack.init( 1 );
+                stack.init(1);
 
                 break;
 
             case _16_BIT_INTEGER:
             case _4_DIGIT_BCD:
-                stack.init( 2 );
+                stack.init(2);
 
                 break;
 
             case _24_BIT_INTEGER:
             case _6_DIGIT_BCD:
-                stack.init( 3 );
+                stack.init(3);
 
                 break;
 
             case _32_BIT_INTEGER:
             case _8_DIGIT_BCD:
             case _32_BIT_REAL:
-                stack.init( 4 );
+                stack.init(4);
 
                 break;
 
             case _48_BIT_INTEGER:
             case _12_DIGIT_BCD:
-                stack.init( 6 );
+                stack.init(6);
 
                 break;
 
             case _64_BIT_INTEGER:
-                stack.init( 8 );
+                stack.init(8);
 
                 break;
 
             case VARIABLE_LENGTH:
-                setState( DecodeState.SET_VARIABLE_LENGTH );
+                setState(DecodeState.SET_VARIABLE_LENGTH);
 
                 return;
 
             default:
-                throw new RuntimeException( "START COLLECTING VALUE" + db.getDataFieldCode(  ) );
+                throw new RuntimeException("START COLLECTING VALUE" + dfc);
         }
 
-        setState( DecodeState.COLLECTING_VALUE );
+        setState(DecodeState.COLLECTING_VALUE);
     }
 
-    private void startCollectingValue( int bytesLeft )
-    {
-        stack.init( bytesLeft );
-        setState( DecodeState.COLLECTING_VALUE );
+    private void startCollectingValue(int bytesLeft) {
+        stack.init(bytesLeft);
+        setState(DecodeState.COLLECTING_VALUE);
     }
 }

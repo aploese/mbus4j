@@ -41,12 +41,8 @@ public class EnhancedIdentificationDataBlock extends DataBlock {
     private int version;
     private MBusMedium medium;
 
-    public EnhancedIdentificationDataBlock(DataBlock db) {
-        super(db);
-    }
-
-    public EnhancedIdentificationDataBlock(DataFieldCode dataFieldCode) {
-        super(dataFieldCode);
+    public EnhancedIdentificationDataBlock() {
+        super();
     }
 
     /**

@@ -162,13 +162,7 @@ public class SendUserData
         fcb = json.getBoolean( "fcb" );
         address = (byte) json.getInt( "address" );
 
-        JSONArray jsonDataBlocks = json.getJSONArray( "dataBlocks" );
+        JSONFactory.readDataBlocks(this, json);
 
-        for ( int i = 0; i < jsonDataBlocks.size(  ); i++ )
-        {
-            DataBlock db = JSONFactory.createDataBlock( jsonDataBlocks.getJSONObject( i ) );
-            db.fromJSON( jsonDataBlocks.getJSONObject( i ) );
-            addDataBlock( db );
-        }
     }
 }
