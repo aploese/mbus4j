@@ -65,21 +65,27 @@ public class SelectionOfSlavesTest {
     public void testMatchId() {
         System.out.println("matchId");
         SelectionOfSlaves instance = new SelectionOfSlaves((byte)0xFD);
-        instance.setBcdId(0x12345678);
+        instance.setBcdMaskedId(0x12345678);
         assertEquals(true, instance.matchId(12345678));
-        instance.setBcdId(0xFFFFFFFF);
+        instance.setBcdMaskedId(0xFFFFFFFF);
         assertEquals(true, instance.matchId(12345678));
-        instance.setBcdId(0x12FFFF78);
+        instance.setBcdMaskedId(0x12FFFF78);
         assertEquals(true, instance.matchId(12345678));
     }
 
-    /**
-     * Test of toBcd method, of class SelectionOfSlaves.
+        /**
+     * Test of matchId method, of class SelectionOfSlaves.
      */
     @Test
-    public void testToBCD() {
-        System.out.println("toBcd");
-        assertEquals(0x12345678, (int)SelectionOfSlaves.toBcd(12345678, 8));
+    public void testMatchAll() {
+        System.out.println("matchAll");
+        SelectionOfSlaves instance = new SelectionOfSlaves((byte)0xFD);
+        instance.setBcdMaskedId(0x00000001);
+        assertEquals(false, instance.matchId(3));
+        instance.setBcdMaskedId(0xFFFFFFFF);
+        assertEquals(true, instance.matchId(12345678));
+        instance.setBcdMaskedId(0x12FFFF78);
+        assertEquals(true, instance.matchId(12345678));
     }
 
 }

@@ -36,11 +36,12 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class IntegerDataBlock extends DataBlock {
+public class IntegerDataBlock extends DataBlock implements BcdValue {
 
     private int value;
     private String bcdError;
 
+    @Override
     public boolean isBcdError() {
         return bcdError != null;
     }
@@ -93,17 +94,18 @@ public class IntegerDataBlock extends DataBlock {
      */
     public void setValue(int value) {
         this.value = value;
+        this.bcdError = null;
     }
 
     @Override
     protected void accumulateDatatoJSON(JSONObject json) {
-            if (!isBcdError()) {
-                json.accumulate("data", getValue());
-            } else {
-                JSONObject jsonBcdError = new JSONObject();
-                jsonBcdError.accumulate("bcdErrorCode", getBcdError());
-                json.accumulate("data", jsonBcdError);
-            }
+        if (!isBcdError()) {
+            json.accumulate("data", getValue());
+        } else {
+            JSONObject jsonBcdError = new JSONObject();
+            jsonBcdError.accumulate("bcdErrorCode", getBcdError());
+            json.accumulate("data", jsonBcdError);
+        }
     }
 
     @Override
@@ -124,6 +126,7 @@ public class IntegerDataBlock extends DataBlock {
     /**
      * @return the bcdError
      */
+    @Override
     public String getBcdError() {
         return bcdError;
     }
@@ -131,8 +134,10 @@ public class IntegerDataBlock extends DataBlock {
     /**
      * @param bcdError the bcdError to set
      */
+    @Override
     public void setBcdError(String bcdError) {
-        this.bcdError = bcdError;
+                this.bcdError = formatBcdError(bcdError);
+        this.value = 0;
     }
 
     @Override
@@ -144,5 +149,10 @@ public class IntegerDataBlock extends DataBlock {
             value = 0;
             bcdError = text;
         }
+    }
+
+    @Override
+    public boolean isBcd() {
+        return DataFieldCode._6_DIGIT_BCD.equals(getDataFieldCode()) || DataFieldCode._8_DIGIT_BCD.equals(getDataFieldCode());
     }
 }

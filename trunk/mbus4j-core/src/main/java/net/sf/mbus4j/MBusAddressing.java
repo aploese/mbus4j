@@ -25,11 +25,13 @@
  */
 package net.sf.mbus4j;
 
+import java.io.Serializable;
+
 /**
  *
  * @author aploese
  */
-public enum MBusAddressing {
+public enum MBusAddressing implements Serializable {
     PRIMARY("primary"), SECONDARY("secondary");
 
 

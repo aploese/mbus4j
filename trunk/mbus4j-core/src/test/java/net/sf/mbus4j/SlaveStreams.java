@@ -106,4 +106,9 @@ public class SlaveStreams extends MockConnection {
         getMockIs().setData(data.get(0).response, data.get(0).noResponseWaitTime);
     }
 
+    @Override
+    public String getJsonFieldName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

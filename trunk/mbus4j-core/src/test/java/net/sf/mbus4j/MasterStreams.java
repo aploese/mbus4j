@@ -127,4 +127,9 @@ public class MasterStreams extends MockConnection {
         getMockIs().releaseReadLock();
     }
 
+    @Override
+    public String getJsonFieldName() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }

@@ -29,7 +29,6 @@ import java.io.UnsupportedEncodingException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.RequestClassXData;
@@ -41,11 +40,11 @@ import net.sf.mbus4j.decoder.Decoder;
 import net.sf.mbus4j.encoder.Encoder;
 import net.sf.mbus4j.json.JSONSerializable;
 import net.sf.mbus4j.json.JsonSerializeType;
+import net.sf.mbus4j.Connection;
+import net.sf.mbus4j.SerialPortConnection;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gnu.io.SerialPort;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -65,8 +64,6 @@ import java.util.logging.Level;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import net.sf.mbus4j.Connection;
-import net.sf.mbus4j.TcpIpConnection;
 
 /**
  *
@@ -95,11 +92,7 @@ public class Slaves implements JSONSerializable {
     public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
 
-        if (conn instanceof SerialPortConnection) {
-            result.accumulate("serialConnection", conn.toJSON(jsonSerializeType));
-        } else if (conn instanceof TcpIpConnection) {
-            result.accumulate("tcpIpConnection", conn.toJSON(jsonSerializeType));
-        }
+        result.accumulate(conn.getJsonFieldName(), conn.toJSON(jsonSerializeType));
 
         JSONArray jsonSlaves = new JSONArray();
 
@@ -114,13 +107,7 @@ public class Slaves implements JSONSerializable {
 
     @Override
     public void fromJSON(JSONObject json) {
-        if (json.containsKey("serialConnection")) {
-            conn = new SerialPortConnection();
-            conn.fromJSON(json.getJSONObject("serialConnection"));
-        } else if (json.containsKey("tcpIpConnection")) {
-            conn = new TcpIpConnection();
-            conn.fromJSON(json.getJSONObject("tcpIpConnection"));
-        }
+        conn = Connection.createFromJSON(json);
 
         JSONArray jsonSlaves = json.getJSONArray("devices");
 

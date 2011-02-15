@@ -26,6 +26,7 @@
 package net.sf.mbus4j.dataframes.datablocks;
 
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 
 
 /**
@@ -34,11 +35,12 @@ import net.sf.json.JSONObject;
  * @version $Id$
  */
 public class LongDataBlock
-        extends DataBlock {
+        extends DataBlock implements BcdValue {
 
     private long value;
     private String bcdError;
 
+    @Override
     public boolean isBcdError() {
         return bcdError != null;
     }
@@ -61,16 +63,13 @@ public class LongDataBlock
     @Override
     public String getValueAsString() {
         if (bcdError != null) {
-            return "BCD Error: " + bcdError;
+            return bcdError;
         }
 
         switch (getDataFieldCode()) {
             case _48_BIT_INTEGER:
             case _64_BIT_INTEGER:
                 return Long.toString(value);
-
-            case _8_DIGIT_BCD:
-                return String.format("%08d", value);
 
             case _12_DIGIT_BCD:
                 return String.format("%012d", value);
@@ -85,6 +84,7 @@ public class LongDataBlock
      */
     public void setValue(long value) {
         this.value = value;
+        this.bcdError = null;
     }
 
     @Override
@@ -120,6 +120,7 @@ public class LongDataBlock
     /**
      * @return the bcdError
      */
+    @Override
     public String getBcdError() {
         return bcdError;
     }
@@ -127,8 +128,10 @@ public class LongDataBlock
     /**
      * @param bcdError the bcdError to set
      */
+    @Override
     public void setBcdError(String bcdError) {
-        this.bcdError = bcdError;
+                this.bcdError = formatBcdError(bcdError);
+        this.value = 0;
     }
 
     @Override
@@ -141,4 +144,10 @@ public class LongDataBlock
             bcdError = text;
         }
     }
+
+    @Override
+    public boolean isBcd() {
+        return DataFieldCode._12_DIGIT_BCD.equals(getDataFieldCode());
+    }
+
 }

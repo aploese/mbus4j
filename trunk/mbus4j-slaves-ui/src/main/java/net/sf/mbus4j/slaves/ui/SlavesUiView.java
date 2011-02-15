@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

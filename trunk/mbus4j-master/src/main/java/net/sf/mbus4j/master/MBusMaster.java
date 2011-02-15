@@ -27,7 +27,6 @@ package net.sf.mbus4j.master;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
-import net.sf.mbus4j.MBusConstants;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.dataframes.RequestClassXData;
@@ -52,18 +51,20 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import net.sf.mbus4j.AtModemConnection;
 import net.sf.mbus4j.Connection;
+import net.sf.mbus4j.MBusAddressing;
+import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.TcpIpConnection;
+import net.sf.mbus4j.dataframes.GarbageCharFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.json.JSONSerializable;
 import net.sf.mbus4j.json.JsonSerializeType;
@@ -113,6 +114,8 @@ public class MBusMaster
                     return db;
                 }
             }
+        } else if (frame == null) {
+            return null;
         } else {
             throw new RuntimeException("Response is not a UserDataResponse but: " + frame);
         }
@@ -136,6 +139,13 @@ public class MBusMaster
         osw.write(text, 0, text.length());
         osw.flush();
         osw.close();
+    }
+
+    /**
+     * @return the lastByteSended
+     */
+    public long getLastByteSended() {
+        return lastByteSended;
     }
 
     private class StreamListener
@@ -204,6 +214,7 @@ public class MBusMaster
     private StreamListener streamListener = new StreamListener();
     private final Queue<Frame> frameQueue = new ConcurrentLinkedQueue<Frame>();
     private Connection conn;
+    private long lastByteSended;
 
     public MBusMaster() {
         super();
@@ -235,7 +246,7 @@ public class MBusMaster
             //TODO detect dev and create
             result = DeviceFactory.createDevice(udr, new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address));
             addDevice(result);
-            log.info(String.format("added device: address = 0x%02X, id = = %08d, man = %s, medium = %s, version = 0x%02X",
+            log.info(String.format("added device: address = 0x%02X, id = %08d, man = %s, medium = %s, version = 0x%02X",
                     udr.getAddress(),
                     udr.getIdentNumber(),
                     udr.getManufacturer(),
@@ -251,13 +262,14 @@ public class MBusMaster
     public int deviceIndexOf(GenericDevice d) {
         return devices.indexOf(d);
     }
-    
+
     public void clearDevices() {
         devices.clear();
     }
 
-    private void clearFrameQueue() {
+    private void clearFrameQueue(boolean collectGarbage) {
         synchronized (frameQueue) {
+            streamListener.parser.setCollectGarbage(collectGarbage);
             frameQueue.clear();
         }
     }
@@ -292,7 +304,7 @@ public class MBusMaster
      * Idle time is 33 bit periods see M-Bus doc chaper 5.4
      * @return
      */
-    private long getIdleTime() {
+    public long getIdleTime() {
         return 33000 / conn.getBitPerSecond();
     }
 
@@ -301,8 +313,12 @@ public class MBusMaster
      * 2 times max (256) packet size added
      * @return
      */
-    private long getResponseTimeout() {
+    public long getResponseTimeout() {
         return ((((512 * 11) + 330) * 1000) / conn.getBitPerSecond()) + conn.getResponseTimeOutOffset();
+    }
+
+    public long getShortResponseTimeout() {
+        return getIdleTime() * 10 + conn.getResponseTimeOutOffset();
     }
 
     @Override
@@ -315,7 +331,7 @@ public class MBusMaster
     }
 
     public GenericDevice[] searchDevicesBySecondaryAddressing(int maxTries) throws IOException, InterruptedException {
-        return widcardSearch(0x00, 7, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF, maxTries);
+        return widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF, maxTries);
     }
 
     /**
@@ -327,13 +343,13 @@ public class MBusMaster
      */
     public GenericDevice[] searchDevicesByPrimaryAddress()
             throws IOException, InterruptedException {
-        return searchDevicesByPrimaryAddress(0, MBusConstants.LAST_REGULAR_PRIMARY_ADDRESS);
+        return searchDevicesByPrimaryAddress(0, MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS);
     }
 
     public GenericDevice[] searchDevicesByPrimaryAddress(int first, int last)
             throws IOException, InterruptedException {
         List<GenericDevice> result = new ArrayList<GenericDevice>();
-        for (int i = first; i <= last; i++) {
+        for (int i = first & 0xFF; i <= (last & 0xFF); i++) {
             GenericDevice c = addDeviceByAddress(i);
             if (c != null) {
                 result.add(c);
@@ -342,27 +358,16 @@ public class MBusMaster
         return result.toArray(new GenericDevice[result.size()]);
     }
 
-    //TODO
-    public void selectBySecondaryAddress() {
-    }
-
     @Override
-    public Frame send(Frame frame)
-            throws IOException, InterruptedException {
-        return send(frame, DEFAULT_MAY_TRIES);
-    }
-
-    @Override
-    public Frame send(Frame frame, int maxTries)
+    public Frame send(Frame frame, boolean collectGarbage, int maxTries, long timeout)
             throws IOException, InterruptedException {
         for (int tries = 0; tries <= maxTries; tries++) {
-            clearFrameQueue();
+            clearFrameQueue(collectGarbage);
 
             final byte[] b = encoder.encode(frame);
             conn.getOutputStrteam().write(b);
             conn.getOutputStrteam().flush();
-
-            final long time = System.currentTimeMillis();
+            lastByteSended = System.currentTimeMillis();
 
             if (log.isDebugEnabled()) {
                 log.debug(String.format("Data Sent (try: %d): %s ",
@@ -370,62 +375,90 @@ public class MBusMaster
                         Decoder.bytes2Ascii(b)));
             }
 
-            Frame result = waitAndPollFrame(getResponseTimeout());
-            log.info(String.format("Answer took %d ms", System.currentTimeMillis() - time));
+            Frame result = pollFrameOrWaitUntil(lastByteSended + timeout);
+            log.debug(String.format("Answer took %d ms", System.currentTimeMillis() - lastByteSended));
 
             if (result != null) {
                 return result;
             } else {
                 Thread.sleep(getIdleTime());
-
-                if (tries < 2) {
-                    log.warn("Timeout Reply");
-                } else {
-                    log.error("Timeout Reply");
-
-                    //TODO throw Ex?
-                    return null;
-                }
             }
         }
-
+        log.info(String.format("max tries(%d) reached .. aborting send to: %s ", maxTries, frame.toString()));
         return null;
     }
 
-    public void sendRequestUserData()
+    public Map<GenericDevice, Frame> sendRequestUserData(MBusAddressing addressing)
             throws IOException, InterruptedException {
-        sendRequestUserData(devices);
+        Map<GenericDevice, MBusAddressing> devMap = new HashMap<GenericDevice, MBusAddressing>();
+        for (GenericDevice d : devices) {
+            devMap.put(d, addressing);
+        }
+        return sendRequestUserData(devMap);
     }
 
     public Frame sendRequestUserData(int address)
             throws IOException, InterruptedException {
         RequestClassXData req = new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address);
-
-        return send(req);
+        return send(req, false, DEFAULT_SEND_TRIES, getResponseTimeout());
     }
 
-    public Map<GenericDevice, Frame> sendRequestUserData(Iterable<GenericDevice> devices)
+    public Map<GenericDevice, Frame> sendRequestUserData(Map<GenericDevice, MBusAddressing> devices)
             throws IOException, InterruptedException {
         Map<GenericDevice, Frame> result = new HashMap<GenericDevice, Frame>();
 
-        for (GenericDevice dev : devices) {
-            result.put(dev,
-                    sendRequestUserData(dev.getAddress()));
+        int address;
+        for (GenericDevice dev : devices.keySet()) {
+            MBusAddressing addressing = devices.get(dev);
+            if (MBusAddressing.SECONDARY.equals(addressing)) {
+                selectDevice(dev);
+                address = MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS;
+            } else {
+                address = dev.getAddress();
+            }
+            result.put(dev, sendRequestUserData(address));
+            if (MBusAddressing.SECONDARY.equals(addressing)) {
+                //TODO deselect??
+            }
         }
 
         return result;
     }
 
-    public void sendSlaveSelect(byte[] idWithMask, short manWithMask, byte versionWithMask) {
-        //TODO search...
-    }
+    public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion,
+            byte maskedMedium, int maxTries) throws IOException, InterruptedException {
 
-    public void sendSlaveSelect(MBusResponseFramesContainer dev) {
-        //TODO search...
+        log.debug(String.format("Will select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+        selOfSl.setBcdMaskedId(bcdMaskedId);
+        selOfSl.setMaskedMan(maskedMan);
+        selOfSl.setMaskedVersion(maskedVersion);
+        selOfSl.setMaskedMedium(maskedMedium);
+
+        int result = 0;
+        Frame resultFrame = send(selOfSl, true, maxTries, getShortResponseTimeout());
+        if (resultFrame == null) {
+            return 0;
+        }
+        if (resultFrame instanceof SingleCharFrame) {
+            log.debug(String.format("Slave selected", bcdMaskedId));
+            result = 1;
+        } else if (resultFrame instanceof GarbageCharFrame) {
+            log.debug(String.format("Multiple Slaves selected", bcdMaskedId));
+            result = 2;
+        } else {
+            log.error(String.format("unexpected Frame received \n \"%s\" \n tried to select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", resultFrame.toString(), bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+            return 0;
+        }
+        log.debug("Wait for more Answers of slave select");
+        result += waitForSingleCharsOrGarbage(getShortResponseTimeout());
+        return result;
     }
 
     private synchronized void setLastFrame(Frame frame) {
-        log.debug(String.format("New frame parsed %s", frame));
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("New frame parsed %s", frame));
+        }
 
         synchronized (frameQueue) {
             frameQueue.add(frame);
@@ -444,34 +477,31 @@ public class MBusMaster
         t.start();
     }
 
-    private Frame waitAndPollFrame(long timeout)
-            throws InterruptedException {
-        log.debug("timeout: " + timeout);
-
+    private Frame pollFrameOrWaitUntil(long endTime) throws InterruptedException {
         synchronized (frameQueue) {
-            if (frameQueue.peek() == null) {
-                if (timeout > 0) {
-                    frameQueue.wait(100 + conn.getResponseTimeOutOffset());
-                    //TODO apl 100ms is enought???  
-                    //If there is nothing until now, there will be nothing in the future
-                    if (this.streamListener.parser.getState() != Decoder.DecodeState.EXPECT_START) {
-                        frameQueue.wait(timeout - 100 - conn.getResponseTimeOutOffset());
-                    }
+            while (endTime - System.currentTimeMillis() > 0) {
+                if (frameQueue.peek() == null) {
+                   log.debug(String.format("Wait max for %d ms", endTime - System.currentTimeMillis()));
+                   frameQueue.wait(endTime - System.currentTimeMillis());
+                } else {
+                    return frameQueue.poll();
                 }
             }
             return frameQueue.poll();
         }
     }
 
-    private int waitForSingleChars(long timeout)
+    private int waitForSingleCharsOrGarbage(long timeout)
             throws InterruptedException {
         int result = 0;
-        final long time = System.currentTimeMillis();
 
-        while ((System.currentTimeMillis() - time) <= timeout) {
-            Frame frame = waitAndPollFrame(time - System.currentTimeMillis() + timeout);
+
+        while ((System.currentTimeMillis() - lastByteSended) <= timeout) {
+            Frame frame = pollFrameOrWaitUntil(lastByteSended + timeout);
 
             if (frame instanceof SingleCharFrame) {
+                result++;
+            } else if (frame instanceof GarbageCharFrame) {
                 result++;
             } else {
                 return result;
@@ -481,99 +511,95 @@ public class MBusMaster
         return result;
     }
 
+    private int getLeftmostMaskedNibble(int value) {
+        int mask = 0xF0000000;
+        for (int nibblePos = 7; nibblePos >= 0; nibblePos--) {
+            if ((value & mask) == mask) {
+                return nibblePos;
+            } else {
+                mask >>>= 4;
+            }
+        }
+        return -1;
+    }
+
+    private int exchangeNibbleAtPos(int nibblePos, int value, int nibbleValue) {
+        int mask = ~(0x0F << (nibblePos * 4));
+        int nibbleToSet = (nibbleValue & 0x0F) << (nibblePos * 4);
+        return (value & mask) | nibbleToSet;
+    }
+
     //TODO all BCD
-    public GenericDevice[] widcardSearch(int leadingBcdDigitsId, int maskLength, short bcdMan, byte bcdVersion, byte bcdMedium, int maxTries)
+    public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium, int maxTries)
             throws IOException, InterruptedException {
         List<GenericDevice> result = new ArrayList<GenericDevice>();
-        log.debug(String.format("widcardSearch leadingBcdDigitsId: 0x%08X, maskLength: %d", leadingBcdDigitsId,
-                maskLength));
-
-        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
-        int idMask = 0;
-
-        for (int i = 1; i <= maskLength; i++) {
-            idMask <<= 4;
-            idMask |= 0x0F;
-        }
-
-        for (int i = 0; i <= 9; i++) {
-            selOfSl.setBcdId((leadingBcdDigitsId << (maskLength * 4)) + idMask);
-            selOfSl.setBcdMan(bcdMan);
-            selOfSl.setBcdVersion(bcdVersion);
-            selOfSl.setBcdMedium(bcdMedium);
-
-            Frame resultFrame = send(selOfSl, maxTries);
-
-            if (resultFrame instanceof SingleCharFrame) {
-                log.debug(String.format("got answer with mask: 0x%08X", leadingBcdDigitsId));
-
-                int answers = waitForSingleChars(getResponseTimeout());
-
-                if (answers == 0) {
-                    log.debug(String.format("detect slave with mask: 0x%08X", leadingBcdDigitsId));
-                    GenericDevice dev = addDeviceByAddress(MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
-                    result.add(dev);
-                } else {
-                    if (maskLength > 0) {
-                        log.debug(String.format("multiple slaves (%d) with mask: 0x%08X", answers, leadingBcdDigitsId));
-                        GenericDevice[] devs = widcardSearch(leadingBcdDigitsId << 4, maskLength - 1, bcdMan, bcdVersion, bcdMedium, maxTries);
-                        result.addAll(Arrays.asList(devs));
-                    } else { // wenn idMask == 8 man ver und medium ???
-                        log.error(String.format("Cant separate slaves (%d) with id: 0x%08X", answers,
-                                leadingBcdDigitsId));
-                    }
+        log.debug(String.format("widcardSearch bcdMaskedId: 0x%08X", bcdMaskedId));
+        int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, maxTries);
+        if (answers == 0) {
+            log.debug(String.format("no slave with mask: 0x%08X", bcdMaskedId));
+        } else if (answers == 1) {
+            log.debug(String.format("detect slave with mask: 0x%08X", bcdMaskedId));
+            GenericDevice dev = addDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+            result.add(dev);
+        } else {
+            log.debug(String.format("multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
+            int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
+            if (leftmostMaskedNibble >= 0) {
+                for (int i = 0; i <= 9; i++) {
+                    GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, maxTries);
+                    result.addAll(Arrays.asList(devs));
                 }
             } else {
-                log.debug(String.format("no slave with mask: 0x%08X", leadingBcdDigitsId));
+                log.error(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
+                        bcdMaskedId));
             }
-
-            leadingBcdDigitsId++;
         }
         return result.toArray(new GenericDevice[result.size()]);
     }
 
     public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium, int maxTries) throws IOException, InterruptedException {
-        final short bcdMan = (man == null || man.length() == 0) ? (short)0xFFFF : MBusConstants.man2Short(man);
-        byte bcdVersion = (version == null) ? (byte)0xFF : version;
+        final short bcdMan = (man == null || man.length() == 0) ? (short) 0xFFFF : MBusUtils.man2Short(man);
+        byte bcdVersion = (version == null) ? (byte) 0xFF : version;
         byte bcdMedium = (medium == null) ? (byte) 0xFF : (byte) medium.getId();
 
         if (selectDevice(bcdId, bcdMan, bcdVersion, bcdMedium, maxTries)) {
-            return readResponse(MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
+            return readResponse(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
         } else {
             return null;
         }
     }
 
     public UserDataResponse readResponse(int address) throws IOException, InterruptedException {
-       Frame f = sendRequestUserData(address);
+        Frame f = sendRequestUserData(address);
         if (f instanceof UserDataResponse) {
             return (UserDataResponse) f;
         } else {
 //TODO Ex??
-           return null;
+            return null;
         }
-     }
+    }
 
-    public boolean selectDevice(int bcdId, short bcdMan, byte bcdVersion, byte bcdMedium, int maxTries) throws IOException, InterruptedException {
-        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS);
-        selOfSl.setBcdId(bcdId);
-        selOfSl.setBcdMan(bcdMan);
-        selOfSl.setBcdVersion(bcdVersion);
-        selOfSl.setBcdMedium(bcdMedium);
-            Frame resultFrame = send(selOfSl, maxTries);
+    public boolean selectDevice(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium, int maxTries) throws IOException, InterruptedException {
+        int answers = sendSlaveSelect(bcdMaskedId, maskedMan, maskedVersion, maskedMedium, maxTries);
+        if (answers > 1) {
+            log.warn(String.format("Can't select select (too many) Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+        } else if (answers == 0) {
+            log.warn(String.format("Can't select select (none) Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+        }
+        return answers == 1;
+    }
 
-            if (resultFrame instanceof SingleCharFrame) {
-                int answers = waitForSingleChars(getResponseTimeout());
-                return answers == 0;
-            } else {
-                return false;
-            }
+    public boolean selectDevice(MBusResponseFramesContainer dev) throws IOException, InterruptedException {
+        return selectDevice(MBusUtils.int2Bcd(dev.getIdentNumber()),
+                MBusUtils.man2Short(dev.getManufacturer()),
+                dev.getVersion(),
+                (byte) dev.getMedium().getId(), DEFAULT_SEND_TRIES);
     }
 
     public void readValues(ValueRequest<?> requests)
             throws IOException, InterruptedException {
         //Create devices if neccecary
-        Set<GenericDevice> deviceSet = new HashSet<GenericDevice>();
+        HashMap<GenericDevice, MBusAddressing> deviceMap = new HashMap<GenericDevice, MBusAddressing>();
 
         for (ValueRequestPointLocator locator : requests) {
             GenericDevice myDevice = getDevice(devices, locator);
@@ -588,16 +614,16 @@ public class MBusMaster
                 addDevice(myDevice);
             }
 
-            deviceSet.add(myDevice);
+            deviceMap.put(myDevice, locator.getAddressing());
         }
 
         //get data from devices
-        //TODO hounor frames and addressing
-        Map<GenericDevice, Frame> responses = sendRequestUserData(deviceSet);
+        //TODO honor frames 
+        Map<GenericDevice, Frame> responses = sendRequestUserData(deviceMap);
 
         //pack response
         for (ValueRequestPointLocator locator : requests) {
-            GenericDevice dev = getDevice(deviceSet, locator);
+            GenericDevice dev = getDevice(deviceMap.keySet(), locator);
             DataBlock db = getDataBlock(responses.get(dev),
                     locator);
             locator.setDb(db);
@@ -624,13 +650,7 @@ public class MBusMaster
 
     @Override
     public void fromJSON(JSONObject json) {
-        if (json.containsKey("serialConnection")) {
-            conn = new SerialPortConnection();
-            conn.fromJSON(json.getJSONObject("serialConnection"));
-        } else if (json.containsKey("tcpIpConnection")) {
-            conn = new TcpIpConnection();
-            conn.fromJSON(json.getJSONObject("tcpIpConnection"));
-        }
+        conn = Connection.createFromJSON(json);
 
         JSONArray jsonDevices = json.getJSONArray("devices");
 
@@ -645,11 +665,8 @@ public class MBusMaster
     public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();
 
-        if (conn instanceof SerialPortConnection) {
-            result.accumulate("serialConnection", conn.toJSON(jsonSerializeType));
-        } else if (conn instanceof TcpIpConnection) {
-            result.accumulate("tcpIpConnection", conn.toJSON(jsonSerializeType));
-        }
+        result.accumulate(conn.getJsonFieldName(), conn.toJSON(jsonSerializeType));
+
 
         JSONArray jsonDevices = new JSONArray();
 

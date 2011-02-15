@@ -676,8 +676,8 @@ public class VariableDataBlockDecoder {
         DecodeState oldState = this.ds;
         this.ds = ds;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("DecodeState change from: %20s => %s", oldState, ds));
+        if (LOG.isTraceEnabled()) {
+            LOG.trace(String.format("%s => %s", oldState, ds));
         }
     }
 

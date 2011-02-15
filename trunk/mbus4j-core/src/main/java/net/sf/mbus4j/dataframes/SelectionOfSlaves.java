@@ -28,13 +28,12 @@ package net.sf.mbus4j.dataframes;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
-import net.sf.mbus4j.encoder.Encoder;
 import net.sf.mbus4j.json.JsonSerializeType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import net.sf.mbus4j.MBusConstants;
+import net.sf.mbus4j.MBusUtils;
 
 /**
  *
@@ -45,10 +44,10 @@ public class SelectionOfSlaves
     implements LongFrame
 {
     private byte address;
-    private int bcdId;
-    private byte bcdVersion;
-    private short bcdMan;
-    private byte bcdMedium;
+    private int bcdMaskedId;
+    private byte maskedVersion;
+    private short maskedMan;
+    private byte maskedMedium;
     private List<DataBlock> datablocks = new ArrayList<DataBlock>(  );
 
     public SelectionOfSlaves( byte address )
@@ -86,35 +85,35 @@ public class SelectionOfSlaves
     }
 
     /**
-     * @return the bcdId
+     * @return the bcdMaskedId
      */
-    public int getBcdId(  )
+    public int getBcdMaskedId(  )
     {
-        return bcdId;
+        return bcdMaskedId;
     }
 
     /**
-     * @return the bcdMan
+     * @return the maskedMan
      */
-    public short getBcdMan(  )
+    public short getMaskedMan(  )
     {
-        return bcdMan;
+        return maskedMan;
     }
 
     /**
-     * @return the bcdMedium
+     * @return the maskedMedium
      */
-    public int getBcdMedium(  )
+    public int getMaskedMedium(  )
     {
-        return bcdMedium;
+        return maskedMedium;
     }
 
     /**
-     * @return the bcdVersion
+     * @return the maskedVersion
      */
-    public int getBcdVersion(  )
+    public int getMaskedVersion(  )
     {
-        return bcdVersion;
+        return maskedVersion;
     }
 
     /**
@@ -146,35 +145,35 @@ public class SelectionOfSlaves
     }
 
     /**
-     * @param bcdId the maskedId to set
+     * @param bcdMaskedId the bcdMaskedId to set
      */
-    public void setBcdId( int bcdId )
+    public void setBcdMaskedId(int bcdMaskedId )
     {
-        this.bcdId = bcdId;
+        this.bcdMaskedId = bcdMaskedId;
     }
 
     /**
-     * @param bcdMan the bcdMan to set
+     * @param maskedMan the maskedMan to set
      */
-    public void setBcdMan( short bcdMan )
+    public void setMaskedMan( short maskedMan )
     {
-        this.bcdMan = bcdMan;
+        this.maskedMan = maskedMan;
     }
 
     /**
-     * @param maskedMedium the bcdMedium to set
+     * @param maskedMedium the maskedMedium to set
      */
-    public void setBcdMedium( byte bcdMedium )
+    public void setMaskedMedium( byte maskedMedium )
     {
-        this.bcdMedium = bcdMedium;
+        this.maskedMedium = maskedMedium;
     }
 
     /**
-     * @param maskedVersion the bcdVersion to set
+     * @param maskedVersion the maskedVersion to set
      */
-    public void setBcdVersion( byte bcdVersion )
+    public void setMaskedVersion( byte maskedVersion )
     {
-        this.bcdVersion = bcdVersion;
+        this.maskedVersion = maskedVersion;
     }
 
     @Override
@@ -183,18 +182,18 @@ public class SelectionOfSlaves
         StringBuilder sb = new StringBuilder(  );
         sb.append( "control code = " ).append( getControlCode(  ) ).append( '\n' );
         sb.append( String.format( "address = 0x%02X\n", address ) );
-        sb.append( String.format( "bcdId = 0x%08X\n", bcdId ) );
-        sb.append( String.format( "bcdMan = 0x%04X\n", bcdMan ) );
-        sb.append( String.format( "bcdVersion = 0x%02X\n", bcdVersion ) );
-        sb.append( String.format( "bcdMedium = 0x%02X\n", bcdMedium ) );
+        sb.append( String.format( "bcdMaskedId = 0x%08X\n", bcdMaskedId ) );
+        sb.append( String.format( "maskedMan = 0x%04X\n", maskedMan ) );
+        sb.append( String.format( "maskedVersion = 0x%02X\n", maskedVersion ) );
+        sb.append( String.format( "maskedMedium = 0x%02X\n", maskedMedium ) );
 
         return sb.toString(  );
     }
 
     public boolean matchId( int id )
     {
-        int hexBcdId = (int) toBcd( id, 8 );
-        int hexMask = bcdId;
+        int hexBcdId = MBusUtils.int2Bcd(id);
+        int hexMask = bcdMaskedId;
 
         for ( int i = 0; i < 8; i++ )
         {
@@ -211,21 +210,6 @@ public class SelectionOfSlaves
         return true;
     }
 
-    public static long toBcd( long value, int bcdDigits )
-    {
-        long result = 0;
-
-        for ( int i = bcdDigits; i > 0; i -= 2 )
-        {
-            result |= ( ( value % 10 ) << ( 4 * ( bcdDigits - i ) ) );
-            value /= 10;
-            result |= ( ( value % 10 ) << ( 4 + ( 4 * ( bcdDigits - i ) ) ) );
-            value /= 10;
-        }
-
-        return result;
-    }
-
     public boolean matchAll( int id, String man, MBusMedium medium, int version )
     {
         return matchId( id ) && matchMan( man ) && matchMedium( medium ) && matchVersion( version );
@@ -233,19 +217,18 @@ public class SelectionOfSlaves
 
     private boolean matchMan( String man )
     {
-        int hexBcdMan = (int) toBcd( MBusConstants.man2Short( man ),
-                                     4 );
-        int hexMask = bcdMan;
+        int hexMan = MBusUtils.man2Short( man );
+        int hexMask = maskedMan;
 
         for ( int i = 0; i < 8; i++ )
         {
-            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexBcdMan & 0x0F ) ) )
+            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexMan & 0x0F ) ) )
             {
                 return false;
             }
 
             hexMask >>= 4;
-            hexBcdMan >>= 4;
+            hexMan >>= 4;
         }
 
         return true;
@@ -253,19 +236,18 @@ public class SelectionOfSlaves
 
     private boolean matchMedium( MBusMedium medium )
     {
-        int hexBcdMedium = (int) toBcd( medium.getId(  ),
-                                        2 );
-        int hexMask = bcdMedium;
+        int hexMedium = medium.getId();
+        int hexMask = maskedMedium;
 
         for ( int i = 0; i < 8; i++ )
         {
-            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexBcdMedium & 0x0F ) ) )
+            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexMedium & 0x0F ) ) )
             {
                 return false;
             }
 
             hexMask >>= 4;
-            hexBcdMedium >>= 4;
+            hexMedium >>= 4;
         }
 
         return true;
@@ -273,18 +255,18 @@ public class SelectionOfSlaves
 
     private boolean matchVersion( int version )
     {
-        int hexBcdVersion = (int) toBcd( version, 2 );
-        int hexMask = bcdVersion;
+        int hexVersion = version;
+        int hexMask = maskedVersion;
 
         for ( int i = 0; i < 8; i++ )
         {
-            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexBcdVersion & 0x0F ) ) )
+            if ( ( ( hexMask & 0x0F ) != 0x0F ) && ( ( hexMask & 0x0F ) != ( hexVersion & 0x0F ) ) )
             {
                 return false;
             }
 
             hexMask >>= 4;
-            hexBcdVersion >>= 4;
+            hexVersion >>= 4;
         }
 
         return true;

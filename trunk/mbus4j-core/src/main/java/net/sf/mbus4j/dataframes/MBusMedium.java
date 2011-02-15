@@ -345,4 +345,5 @@ public enum MBusMedium
 
         throw new IllegalArgumentException( String.format( "Cant get MBusMedium from 0x%02x", b & 0xFF ) );
     }
+
 }

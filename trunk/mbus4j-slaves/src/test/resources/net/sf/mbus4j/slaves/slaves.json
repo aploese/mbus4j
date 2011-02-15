@@ -2,7 +2,7 @@
  "tcpIpConnection":  {
   "bitPerSecond": 2400,
   "responseTimeOutOffset": 600,
-  "hostname": "127.0.0.1",
+  "host": "127.0.0.1",
   "port": 65031
  },
  "devices":  [

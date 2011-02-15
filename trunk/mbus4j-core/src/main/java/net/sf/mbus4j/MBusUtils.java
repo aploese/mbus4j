@@ -29,7 +29,7 @@ package net.sf.mbus4j;
  *
  * @author aploese
  */
-public class MBusConstants {
+public class MBusUtils {
 
     public final static int UNCONFIGURED_PRIMARY_ADDRESS = 0x00;
     public final static int FIRST_REGULAR_PRIMARY_ADDRESS = 0x01;
@@ -38,7 +38,7 @@ public class MBusConstants {
     public final static int BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS = 0xFE;// 254
     public final static int BROADCAST_NO_ANSWER_PRIMARY_ADDRESS = 0xFF;//255
 
-    public static String int2Man(short value) {
+    public static String short2Man(short value) {
         if (value == -1) {
             return null;
         }
@@ -75,4 +75,80 @@ public class MBusConstants {
         }
         return result;
     }
+
+    public static long long2Bcd(long l) {
+        long result = 0;
+        for (int i = 0; i < 16; i++) {
+            result |= (l % 10) << (i * 4);
+            l /= 10;
+        }
+        return result;
+    }
+
+    public static long bcd2Long(long l) {
+        long result = 0;
+        for (int i = 0; i < 16; i++) {
+            result += (long)((l % 16) * Math.pow(10, i));
+            l >>= 4;
+        }
+        return result;
+    }
+
+    public static int int2Bcd(int i) {
+        int result = 0;
+        for (int idx = 0; idx < 8; idx++) {
+            result |= (i % 10) << (idx * 4);
+            i /= 10;
+        }
+        return result;
+    }
+
+    public static int bcd2Int(int i) {
+        int result = 0;
+        for (int idx = 0; idx < 8; idx++) {
+            result += (int)((i % 16) * Math.pow(10, idx));
+            i >>= 4;
+        }
+        return result;
+    }
+
+    public static short short2Bcd(short s) {
+        short result = 0;
+        for (int i = 0; i < 4; i++) {
+            result |= (s % 10) << (i * 4);
+            s /= 10;
+        }
+        return result;
+    }
+
+    public static short bcd2Short(short s) {
+        short result = 0;
+        for (int i = 0; i < 4; i++) {
+            result += (short)((s % 16) * Math.pow(10, i));
+            s >>= 4;
+        }
+        return result;
+    }
+
+    public static byte byte2Bcd(byte b) {
+        byte result = 0;
+        for (int i = 0; i < 2; i++) {
+            result |= (b % 10) << (i * 4);
+            b /= 10;
+        }
+        return result;
+    }
+
+    public static byte bcd2Byte(byte b) {
+        byte result = 0;
+        for (int i = 0; i < 16; i++) {
+            result += (long)((b % 16) * Math.pow(10, i));
+            b >>= 4;
+        }
+        return result;
+    }
+
+
+
+
 }

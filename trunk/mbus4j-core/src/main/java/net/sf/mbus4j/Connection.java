@@ -1,13 +1,37 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ *
+ * @author Arne Plöse
+ *
  */
-
 package net.sf.mbus4j;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.json.JSONSerializable;
 import net.sf.mbus4j.json.JsonSerializeType;
@@ -16,7 +40,9 @@ import net.sf.mbus4j.json.JsonSerializeType;
  *
  * @author aploese
  */
-public abstract class Connection implements JSONSerializable {
+public abstract class Connection implements JSONSerializable, Serializable {
+
+    public static final int DEFAULT_BAUDRATE = 2400;
 
     /**
      * @return the connState
@@ -37,9 +63,9 @@ public abstract class Connection implements JSONSerializable {
     private int bitPerSecond;
 
     private int responseTimeOutOffset;
-    protected InputStream is;
-    protected OutputStream os;
-    private State connState = State.CLOSED;
+    protected transient  InputStream is;
+    protected transient OutputStream os;
+    private transient State connState = State.CLOSED;
 
     public Connection() {
 
@@ -105,5 +131,47 @@ public abstract class Connection implements JSONSerializable {
        bitPerSecond = json.getInt("bitPerSecond");
        responseTimeOutOffset = json.getInt("responseTimeOutOffset");
     }
+
+    private static final long serialVersionUID = -1;
+    private static final int version = 1;
+
+    // Serialization for saveDataSource
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeInt(version);
+        out.writeInt(bitPerSecond);
+        out.writeInt(responseTimeOutOffset);
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException {
+        int ver = in.readInt();
+        switch (ver) {
+            case 1:
+                readObjectVer1(in);
+                break;
+        }
+    }
+
+    private void readObjectVer1(ObjectInputStream in) throws IOException {
+        bitPerSecond = in.readInt();
+        responseTimeOutOffset = in.readInt();
+    }
+
+    /** find fields in json and create approbirate connection instance*/
+    public static Connection createFromJSON(JSONObject json) {
+        Connection result = null;
+        if (json.containsKey(SerialPortConnection.SERIAL_CONNECTION)) {
+            result = new SerialPortConnection();
+            result.fromJSON(json.getJSONObject(SerialPortConnection.SERIAL_CONNECTION));
+        } else if (json.containsKey(TcpIpConnection.TCP_IP_CONNECTION)) {
+            result = new TcpIpConnection();
+            result.fromJSON(json.getJSONObject(TcpIpConnection.TCP_IP_CONNECTION));
+        } else if (json.containsKey(AtModemConnection.AT_MODEM_CONNECTION)) {
+            result = new AtModemConnection();
+            result.fromJSON(json.getJSONObject(AtModemConnection.AT_MODEM_CONNECTION));
+        }
+        return result;
+    }
+
+    public abstract String getJsonFieldName();
 
 }

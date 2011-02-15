@@ -38,7 +38,7 @@ class TcpIpConnectionToolBar extends ConnectionToolBar<TcpIpConnection> {
         if (!(getConnection() instanceof TcpIpConnection)) {
             getmBusMaster().setConnection(new TcpIpConnection());
         }
-        hostNameTextField = new JTextField(getConnection().getHostname());
+        hostNameTextField = new JTextField(getConnection().getHost());
         hostNameTextField.setColumns(15);
         hostNameTextField.addFocusListener(new FocusListener() {
 
@@ -48,7 +48,7 @@ class TcpIpConnectionToolBar extends ConnectionToolBar<TcpIpConnection> {
 
             @Override
             public void focusLost(FocusEvent e) {
-                getConnection().setHostname(hostNameTextField.getText());
+                getConnection().setHost(hostNameTextField.getText());
             }
         });
 

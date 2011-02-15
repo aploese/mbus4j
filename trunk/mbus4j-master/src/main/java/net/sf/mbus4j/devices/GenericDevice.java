@@ -193,6 +193,8 @@ public class GenericDevice
         setAccessnumber(udResp.getAccessNumber());
         setAcd(udResp.isAcd());
         setDfc(udResp.isDfc());
+        setStatus(udResp.getStatus());
+        setSignature(udResp.getSignature());
         ResponseFrameContainer rfc = new ResponseFrameContainer();
         rfc.setResponseFrame(udResp);
         rfc.setRequestFrame(requestFrame);

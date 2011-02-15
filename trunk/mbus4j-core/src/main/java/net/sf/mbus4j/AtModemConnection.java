@@ -25,28 +25,50 @@
  */
 package net.sf.mbus4j;
 
+import net.sf.json.JSONObject;
+import net.sf.mbus4j.json.JsonSerializeType;
+
 /**
  *
  * @author aploese
  */
-public class SerialPortConnection extends AbstractSerialPortConnection {
-    static final String SERIAL_CONNECTION = "serialConnection";
+public class AtModemConnection extends AbstractSerialPortConnection {
+    static final String AT_MODEM_CONNECTION = "atModemConnection";
 
-    public SerialPortConnection(String portName, int bitPerSecond, int responseTimeoutOffset) {
-        super(portName, bitPerSecond, responseTimeoutOffset);
+    private String phoneNumber;
+
+    @Override
+    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
+        JSONObject result = super.toJSON(jsonSerializeType);
+        result.accumulate("phoneNumber", getPhoneNumber());
+        return result;
     }
 
-    public SerialPortConnection(String portName) {
-        super(portName);
+    @Override
+    public void fromJSON(JSONObject json) {
+        super.fromJSON(json);
+        phoneNumber = json.getString("phoneNumber");
     }
 
-    public SerialPortConnection() {
-        super();
+
+    /**
+     * @return the phoneNumber
+     */
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    /**
+     * @param phoneNumber the phoneNumber to set
+     */
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override
     public String getJsonFieldName() {
-        return SERIAL_CONNECTION;
+        return AT_MODEM_CONNECTION;
     }
+
 
 }
