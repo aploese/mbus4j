@@ -63,6 +63,7 @@ import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.devices.GenericDevice;
+import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.master.MBusMaster;
 
 /**
@@ -507,10 +508,10 @@ public class MBusMasterUiView
                 appReset.setFcb(true);
                 appReset.setTelegramType(ApplicationReset.TelegramType.ALL);
                 appReset.setSubTelegram(i);
-                getMaster().send(appReset);
+                getMaster().send(appReset, false, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
                 RequestClassXData request = new RequestClassXData(true, true, ControlCode.REQ_UD2);
                 request.setAddress(device.getAddress());
-                Frame f = getMaster().send(request);
+                Frame f = getMaster().send(request, false, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
                 if (f instanceof UserDataResponse) {
                     ResponseFrameContainer container = new ResponseFrameContainer();
                     container.setSelectFrame(appReset);

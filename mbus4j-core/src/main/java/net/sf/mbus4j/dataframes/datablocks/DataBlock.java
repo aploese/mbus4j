@@ -155,7 +155,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
                 return RawDataBlock.class;
             case VARIABLE_LENGTH:
                 switch (variableLengthType) {
-                    case STRING : 
+                    case STRING:
                         return StringDataBlock.class;
                     case BIG_DECIMAL:
                         return BigDecimalDataBlock.class;
@@ -532,9 +532,9 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         }
 
         setDataFieldCode(DataFieldCode.fromLabel(dib.getString("dataFieldCode")));
-        if ((DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET == dataFieldCode) ||
-                (DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS == dataFieldCode) ||
-                (DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST == dataFieldCode)) {
+        if ((DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET == dataFieldCode)
+                || (DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS == dataFieldCode)
+                || (DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST == dataFieldCode)) {
         } else {
             setFunctionField(FunctionField.fromLabel(dib.getString("functionField")));
             setStorageNumber(dib.getLong("storageNumber"));
@@ -569,5 +569,47 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
     public void clearVifes() {
         vifes = EMPTY_VIFE;
+    }
+
+    /* Helper method */
+    protected String formatBcdError(String bcdError) {
+        if (bcdError == null) {
+            return bcdError;
+        }
+        int length;
+        switch (getDataFieldCode()) {
+            case _2_DIGIT_BCD:
+                length = 2;
+                break;
+            case _4_DIGIT_BCD:
+                length = 4;
+                break;
+            case _6_DIGIT_BCD:
+                length = 6;
+                break;
+            case _8_DIGIT_BCD:
+                length = 8;
+                break;
+            case _12_DIGIT_BCD:
+                length = 12;
+                break;
+            default:
+                throw new RuntimeException("Unknown DFC " + getDataFieldCode());
+        }
+
+
+        if (bcdError.length() == length) {
+            return bcdError;
+        } else if ((bcdError.length() < length) && (bcdError.length() > 0)) {
+            StringBuilder sb = new StringBuilder(length);
+            for (int i = 0; i < length - bcdError.length(); i++) {
+                sb.append(' ');
+            }
+            sb.append(bcdError);
+            return sb.toString();
+        } else {
+            throw new RuntimeException("Bcd is too long: \"" + bcdError + "\"");
+        }
+
     }
 }

@@ -25,7 +25,6 @@
  */
 package net.sf.mbus4j.master;
 
-import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.devices.Sender;
@@ -87,9 +86,14 @@ public class MasterTest
                   throws Exception
     {
         System.out.println( "tearDown" );
-        master.close();
+        if (master != null) {
+            master.close();
+        }
         master = null;
-        slaves.close(  );
+        if (slaves != null) {
+          slaves.close(  );
+        }
+        slaves = null;
     }
 
     /**
@@ -105,34 +109,40 @@ public class MasterTest
         fail( "The test case is a prototype." );
     }
 
-    /**
-     * Test of selectBySecondaryAddress method, of class MBusMaster.
-     */
-    @Test
-    @Ignore
-    public void testSelectBySecondaryAddress(  )
-    {
-        System.out.println( "selectBySecondaryAddress" );
-        master.selectBySecondaryAddress(  );
-        // TODO review the generated test code and remove the default call to fail.
-        fail( "The test case is a prototype." );
-    }
+/*        @Test
+    public void testTest() throws Exception {
+        int value = 0x12FFFFFF;
+        //slabveSelect(value);
+        // wenn Ans == 1 return 1 gefunden
+        // wenn Ans == 0 return nix gefunden
+        int nibblePos;
+        while ((nibblePos = getLeftmostMaskedNibble(value)) >= 0) {
+            for (int i = 0; i <= 9; i++) {
+                int res = exchangeNibbleAtPos(nibblePos, value, i);
+                log.error(String.format("VALUE MASKED: %d 0x%08X", nibblePos, res));
+            }
+            return;
+        }
 
+
+
+    }
+*/
     /**
      * Test of widcardSearch method, of class MBusMaster.
      */
     @Test( timeout = 60000 )
-    @Ignore
+//    @Ignore
     public void testWidcardSearch(  )
                            throws Exception
     {
         System.out.println( "widcardSearch" );
 
-        int leadingBcdDigitsId = 0;
-        int maskLength = 7;
-        short maskedMan = (short) 0xFFFF;
-        byte maskedVersion = (byte) 0xFF;
-        byte maskedMedium = (byte) 0xFF;
+        int bcdMaskedId = 0xFFFFFFFF;
+        short bcdMaskedMan = (short) 0xFFFF;
+        byte bcdMaskedVersion = (byte) 0xFF;
+        byte bcdMaskedMedium = (byte) 0xFF;
+        slaves.respondToRequest( "680B0B6853FD52FFFFFFFFFFFFFFFF9A16", "E5E5" );
         slaves.respondToRequest( "680B0B6853FD52FFFFFF0FFFFFFFFFAA16", 3 );
         slaves.respondToRequest( "680B0B6853FD52FFFFFF1FFFFFFFFFBA16", "E5E5" );
         slaves.respondToRequest( "680B0B6853FD52FFFFFF10FFFFFFFFAB16", 3 );
@@ -218,7 +228,7 @@ public class MasterTest
         slaves.respondToRequest( "680B0B6853FD52FFFFFF8FFFFFFFFF2A16", 3 );
         slaves.respondToRequest( "680B0B6853FD52FFFFFF9FFFFFFFFF3A16", 3 );
         slaves.replay(  );
-        master.widcardSearch( leadingBcdDigitsId, maskLength, maskedMan, maskedVersion, maskedMedium, Sender.DEFAULT_MAY_TRIES);
+        master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, Sender.DEFAULT_SEND_TRIES);
         assertTrue( slaves.isOK(  ) );
         log.info( "widcardSearch finished" );
         assertEquals( 4,
@@ -308,4 +318,5 @@ public class MasterTest
         assertEquals("RESULT SIZE", 7, result.size());
         */
     }
+
 }

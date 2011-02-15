@@ -34,11 +34,12 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class ByteDataBlock extends DataBlock {
+public class ByteDataBlock extends DataBlock implements BcdValue {
 
     private byte value;
     private String bcdError;
 
+    @Override
     public boolean isBcdError() {
         return bcdError != null;
     }
@@ -66,7 +67,7 @@ public class ByteDataBlock extends DataBlock {
     @Override
     public String getValueAsString() {
         if (bcdError != null) {
-            return "BCD Error: " + bcdError;
+            return bcdError;
         }
         switch (getDataFieldCode()) {
             case _8_BIT_INTEGER:
@@ -83,6 +84,7 @@ public class ByteDataBlock extends DataBlock {
      */
     public void setValue(byte value) {
         this.value = value;
+        this.bcdError = null;
     }
 
     @Override
@@ -114,6 +116,7 @@ public class ByteDataBlock extends DataBlock {
     /**
      * @return the bcdError
      */
+    @Override
     public String getBcdError() {
         return bcdError;
     }
@@ -121,8 +124,10 @@ public class ByteDataBlock extends DataBlock {
     /**
      * @param bcdError the bcdError to set
      */
+    @Override
     public void setBcdError(String bcdError) {
-        this.bcdError = bcdError;
+        this.bcdError = formatBcdError(bcdError);
+        this.value = 0;
     }
 
     @Override
@@ -134,5 +139,10 @@ public class ByteDataBlock extends DataBlock {
             value = 0;
             bcdError = text;
         }
+    }
+
+    @Override
+    public boolean isBcd() {
+        return DataFieldCode._2_DIGIT_BCD.equals(getDataFieldCode());
     }
 }

@@ -281,7 +281,7 @@ public class UserDataResponseTest {
             bdb.setDataFieldCode(DataFieldCode._2_DIGIT_BCD);
             bdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
             bdb.setVif(VifPrimary.ENERGY_J_E_0);
-            bdb.setBcdError("ff");
+            bdb.setBcdError("-E");
             udr.addDataBlock(bdb);
             ShortDataBlock sdb = new ShortDataBlock();
             sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
@@ -293,7 +293,7 @@ public class UserDataResponseTest {
             sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
             sdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
             sdb.setVif(VifPrimary.ENERGY_J_E_0);
-            sdb.setBcdError("ffee");
+            sdb.setBcdError("-EE-");
             udr.addDataBlock(sdb);
             IntegerDataBlock idb = new IntegerDataBlock();
             idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
@@ -305,7 +305,7 @@ public class UserDataResponseTest {
             idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
             idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
             idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setBcdError("ffeedd");
+            idb.setBcdError("--EE  ");
             udr.addDataBlock(idb);
             idb = new IntegerDataBlock();
             idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
@@ -317,7 +317,7 @@ public class UserDataResponseTest {
             idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
             idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
             idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setBcdError("ffeeddcc");
+            idb.setBcdError("--EE  CC");
             udr.addDataBlock(idb);
             LongDataBlock ldb = new LongDataBlock();
             ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
@@ -329,7 +329,14 @@ public class UserDataResponseTest {
             ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
             ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
             ldb.setVif(VifPrimary.ENERGY_J_E_0);
-            ldb.setBcdError("ffeeddccbbaa");
+            ldb.setBcdError("--EE  CCbbAA");
+            udr.addDataBlock(ldb);
+            ldb = new LongDataBlock();
+            ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
+            ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+            ldb.setStorageNumber(1);
+            ldb.setVif(VifPrimary.ENERGY_J_E_0);
+            ldb.setBcdError("00--EE  CC90");
             udr.addDataBlock(ldb);
 
             System.out.print(udr);

@@ -34,11 +34,12 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class ShortDataBlock extends DataBlock {
+public class ShortDataBlock extends DataBlock implements BcdValue {
 
     private short value;
     private String bcdError;
 
+    @Override
     public boolean isBcdError() {
         return bcdError != null;
     }
@@ -66,7 +67,7 @@ public class ShortDataBlock extends DataBlock {
     @Override
     public String getValueAsString() {
         if (bcdError != null) {
-            return "BCD Error: " + bcdError;
+            return bcdError;
         }
         switch (getDataFieldCode()) {
             case _16_BIT_INTEGER:
@@ -83,6 +84,7 @@ public class ShortDataBlock extends DataBlock {
      */
     public void setValue(short value) {
         this.value = value;
+        this.bcdError = null;
     }
 
     @Override
@@ -114,6 +116,7 @@ public class ShortDataBlock extends DataBlock {
     /**
      * @return the bcdError
      */
+    @Override
     public String getBcdError() {
         return bcdError;
     }
@@ -121,8 +124,10 @@ public class ShortDataBlock extends DataBlock {
     /**
      * @param bcdError the bcdError to set
      */
+    @Override
     public void setBcdError(String bcdError) {
-        this.bcdError = bcdError;
+        this.bcdError = formatBcdError(bcdError);
+        this.value = 0;
     }
 
     @Override
@@ -134,5 +139,10 @@ public class ShortDataBlock extends DataBlock {
             value = 0;
             bcdError = text;
         }
+    }
+
+    @Override
+    public boolean isBcd() {
+        return DataFieldCode._4_DIGIT_BCD.equals(getDataFieldCode());
     }
 }

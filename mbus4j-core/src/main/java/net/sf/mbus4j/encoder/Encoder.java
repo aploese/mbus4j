@@ -27,7 +27,7 @@ package net.sf.mbus4j.encoder;
 
 import java.util.Arrays;
 import java.util.Calendar;
-import net.sf.mbus4j.MBusConstants;
+import net.sf.mbus4j.MBusUtils;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.ControlFrame;
@@ -44,6 +44,7 @@ import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.UserDataResponse.StatusCode;
+import net.sf.mbus4j.dataframes.datablocks.BcdValue;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
@@ -165,9 +166,9 @@ public class Encoder {
     }
 
     private boolean needDIFE(DataBlock db, int index) {
-        return ((db.getStorageNumber() >> (1 + index * 4)) > 0x00) ||
-                (((db.getTariff() >> (index * 2)) << 0x04) > 0x00) ||
-                ((db.getSubUnit() >> index) > 0x00);
+        return ((db.getStorageNumber() >> (1 + index * 4)) > 0x00)
+                || (((db.getTariff() >> (index * 2)) << 0x04) > 0x00)
+                || ((db.getSubUnit() >> index) > 0x00);
     }
 
     private boolean needVIFE(DataBlock db, int index) {
@@ -186,16 +187,66 @@ public class Encoder {
         data[currentPos++] = (byte) (applicationReset.getTelegramType().id | applicationReset.getSubTelegram());
     }
 
-    private void pushBcdError(String value, int bcdDigits) {
-        for (int i = bcdDigits / 2; i > 0; i--) {
-            data[currentPos++] = (byte)Short.parseShort(value.substring(i * 2 - 2, i * 2), 16);
+    /* convert to byte nibble (LCD recomendation) */
+    public int fromLcdDigit(char lcdDigit) {
+        switch (lcdDigit) {
+            case '0':
+                return 0x00;
+            case '1':
+                return 0x01;
+            case '2':
+                return 0x02;
+            case '3':
+                return 0x03;
+            case '4':
+                return 0x04;
+            case '5':
+                return 0x05;
+            case '6':
+                return 0x06;
+            case '7':
+                return 0x07;
+            case '8':
+                return 0x08;
+            case '9':
+                return 0x09;
+            case 'a':
+            case 'A':
+                return 0x0A;
+            case 'b':
+            case 'B':
+                return 0x0B;
+            case 'c':
+            case 'C':
+                return 0x0C;
+            case ' ':
+            case 'd':
+            case 'D':
+                return 0x0D;
+            case 'e':
+            case 'E':
+                return 0x0E;
+            case '-':
+            case 'f':
+            case 'F':
+                return 0x0F;
+            default:
+                throw new RuntimeException("Should never ever happend!");
+        }
+
+    }
+
+    private void pushBcdError(String value) {
+        for (int i = value.length() - 1; i >= 0; i -= 2) {
+            int v = fromLcdDigit(value.charAt(i)) | fromLcdDigit(value.charAt(i - 1)) << 4;
+            data[currentPos++] = (byte) v;
         }
     }
 
     private void pushBcd(long value, int bcdDigits) {
         final boolean isNegative = value < 0;
         if (isNegative) {
-            value = - value; 
+            value = -value;
         }
         for (int i = bcdDigits / 2; i > 0; i--) {
             data[currentPos] = (byte) (value % 10);
@@ -352,21 +403,21 @@ public class Encoder {
                 break;
             case _2_DIGIT_BCD:
                 if (((ByteDataBlock) db).isBcdError()) {
-                    pushBcdError(((ByteDataBlock) db).getBcdError(), 2);
+                    pushBcdError(((BcdValue) db).getBcdError());
                 } else {
                     pushBcd(((ByteDataBlock) db).getValue(), 2);
                 }
                 break;
             case _4_DIGIT_BCD:
                 if (((ShortDataBlock) db).isBcdError()) {
-                    pushBcdError(((ShortDataBlock) db).getBcdError(), 4);
+                    pushBcdError(((BcdValue) db).getBcdError());
                 } else {
                     pushBcd(((ShortDataBlock) db).getValue(), 4);
                 }
                 break;
             case _6_DIGIT_BCD:
                 if (((IntegerDataBlock) db).isBcdError()) {
-                    pushBcdError(((IntegerDataBlock) db).getBcdError(), 6);
+                    pushBcdError(((BcdValue) db).getBcdError());
                 } else {
                     pushBcd(((IntegerDataBlock) db).getValue(), 6);
                 }
@@ -375,11 +426,11 @@ public class Encoder {
                 if (db instanceof EnhancedIdentificationDataBlock) {
                     pushEnhancedIdentificationDataBlockShort((EnhancedIdentificationDataBlock) db);
                 } else {
-                if (((IntegerDataBlock) db).isBcdError()) {
-                    pushBcdError(((IntegerDataBlock) db).getBcdError(), 8);
-                } else {
-                    pushBcd(((IntegerDataBlock) db).getValue(), 8);
-                }
+                    if (((IntegerDataBlock) db).isBcdError()) {
+                        pushBcdError(((BcdValue) db).getBcdError());
+                    } else {
+                        pushBcd(((IntegerDataBlock) db).getValue(), 8);
+                    }
                 }
                 break;
             case VARIABLE_LENGTH:
@@ -392,7 +443,7 @@ public class Encoder {
                 break;
             case _12_DIGIT_BCD:
                 if (((LongDataBlock) db).isBcdError()) {
-                    pushBcdError(((LongDataBlock) db).getBcdError(), 12);
+                    pushBcdError(((BcdValue) db).getBcdError());
                 } else {
                     pushBcd(((LongDataBlock) db).getValue(), 12);
                 }
@@ -499,7 +550,7 @@ public class Encoder {
     }
 
     private void pushManufacturer(String man) {
-        pushInteger(MBusConstants.man2Short(man), 2);
+        pushInteger(MBusUtils.man2Short(man), 2);
     }
 
     private void pushObjectAction(DataBlock db) {
@@ -507,10 +558,10 @@ public class Encoder {
     }
 
     private void pushSelectionOfSlavesDataHeader(SelectionOfSlaves frame) {
-        pushInteger(frame.getBcdId(), 4);
-        pushInteger(frame.getBcdMan(), 2);
-        data[currentPos++] = (byte) frame.getBcdVersion();
-        data[currentPos++] = (byte) frame.getBcdMedium();
+        pushInteger(frame.getBcdMaskedId(), 4);
+        pushInteger(frame.getMaskedMan(), 2);
+        data[currentPos++] = (byte) frame.getMaskedVersion();
+        data[currentPos++] = (byte) frame.getMaskedMedium();
     }
 
     private void pushString(String value) {

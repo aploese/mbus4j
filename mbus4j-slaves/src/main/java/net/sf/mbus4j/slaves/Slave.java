@@ -28,7 +28,7 @@ package net.sf.mbus4j.slaves;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import net.sf.mbus4j.MBusConstants;
+import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -283,9 +283,9 @@ public class Slave
         {
             SelectionOfSlaves selectionOfSlaves = (SelectionOfSlaves) frame;
             log.info( "will handle SelectionOfSlaves: " +
-                      ( ( selectionOfSlaves.getAddress(  ) & 0xFF ) == MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS ) );
+                      ( ( selectionOfSlaves.getAddress(  ) & 0xFF ) == MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS ) );
 
-            return ( selectionOfSlaves.getAddress(  ) & 0xFF ) == MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS;
+            return ( selectionOfSlaves.getAddress(  ) & 0xFF ) == MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS;
         } else if ( frame instanceof PrimaryAddress )
         {
             int primaryAddress = ( (PrimaryAddress) frame ).getAddress(  ) & 0xFF;
@@ -304,7 +304,7 @@ public class Slave
 
     Frame handleSelectionOfSlaves( SelectionOfSlaves selectionOfSlaves )
     {
-        if ( ( selectionOfSlaves.getAddress(  ) & 0xFF ) != MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS )
+        if ( ( selectionOfSlaves.getAddress(  ) & 0xFF ) != MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS )
         {
             log.warn( "NETWORK SELECT ERROR" );
 
@@ -357,10 +357,10 @@ public class Slave
 
     private boolean willHandleByAddress( int primaryAddress )
     {
-        return ( primaryAddress == MBusConstants.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS ) ||
-               ( primaryAddress == MBusConstants.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS ) ||
+        return ( primaryAddress == MBusUtils.BROADCAST_NO_ANSWER_PRIMARY_ADDRESS ) ||
+               ( primaryAddress == MBusUtils.BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS ) ||
                ( primaryAddress == ( getAddress(  ) & 0xFF ) ) ||
-               ( ( primaryAddress == MBusConstants.SLAVE_SELECT_PRIMARY_ADDRESS ) && isNetworkSelected(  ) );
+               ( ( primaryAddress == MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS ) && isNetworkSelected() );
     }
 
     @Override
@@ -393,13 +393,14 @@ public class Slave
     /**
      * track the version of self saved data !!!
      */
-    private final static int MY_SERIAL_VERSION = 0;
+    private static final long serialVersionUID = -1;
+    private final static int SERIAL_VERSION = 1;
 
     private void writeObject( java.io.ObjectOutputStream stream )
                       throws IOException
     {
         stream.defaultWriteObject(  );
-        stream.writeInt( MY_SERIAL_VERSION );
+        stream.writeInt( SERIAL_VERSION );
         stream.writeByte( getAddress(  ) );
         stream.writeInt( getIdentNumber(  ) );
         stream.writeObject( getManufacturer(  ) );
@@ -416,7 +417,7 @@ public class Slave
 
         switch ( stream.readInt(  ) )
         {
-            case MY_SERIAL_VERSION:
+            case 1:
                 setAddress( stream.readByte(  ) );
                 setIdentNumber( stream.readInt(  ) );
                 setManufacturer( (String) stream.readObject(  ) );
@@ -559,8 +560,11 @@ public class Slave
             sfc.fromJSON( jsonSlaveFrameContainers.getJSONObject( i ) );
             responseFrameContainers.add( sfc );
         }
-
-        selectedIndex = json.getInt( "selectedFrame" );
+        if (json.containsKey("selectedFrame")) {
+            selectedIndex = json.getInt( "selectedFrame" );
+        } else {
+            selectedIndex = 0;
+        }
     }
 
     @Override

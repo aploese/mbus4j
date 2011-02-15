@@ -27,7 +27,7 @@ package net.sf.mbus4j.decoder;
 
 import java.util.Calendar;
 import java.util.Date;
-import net.sf.mbus4j.MBusConstants;
+import net.sf.mbus4j.MBusUtils;
 
 /**
  *
@@ -77,6 +77,47 @@ public class Stack {
         return (byte) popBcdLong(2);
     }
 
+    /* convert to String (LCD recomendation) */
+    public char toLcdDigit(int bcdDigit) {
+        switch (bcdDigit) {
+            case 0x00:
+                return '0';
+            case 0x01:
+                return '1';
+            case 0x02:
+                return '2';
+            case 0x03:
+                return '3';
+            case 0x04:
+                return '4';
+            case 0x05:
+                return '5';
+            case 0x06:
+                return '6';
+            case 0x07:
+                return '7';
+            case 0x08:
+                return '8';
+            case 0x09:
+                return '9';
+            case 0x0A:
+                return 'A';
+            case 0x0B:
+                return 'b';
+            case 0x0C:
+                return 'C';
+            case 0x0D:
+                return ' ';
+            case 0x0E:
+                return 'E';
+            case 0x0F:
+                return '-';
+            default:
+                throw new RuntimeException("Should never ever happend!");
+        }
+    }
+
+    //TODO Pop BCD Error???
     public String peekBcdError(int digits) {
         char[] result = new char[digits];
         int resultPos = 0;
@@ -84,9 +125,9 @@ public class Stack {
         boolean isError = false;
 
         for (int i = stackPos - 1; i >= floorPos; i--) {
-            result[resultPos++] = Integer.toHexString((data[i] >> 4) & 0x0F).charAt(0);
+            result[resultPos++] = toLcdDigit((data[i] >> 4) & 0x0F);
             isError |= ((i == (stackPos - 1)) && ((data[i] & 0x0F) == 0x0F));
-            result[resultPos++] += Integer.toHexString(data[i] & 0x0F).charAt(0);
+            result[resultPos++] += toLcdDigit(data[i] & 0x0F);
             isError |= ((data[i] & 0x0F) > 0x09);
         }
 
@@ -196,7 +237,7 @@ public class Stack {
     }
 
     public String popMan() {
-        return MBusConstants.int2Man(popShort());
+        return MBusUtils.short2Man(popShort());
     }
 
     public short popShort() {

@@ -34,10 +34,8 @@ import net.sf.mbus4j.dataframes.Frame;
  */
 public interface Sender {
 
-    Frame send(Frame frame) throws IOException, InterruptedException;
+    Frame send(Frame frame, boolean collectGarbage, int maxTries, long timeout) throws IOException, InterruptedException;
 
-    Frame send(Frame frame, int maxTries) throws IOException, InterruptedException;
-
-    public final static int DEFAULT_MAY_TRIES = 3;
+    public final static int DEFAULT_SEND_TRIES = 2;
 
 }

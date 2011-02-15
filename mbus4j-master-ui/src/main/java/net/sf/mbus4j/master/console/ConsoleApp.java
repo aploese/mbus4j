@@ -26,7 +26,7 @@ package net.sf.mbus4j.master.console;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.sf.mbus4j.MBusConstants;
+import net.sf.mbus4j.MBusUtils;
 
 
 import org.apache.commons.cli.CommandLine;
@@ -206,7 +206,13 @@ public class ConsoleApp {
                 if (cmd.hasOption("paddr")) {
                     master.searchDevicesByPrimaryAddress();
                 } else if (cmd.hasOption("saddr")) {
-                    master.searchDevicesBySecondaryAddressing(3);
+                    int bcdId = cmd.hasOption("id") ? (int)MBusUtils.String2Bcd(cmd.getOptionValue("id")) : 0xFFFFFFFF;
+                    byte version = (byte) Short.parseShort(cmd.getOptionValue("version", "FF"), 16);
+                    byte medium = cmd.hasOption("medium") ? (byte)MBusMedium.fromLabel(cmd.getOptionValue("medium")).getId() : (byte)0xFF;
+                    short manufacturer = cmd.hasOption("manufacturer") ? MBusUtils.man2Short(cmd.getOptionValue("manufacturer")) : (short)0xFFFF;
+//                    System.out.println("FOUND SLAVES: " + master.sendSlaveSelect(bcdId, manufacturer, version, medium, 1));
+                    master.widcardSearch(bcdId, manufacturer, version, medium, 3);
+                    Thread.sleep(1000 * 5); // 20 sec
                 }
                 if (cmd.hasOption("json")) {
                     System.out.print(master.toJSON(JsonSerializeType.ALL).toString(2));
@@ -218,7 +224,7 @@ public class ConsoleApp {
                 if (cmd.hasOption("paddr")) {
                     udr = master.readResponse((byte) Short.parseShort(cmd.getOptionValue("address")));
                 } else if (cmd.hasOption("saddr")) {
-                    int bcdId = (int)MBusConstants.String2Bcd(cmd.getOptionValue("id"));
+                    int bcdId = (int)MBusUtils.String2Bcd(cmd.getOptionValue("id"));
                     Byte version = cmd.hasOption("version") ? (byte) Short.parseShort(cmd.getOptionValue("version")) : null;
                     MBusMedium medium = cmd.hasOption("medium") ? MBusMedium.fromLabel(cmd.getOptionValue("medium")) : null;
                     String manufacturer = cmd.hasOption("manufacturer") ? cmd.getOptionValue("manufacturer") : null;

@@ -37,6 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
 public interface SingleCharFrame
     extends Frame
 {
+
     static class SingleCharFrameImpl
         implements SingleCharFrame
     {
