@@ -44,10 +44,6 @@
             <artifactId>swing-worker</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.java.dev.wizard</groupId>
-            <artifactId>wizard</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <classifier>jdk15</classifier>
@@ -86,7 +82,7 @@
                     <!-- set alternative assemble directory -->
                     <assembleDirectory>${project.build.directory}/master-ui</assembleDirectory>
                     <!-- Extra JVM arguments that will be included in the bin scripts -->
-                    <extraJvmArguments>-javaagent:repo/aspectjweaver-1.6.9.jar</extraJvmArguments>
+                    <extraJvmArguments>-javaagent:repo/aspectjweaver-1.6.11.jar</extraJvmArguments>
                     <!-- Generate bin scripts for windows and unix pr default -->
                     <platforms>
                         <platform>windows</platform>
@@ -133,7 +129,7 @@
 
     <!--
 <plugin>  <artifactId>maven-surefire-plugin</artifactId>  <configuration>  <forkMode>once</forkMode>
-<argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/1.6.9/aspectjweaver-1.6.9.jar</argLine> </configuration> </plugin>
+<argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar</argLine> </configuration> </plugin>
 
     -->
 </project>
