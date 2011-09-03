@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project>
+    <body>
+        <menu ref="parent"/>
+        <menu name="MBus4J Core">
+            <item name="Introduction" href="index.html"/>
+        </menu>
+    </body>
+</project>

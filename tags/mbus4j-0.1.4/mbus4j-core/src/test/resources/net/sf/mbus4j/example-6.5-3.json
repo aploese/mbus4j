@@ -1,0 +1,23 @@
+{
+ "controlCode": "SND_UD",
+ "subType": "send user data",
+ "fcb": false,
+ "address": 1,
+ "dataBlocks": [{"drh":  {
+  "dib":   {
+   "action": "freeze data",
+   "dataFieldCode": "No Data",
+   "functionField": "Instantaneous value",
+   "storageNumber": 1,
+   "subUnit": 0,
+   "tariff": 0
+  },
+  "vib": {"vif":   {
+   "vifType": "primary",
+   "description": "Flow Temperature",
+   "unitOfMeasurement": "°C",
+   "siPrefix": "",
+   "exponent": -1
+  }}
+ }}]
+}
