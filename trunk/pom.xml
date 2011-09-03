@@ -68,17 +68,17 @@
         <repository>
             <id>mbus4j.sf.net</id>
             <name>MBus4J Repository</name>
-            <url>sftp://web.sf.net:/home/groups/m/mb/mbus4j/htdocs/repository</url>
+            <url>sftp://web.sf.net:/home/project-web/mbus4j/htdocs/repository</url>
         </repository>
         <snapshotRepository>
             <id>mbus4j.sf.net</id>
             <name>MBus4J Snapshot Repository</name>
-            <url>sftp://web.sf.net:/home/groups/m/mb/mbus4j/htdocs/snapshot-repository</url>
+            <url>sftp://web.sf.net:/home/project-web/mbus4j/htdocs/snapshot-repository</url>
         </snapshotRepository>
         <site>
             <id>mbus4j.sf.net</id>
             <name>MBusV4J Site</name>
-            <url>scp://shell.sf.net:/home/groups/m/mb/mbus4j/htdocs</url>
+            <url>scp://shell.sf.net:/home/project-web/mbus4j/htdocs</url>
         </site>
     </distributionManagement>
 
