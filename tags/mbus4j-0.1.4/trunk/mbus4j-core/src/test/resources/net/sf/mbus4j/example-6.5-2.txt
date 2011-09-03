@@ -1,0 +1,13 @@
+680A0A685305510C8608110500005916
+control code = SND_UD
+isFcb = false
+address = 0x05
+datablock[0]:
+  action = add entry
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00000511 [kWh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
