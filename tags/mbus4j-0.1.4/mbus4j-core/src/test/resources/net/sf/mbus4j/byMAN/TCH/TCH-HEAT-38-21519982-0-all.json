@@ -1,0 +1,190 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "TCH",
+ "medium": "Heat",
+ "version": "0x26",
+ "identNumber": 21519982,
+ "address": "0x4e",
+ "accessNumber": 133,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "29.09.2000 13:50:00",
+    "summertime": false,
+    "valid": true,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "Date"
+    }}
+   },
+   "data": {"date": "29.05.2000"}
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "6 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume Flow",
+     "unitOfMeasurement": "l/h",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Flow Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": -1
+    }}
+   },
+   "data": 234
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Return Temperature",
+     "unitOfMeasurement": "°C",
+     "siPrefix": "",
+     "exponent": -1
+    }}
+   },
+   "data": 224
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 64
+  },
+  {"drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data more records follow in next telegram"}}}
+ ]
+}
