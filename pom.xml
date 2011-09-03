@@ -3,7 +3,7 @@
     <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.1.4</version>
     <name>mbus4j</name>
     <url>http://maven.apache.org</url>
 
@@ -100,9 +100,9 @@
     </mailingLists>
     -->
     <scm>
-        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/trunk</developerConnection>
-        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/trunk</connection>
-        <url>http://mbus4j.svn.sourceforge.net/svn/svnweb-index.cgi</url>
+        <developerConnection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/tags/mbus4j-0.1.4</developerConnection>
+        <connection>scm:svn:https://mbus4j.svn.sourceforge.net/svnroot/mbus4j/tags/mbus4j-0.1.4</connection>
+        <url>http://mbus4j.svn.sourceforge.net/svn/svnweb-index.cgi/tags/mbus4j-0.1.4</url>
     </scm>
 
     <!-- org.jdesktop -->
