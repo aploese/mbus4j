@@ -1,7 +1,0 @@
-{
- "controlCode": "SND_UD",
- "subType": "set baudrate",
- "fcb": false,
- "address": 254,
- "baudrate": 9600
-}
