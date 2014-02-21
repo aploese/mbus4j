@@ -12,26 +12,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.rxtx</groupId>
-            <artifactId>rxtx</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-        </dependency>
-       <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <classifier>jdk15</classifier>
@@ -51,22 +39,37 @@
     </dependencies>
 
 
-    <!--build>
+    <build>
         <plugins>
             <plugin>
-                <!- - mvn package appassembler:assemble - ->
+                <!-- mvn package appassembler:assemble -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>appassembler-maven-plugin</artifactId>
                 <configuration>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <!-- Include etc/ in the beginning of the classpath declaration in the bin scripts -->
+                    <includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
+                    <!-- prefix all bin files with "fhz" -->
+                    <binPrefix>mbus4j</binPrefix>
+                    <!-- set alternative assemble directory -->
+                    <assembleDirectory>${project.build.directory}/mbus4j</assembleDirectory>
+                    <!-- Extra JVM arguments that will be included in the bin scripts -->
+                    <extraJvmArguments />
+                    <!-- Generate bin scripts for windows and unix pr default -->
+                    <platforms>
+                        <platform>windows</platform>
+                        <platform>unix</platform>
+                    </platforms>
                     <programs>
                         <program>
-                            <mainClass>net.sf.mbus.slaves.ui.</mainClass>
-                            <name />
+                            <mainClass>net.sf.mbus.slaves.ui.Main</mainClass>
+                            <name>mbus4j</name>
                         </program>
                     </programs>
                 </configuration>
             </plugin>
+
         </plugins>
-    </build-->
+    </build>
 
 </project>

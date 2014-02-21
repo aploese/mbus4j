@@ -1,10 +1,32 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package net.sf.mbus4j;
 
+/*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
+ * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ * 
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
+ * 
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * #L%
+ */
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -104,12 +126,13 @@ public class MBusUtilsTest {
     public void testBcd2Int() {
         assertEquals(12345678, MBusUtils.bcd2Int(0x12345678));
     }
+
     /**
      * Test of short2Bcd method, of class MBusUtils.
      */
     @Test
     public void testShort2Bcd() {
-        assertEquals(0x1234, MBusUtils.short2Bcd((short)1234));
+        assertEquals(0x1234, MBusUtils.short2Bcd((short) 1234));
     }
 
     /**
@@ -117,14 +140,15 @@ public class MBusUtilsTest {
      */
     @Test
     public void testBcd2Short() {
-        assertEquals(1234, MBusUtils.bcd2Short((short)0x1234));
+        assertEquals(1234, MBusUtils.bcd2Short((short) 0x1234));
     }
+
     /**
      * Test of byte2Bcd method, of class MBusUtils.
      */
     @Test
     public void testByte2Bcd() {
-        assertEquals(0x12, MBusUtils.byte2Bcd((byte)12));
+        assertEquals(0x12, MBusUtils.byte2Bcd((byte) 12));
     }
 
     /**
@@ -132,6 +156,6 @@ public class MBusUtilsTest {
      */
     @Test
     public void testBcd2Byte() {
-        assertEquals(12, MBusUtils.bcd2Byte((byte)0x12));
+        assertEquals(12, MBusUtils.bcd2Byte((byte) 0x12));
     }
 }

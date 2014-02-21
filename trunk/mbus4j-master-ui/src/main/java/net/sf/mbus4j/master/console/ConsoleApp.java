@@ -1,33 +1,39 @@
+package net.sf.mbus4j.master.console;
+
 /*
- * Copyright 2009, openv4j.sf.net, and individual contributors as indicated
+ * #%L
+ * mbus4j-master-ui
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
+ * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * $Id: $
- *
- * @author arnep
+ * #L%
  */
-package net.sf.mbus4j.master.console;
 
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.mbus4j.MBusUtils;
-
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -38,14 +44,13 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import net.sf.mbus4j.TcpIpConnection;
 import net.sf.mbus4j.SerialPortConnection;
+import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.json.JsonSerializeType;
+import net.sf.mbus4j.log.LogUtils;
 import net.sf.mbus4j.master.MBusMaster;
 
 /**
@@ -55,7 +60,7 @@ import net.sf.mbus4j.master.MBusMaster;
  */
 public class ConsoleApp {
 
-    private static Logger log = LoggerFactory.getLogger(ConsoleApp.class);
+    private static Logger LOG = LogUtils.getMasterLogger();
 
     /**
      * Creates a new Main object.
@@ -163,7 +168,7 @@ public class ConsoleApp {
             cmd = parser.parse(options, args);
         } catch (ParseException ex) {
             printHelp(options);
-            log.error("Parse Ex", ex);
+            LOG.log(Level.SEVERE, "Exception during parsing", ex);
             return;
         }
 
@@ -199,17 +204,15 @@ public class ConsoleApp {
             master.setConnection(conn);
         }
 
-
-        try {
-            master.open();
+        try (Closeable c = master.open()) {
             if (cmd.hasOption("search")) {
                 if (cmd.hasOption("paddr")) {
                     master.searchDevicesByPrimaryAddress();
                 } else if (cmd.hasOption("saddr")) {
-                    int bcdId = cmd.hasOption("id") ? (int)MBusUtils.String2Bcd(cmd.getOptionValue("id")) : 0xFFFFFFFF;
+                    int bcdId = cmd.hasOption("id") ? (int) MBusUtils.String2Bcd(cmd.getOptionValue("id")) : 0xFFFFFFFF;
                     byte version = (byte) Short.parseShort(cmd.getOptionValue("version", "FF"), 16);
-                    byte medium = cmd.hasOption("medium") ? (byte)MBusMedium.fromLabel(cmd.getOptionValue("medium")).getId() : (byte)0xFF;
-                    short manufacturer = cmd.hasOption("manufacturer") ? MBusUtils.man2Short(cmd.getOptionValue("manufacturer")) : (short)0xFFFF;
+                    byte medium = cmd.hasOption("medium") ? (byte) MBusMedium.fromLabel(cmd.getOptionValue("medium")).getId() : (byte) 0xFF;
+                    short manufacturer = cmd.hasOption("manufacturer") ? MBusUtils.man2Short(cmd.getOptionValue("manufacturer")) : (short) 0xFFFF;
 //                    System.out.println("FOUND SLAVES: " + master.sendSlaveSelect(bcdId, manufacturer, version, medium, 1));
                     master.widcardSearch(bcdId, manufacturer, version, medium, 3);
                     Thread.sleep(1000 * 5); // 20 sec
@@ -222,9 +225,11 @@ public class ConsoleApp {
             } else if (cmd.hasOption("read")) {
                 UserDataResponse udr = null;
                 if (cmd.hasOption("paddr")) {
-                    udr = master.readResponse((byte) Short.parseShort(cmd.getOptionValue("address")));
+                    final byte slaveAddress = (byte) Short.parseShort(cmd.getOptionValue("address"));
+                    //    Frame f = master.sendInitSlave(slaveAddress);
+                    udr = master.readResponse(slaveAddress);
                 } else if (cmd.hasOption("saddr")) {
-                    int bcdId = (int)MBusUtils.String2Bcd(cmd.getOptionValue("id"));
+                    int bcdId = (int) MBusUtils.String2Bcd(cmd.getOptionValue("id"));
                     Byte version = cmd.hasOption("version") ? (byte) Short.parseShort(cmd.getOptionValue("version")) : null;
                     MBusMedium medium = cmd.hasOption("medium") ? MBusMedium.fromLabel(cmd.getOptionValue("medium")) : null;
                     String manufacturer = cmd.hasOption("manufacturer") ? cmd.getOptionValue("manufacturer") : null;
@@ -237,8 +242,8 @@ public class ConsoleApp {
                 }
             }
 
-        } finally {
-            master.close();
+        } catch (Exception e) {
+            LOG.log(Level.SEVERE, "Error", e);
         }
     }
 

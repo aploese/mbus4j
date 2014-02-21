@@ -1,29 +1,32 @@
+package net.sf.mbus4j.slaves;
+
 /*
+ * #%L
+ * mbus4j-slaves
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.slaves;
 
 import java.io.UnsupportedEncodingException;
 import net.sf.json.JSONArray;
@@ -43,9 +46,6 @@ import net.sf.mbus4j.json.JsonSerializeType;
 import net.sf.mbus4j.Connection;
 import net.sf.mbus4j.SerialPortConnection;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,10 +60,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
@@ -158,9 +160,7 @@ public class Slaves implements JSONSerializable {
         public Frame call()
                 throws Exception {
             try {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("req dispatching: " + request);
-                }
+                LOG.log(Level.FINEST, "req dispatching: {0}", request);
 
                 Frame result;
 
@@ -225,16 +225,14 @@ public class Slaves implements JSONSerializable {
                 if (result != null) {
                     send(result);
 
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("req dispatched: " + result);
-                    }
+                    LOG.log(Level.FINE, "req dispatched: ", result);
                 } else {
-                    LOG.debug("req dispatched no result");
+                    LOG.fine("req dispatched no result");
                 }
 
                 return result;
             } catch (Exception ex) {
-                LOG.error("Call", ex);
+                LOG.log(Level.SEVERE, "Call", ex);
                 throw ex;
             }
         }
@@ -243,8 +241,8 @@ public class Slaves implements JSONSerializable {
     private class StreamListener
             implements Runnable {
 
-        ThreadPoolExecutor tpe =
-                new ThreadPoolExecutor(5, 20, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        ThreadPoolExecutor tpe
+                = new ThreadPoolExecutor(5, 20, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 //    List<Future<Frame>> l = new ArrayList<Future<Frame>>();
         @Override
@@ -257,44 +255,40 @@ public class Slaves implements JSONSerializable {
                 try {
                     while (!isClosed()) {
                         if ((theData = conn.getInputStream().read()) == -1) {
-                            if (LOG.isTraceEnabled()) {
-                                LOG.trace("Thread interrupted or EOF on waiting occured");
-                            }
+                            LOG.finest("Thread interrupted or EOF on waiting occured");
                         } else {
-                            if (LOG.isTraceEnabled()) {
-                                LOG.trace(String.format("Data received 0x%02x", theData));
+                            if (LOG.isLoggable(Level.FINEST)) {
+                                LOG.finest(String.format("Data received 0x%02x", theData));
                             }
 
                             try {
                                 Frame frame = parser.addByte((byte) theData);
 
                                 if (frame != null) {
-                                    if (LOG.isTraceEnabled()) {
-                                        LOG.trace("Frame parsed ... will process: " + frame);
+                                    if (LOG.isLoggable(Level.FINEST)) {
+                                        LOG.log(Level.FINEST, "Frame parsed ... will process: ", frame);
                                     } else {
-                                        LOG.debug("Frame parsed ... will process");
+                                        LOG.fine("Frame parsed ... will process");
                                     }
 
                                     for (Slave slave : slaves) {
                                         if (slave.willHandleRequest(frame)) {
-                                            LOG.debug(String.format(
-                                                    "Frame will be handled by slave %s",
-                                                    slave.slaveIdToString()));
+                                            LOG.log(Level.FINE, "Frame will be handled by slave {}", slave.slaveIdToString());
                                             tpe.submit(new RequestHandler(frame, slave));
                                         }
                                     }
                                 }
                             } catch (Exception e) {
-                                LOG.error("Error during createPackage()", e);
+                                LOG.log(Level.SEVERE, "Error during createPackage()", e);
                             }
                         }
                     }
 
                     LOG.info("closing down - finish waiting for new data");
                 } catch (IOException e) {
-                    LOG.error("run()", e);
+                    LOG.log(Level.SEVERE, "run()", e);
                 } catch (Exception e) {
-                    LOG.info("finished waiting for packages", e);
+                    LOG.log(Level.INFO, "finished waiting for packages", e);
                 }
             } finally {
                 tpe.shutdownNow();
@@ -305,7 +299,7 @@ public class Slaves implements JSONSerializable {
             return conn == null ? true : conn.getConnState().equals(Connection.State.CLOSED) || conn.getConnState().equals(Connection.State.CLOSING);
         }
     }
-    private static Logger LOG = LoggerFactory.getLogger(Slaves.class);
+    private static Logger LOG = LogUtils.getSlaveLogger();
 
     public static void main(String[] args)
             throws Exception {
@@ -342,7 +336,7 @@ public class Slaves implements JSONSerializable {
             try {
                 app.close();
             } catch (InterruptedException ex) {
-                java.util.logging.Logger.getLogger(Slaves.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "main", ex);
             }
         }
     }

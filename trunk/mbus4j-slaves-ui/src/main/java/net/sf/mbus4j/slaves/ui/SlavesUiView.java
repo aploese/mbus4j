@@ -1,29 +1,32 @@
+package net.sf.mbus4j.slaves.ui;
+
 /*
+ * #%L
+ * mbus4j-slaves-ui
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.slaves.ui;
 
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
@@ -37,11 +40,6 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import gnu.io.CommPortIdentifier;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -49,6 +47,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.JDialog;
@@ -61,6 +60,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.ResponseFrameContainer;
+import net.sf.mbus4j.log.LogUtils;
 import net.sf.mbus4j.slaves.Slave;
 
 /**
@@ -69,7 +69,7 @@ import net.sf.mbus4j.slaves.Slave;
 public class SlavesUiView
         extends FrameView {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SlavesUiView.class);
+    private static final Logger LOG = LogUtils.getSlaveLogger();
 
     class SlaveTabChangeListener implements ChangeListener {
 
@@ -92,14 +92,14 @@ public class SlavesUiView
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
-        messageTimer =
-                new Timer(messageTimeout,
-                new ActionListener() {
+        messageTimer
+                = new Timer(messageTimeout,
+                        new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        statusMessageLabel.setText("");
-                    }
-                });
+                            public void actionPerformed(ActionEvent e) {
+                                statusMessageLabel.setText("");
+                            }
+                        });
         messageTimer.setRepeats(false);
 
         int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
@@ -108,15 +108,15 @@ public class SlavesUiView
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
         }
 
-        busyIconTimer =
-                new Timer(busyAnimationRate,
-                new ActionListener() {
+        busyIconTimer
+                = new Timer(busyAnimationRate,
+                        new ActionListener() {
 
-                    public void actionPerformed(ActionEvent e) {
-                        busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-                        statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
-                    }
-                });
+                            public void actionPerformed(ActionEvent e) {
+                                busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
+                                statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+                            }
+                        });
         idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
         statusAnimationLabel.setIcon(idleIcon);
         progressBar.setVisible(false);
@@ -201,10 +201,10 @@ public class SlavesUiView
         SlavesUI.getApplication().show(aboutBox);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -453,9 +453,8 @@ public class SlavesUiView
         setToolBar(toolBar);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void commitChanges( java.awt.event.ActionEvent evt )
-    {//GEN-FIRST:event_commitChanges
-        commitChanges(  );
+    private void commitChanges(java.awt.event.ActionEvent evt)    {//GEN-FIRST:event_commitChanges
+        commitChanges();
     }//GEN-LAST:event_commitChanges
 
     public boolean isConfigFileSet() {
@@ -463,6 +462,7 @@ public class SlavesUiView
     }
 
     private boolean slaveSelected = false;
+
     public boolean isSlaveSelected() {
         return slaveSelected;
     }
@@ -478,6 +478,7 @@ public class SlavesUiView
     }
 
     private boolean responseFrameSelected = false;
+
     public void selectedResponseFrameChangeDetector() {
         boolean old = responseFrameSelected;
         this.responseFrameSelected = isResponseFrameSelected();
@@ -525,39 +526,36 @@ public class SlavesUiView
     private final Icon[] busyIcons = new Icon[15];
     private int busyIconIndex = 0;
     private JDialog aboutBox;
-    private SlavesListModel slavesListModel = new SlavesListModel(  );
+    private SlavesListModel slavesListModel = new SlavesListModel();
     private ParseBinaryPackageFrame parseBinaryPackageFrame;
     private File configFile;
     private SlaveTabChangeListener slaveTabChangeListener;
 
-    private SlavesListModel getSlavesModel(  )
-    {
+    private SlavesListModel getSlavesModel() {
         return slavesListModel;
     }
 
-    public void refreshPorts(  )
-    {
-        portComboBox.removeAllItems(  );
-        Enumeration<CommPortIdentifier> en = CommPortIdentifier.getPortIdentifiers(  );
-        // iterate through the ports.
-        while ( en.hasMoreElements(  ) )
-        {
-            CommPortIdentifier portId = en.nextElement(  );
-            if ( portId.getPortType(  ) == CommPortIdentifier.PORT_SERIAL )
-            {
-                portComboBox.addItem( portId.getName(  ) );
-            }
-        }
-
-        if ( portComboBox.getItemCount(  ) > 0 )
-        {
-            portComboBox.setSelectedIndex( 0 );
+    public void refreshPorts() {
+        portComboBox.removeAllItems();
+        /*TODO
+         Enumeration<CommPortIdentifier> en = CommPortIdentifier.getPortIdentifiers(  );
+         // iterate through the ports.
+         while ( en.hasMoreElements(  ) )
+         {
+         CommPortIdentifier portId = en.nextElement(  );
+         if ( portId.getPortType(  ) == CommPortIdentifier.PORT_SERIAL )
+         {
+         portComboBox.addItem( portId.getName(  ) );
+         }
+         }
+         */
+        if (portComboBox.getItemCount() > 0) {
+            portComboBox.setSelectedIndex(0);
         }
     }
 
     @Action
-    public void addSlave(  )
-    {
+    public void addSlave() {
         if (parseBinaryPackageFrame == null) {
             parseBinaryPackageFrame = new ParseBinaryPackageFrame();
             parseBinaryPackageFrame.addAddSlaveListener(new ActionListener() {
@@ -575,9 +573,8 @@ public class SlavesUiView
     }
 
     @Action
-    public void openFile(  )
-                  throws IOException
-    {
+    public void openFile()
+            throws IOException {
         JFileChooser chooser = new JFileChooser(configFile);
         chooser.setFileFilter(new FileFilter() {
 
@@ -594,9 +591,9 @@ public class SlavesUiView
                 return "JSON|*.json";
             }
         });
-        JFrame mainFrame = SlavesUI.getApplication(  ).getMainFrame(  );
+        JFrame mainFrame = SlavesUI.getApplication().getMainFrame();
 
-       int option = chooser.showOpenDialog(mainFrame);
+        int option = chooser.showOpenDialog(mainFrame);
         if (option == JFileChooser.APPROVE_OPTION) {
             setConfigFile(chooser.getSelectedFile());
             openLast();
@@ -606,45 +603,41 @@ public class SlavesUiView
     /**
      * @return the slaves
      */
-    public Slaves getSlaves(  )
-    {
-        return slavesListModel.getSlaves(  );
+    public Slaves getSlaves() {
+        return slavesListModel.getSlaves();
     }
 
     /**
      * @param slaves the slaves to set
      */
-    public void setSlaves( Slaves slaves )
-    {
-        this.slavesListModel.setSlaves( slaves );
+    public void setSlaves(Slaves slaves) {
+        this.slavesListModel.setSlaves(slaves);
     }
 
     @Action
-    public void openPort(  )  {
-        if ( openPortButton.isSelected(  ) ) {
-            try
-            {
+    public void openPort() {
+        if (openPortButton.isSelected()) {
+            try {
                 if (!(getSlaves().getConnection() instanceof SerialPortConnection)) {
                     getSlaves().setConnection(new SerialPortConnection());
                 }
-                ((SerialPortConnection)getSlaves().getConnection()).setPortName((String) portComboBox.getSelectedItem(  ));
+                ((SerialPortConnection) getSlaves().getConnection()).setPortName((String) portComboBox.getSelectedItem());
                 getSlaves().open();
-            } catch ( Exception ex ) {
-                LOG.error( "Can't close serial port", ex );
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, "Can't close serial port", ex);
             }
         } else {
             try {
                 getSlaves().close();
-            } catch ( IOException ex ) {
-                LOG.error( "Can't close connection", ex );
-            } catch ( InterruptedException ex ) {
-                LOG.error( "Can't close connection", ex );
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, "Can't close connection", ex);
+            } catch (InterruptedException ex) {
+                LOG.log(Level.SEVERE, "Can't close connection", ex);
             }
         }
     }
 
-    private void commitChanges(  )
-    {
+    private void commitChanges() {
         slavePane1.commitChanges(slavePane1.getSlave());
     }
 
@@ -666,37 +659,37 @@ public class SlavesUiView
                 return "JSON|*.json";
             }
         });
-        JFrame mainFrame = SlavesUI.getApplication(  ).getMainFrame(  );
+        JFrame mainFrame = SlavesUI.getApplication().getMainFrame();
 
-       int option = chooser.showSaveDialog(mainFrame);
+        int option = chooser.showSaveDialog(mainFrame);
         if (option == JFileChooser.APPROVE_OPTION) {
-                setConfigFile(chooser.getSelectedFile());
-                save();
+            setConfigFile(chooser.getSelectedFile());
+            save();
         }
     }
 
-        @Action(enabledProperty = "configFileSet")
+    @Action(enabledProperty = "configFileSet")
     public void save() {
-            FileOutputStream os = null;
+        FileOutputStream os = null;
+        try {
+            os = new FileOutputStream(configFile);
+            getSlaves().writeJsonStream(os);
+            os.flush();
+            os.close();
+        } catch (FileNotFoundException ex) {
+            LOG.log(Level.SEVERE, "save", ex);
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, "save", ex);
+        } finally {
             try {
-                os = new FileOutputStream(configFile);
-                getSlaves().writeJsonStream(os);
-                os.flush();
                 os.close();
-            } catch (FileNotFoundException ex) {
-                java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    os.close();
-                } catch (IOException ex) {
-                    java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                LOG.log(Level.SEVERE, "save", ex);
             }
+        }
     }
 
-        @Action(enabledProperty = "configFileSet")
+    @Action(enabledProperty = "configFileSet")
     public void openLast() {
         FileInputStream in = null;
         try {
@@ -707,17 +700,17 @@ public class SlavesUiView
                 slavesList.setSelectedIndex(0);
             }
         } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "openLast", ex);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "openLast", ex);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SlavesUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "openLast", ex);
             }
         }
-   }
+    }
 
     private void setConfigFile(File configFile) {
         final boolean old = isConfigFileSet();
@@ -725,20 +718,20 @@ public class SlavesUiView
         firePropertyChange("configFileSet", old, isConfigFileSet());
     }
 
-        @Action(enabledProperty = "responseFrameSelected")
+    @Action(enabledProperty = "responseFrameSelected")
     public void addDataBlock() {
-            slavePane1.getSelectedResponseFrame().getResponseFrame();
+        slavePane1.getSelectedResponseFrame().getResponseFrame();
     }
 
-        @Action(enabledProperty = "slaveSelected")
+    @Action(enabledProperty = "slaveSelected")
     public void addResponseFrame() {
-        Slave s = (Slave)slavesList.getSelectedValue();
+        Slave s = (Slave) slavesList.getSelectedValue();
         s.addResponseFrameContainer(new ResponseFrameContainer());
     }
 
-        @Action(enabledProperty = "slaveSelected")
+    @Action(enabledProperty = "slaveSelected")
     public void removeSlave() {
-        getSlaves().removeSlave((Slave)slavesList.getSelectedValue());
+        getSlaves().removeSlave((Slave) slavesList.getSelectedValue());
     }
 
 }

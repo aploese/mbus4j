@@ -1,42 +1,44 @@
+package net.sf.mbus4j;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j;
-
 /**
  *
  * @author aploese
  */
 public class MBusUtils {
 
-    public final static int UNCONFIGURED_PRIMARY_ADDRESS = 0x00;
-    public final static int FIRST_REGULAR_PRIMARY_ADDRESS = 0x01;
-    public final static int LAST_REGULAR_PRIMARY_ADDRESS = 0xFA;// 250
-    public final static int SLAVE_SELECT_PRIMARY_ADDRESS = 0xFD; // 253
-    public final static int BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS = 0xFE;// 254
-    public final static int BROADCAST_NO_ANSWER_PRIMARY_ADDRESS = 0xFF;//255
+    public final static byte UNCONFIGURED_PRIMARY_ADDRESS = (byte) 0x00;
+    public final static byte FIRST_REGULAR_PRIMARY_ADDRESS = (byte) 0x01;
+    public final static byte LAST_REGULAR_PRIMARY_ADDRESS = (byte) 0xFA;// 250
+    public final static byte SLAVE_SELECT_PRIMARY_ADDRESS = (byte) 0xFD; // 253
+    public final static byte BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS = (byte) 0xFE;// 254
+    public final static byte BROADCAST_NO_ANSWER_PRIMARY_ADDRESS = (byte) 0xFF;//255
 
     public static String short2Man(short value) {
         if (value == -1) {
@@ -55,6 +57,7 @@ public class MBusUtils {
 
     /**
      * convert the man string to 2 byte binary representation
+     *
      * @param man
      * @return
      */
@@ -71,7 +74,7 @@ public class MBusUtils {
         long result = 0;
         for (int i = 0; i < value.length(); i++) {
             result <<= 4;
-            result |= (byte)(Short.parseShort(value.substring(i, i + 1), 16) & 0x0F);
+            result |= (byte) (Short.parseShort(value.substring(i, i + 1), 16) & 0x0F);
         }
         return result;
     }
@@ -88,7 +91,7 @@ public class MBusUtils {
     public static long bcd2Long(long l) {
         long result = 0;
         for (int i = 0; i < 16; i++) {
-            result += (long)((l % 16) * Math.pow(10, i));
+            result += (long) ((l % 16) * Math.pow(10, i));
             l >>= 4;
         }
         return result;
@@ -106,7 +109,7 @@ public class MBusUtils {
     public static int bcd2Int(int i) {
         int result = 0;
         for (int idx = 0; idx < 8; idx++) {
-            result += (int)((i % 16) * Math.pow(10, idx));
+            result += (int) ((i % 16) * Math.pow(10, idx));
             i >>= 4;
         }
         return result;
@@ -124,7 +127,7 @@ public class MBusUtils {
     public static short bcd2Short(short s) {
         short result = 0;
         for (int i = 0; i < 4; i++) {
-            result += (short)((s % 16) * Math.pow(10, i));
+            result += (short) ((s % 16) * Math.pow(10, i));
             s >>= 4;
         }
         return result;
@@ -142,13 +145,10 @@ public class MBusUtils {
     public static byte bcd2Byte(byte b) {
         byte result = 0;
         for (int i = 0; i < 16; i++) {
-            result += (long)((b % 16) * Math.pow(10, i));
+            result += (long) ((b % 16) * Math.pow(10, i));
             b >>= 4;
         }
         return result;
     }
-
-
-
 
 }

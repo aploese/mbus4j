@@ -1,47 +1,49 @@
+package net.sf.mbus4j;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j;
-
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
+import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  *
- * Problem
- *  1. Schreiben als Masterstream, wenn nix ist ??? Ex ? Assert geht nicht
- *  2. Masterstream wenn letztes Byte gelesen, dann lesen oder timeout triggern und nicht dfdas lesen des letzten Bytes verzögern, das bringt nix ....
+ * Problem 1. Schreiben als Masterstream, wenn nix ist ??? Ex ? Assert geht
+ * nicht 2. Masterstream wenn letztes Byte gelesen, dann lesen oder timeout
+ * triggern und nicht dfdas lesen des letzten Bytes verzögern, das bringt nix
+ * ....
  *
  */
 public class MasterStreams extends MockConnection {
 
-    private static final Logger log = LoggerFactory.getLogger(MasterStreams.class);
     private int handledData;
     private boolean dataReaded;
 
@@ -77,19 +79,15 @@ public class MasterStreams extends MockConnection {
     @Override
     protected synchronized void lastByteWriting() throws IOException {
         if (!dataReaded) {
-            log.error("Data not readed!");
+            log.severe("Data not readed!");
             throw new IOException("Data not readed!");
         }
         setNextData(true);
     }
 
-    @Override
-    protected Logger getLog() {
-        return log;
-    }
-
     /**
      * Send a request and wait for response
+     *
      * @param request
      * @param response
      * @return
@@ -115,9 +113,7 @@ public class MasterStreams extends MockConnection {
             data.remove(0);
         }
         if (data.isEmpty()) {
-            synchronized (this) {
-                notifyAll();
-            }
+            notifyAll();
             return;
         }
         getMockOs().setData(data.get(0).response);
