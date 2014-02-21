@@ -1,90 +1,93 @@
+package net.sf.mbus4j.dataframes;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.dataframes;
-
 import java.io.Serializable;
 
 /**
  *
  * @author arnep@users.sourceforge.net
- * @version $Id$
+ * @version $Id: MBusResponseFramesContainer.java 62 2010-09-29 14:08:57Z arnep
+ * $
  */
 public interface MBusResponseFramesContainer
-    extends Iterable<ResponseFrameContainer>,
-            Serializable
-{
-    void setAddress( byte address );
+        extends Iterable<ResponseFrameContainer>,
+        Serializable {
 
-    void setIdentNumber( int identNumber );
+    void setAddress(byte address);
 
-    void setVersion( byte version );
+    void setIdentNumber(int identNumber);
 
-    boolean isAcd(  );
+    void setVersion(byte version);
 
-    void setAcd( boolean acd );
+    boolean isAcd();
 
-    boolean isDfc(  );
+    void setAcd(boolean acd);
 
-    void setDfc( boolean dfc );
+    boolean isDfc();
 
-    String getManufacturer(  );
+    void setDfc(boolean dfc);
 
-    void setManufacturer( String manufacturer );
+    String getManufacturer();
 
-    MBusMedium getMedium(  );
+    void setManufacturer(String manufacturer);
 
-    void setMedium( MBusMedium medium );
+    MBusMedium getMedium();
 
-    byte getAddress(  );
+    void setMedium(MBusMedium medium);
 
-    int getIdentNumber(  );
+    byte getAddress();
 
-    byte getVersion(  );
+    int getIdentNumber();
 
-    UserDataResponse.StatusCode[] getStatus(  );
+    byte getVersion();
 
-    void setStatus( UserDataResponse.StatusCode[] status );
+    UserDataResponse.StatusCode[] getStatus();
 
-    short getSignature(  );
+    void setStatus(UserDataResponse.StatusCode[] status);
 
-    void setSignature( short signature );
+    short getSignature();
 
-    short getAccessnumber(  );
+    void setSignature(short signature);
 
-    void setAccessnumber( short accessnumber );
+    short getAccessnumber();
 
-    boolean addResponseFrameContainer( ResponseFrameContainer rfc );
+    void setAccessnumber(short accessnumber);
+
+    boolean addResponseFrameContainer(ResponseFrameContainer rfc);
 
     ResponseFrameContainer removeResponseFrameContainer(int i);
 
-    ResponseFrameContainer getResponseFrameContainer( int index );
+    ResponseFrameContainer getResponseFrameContainer(int index);
 
-    ResponseFrameContainer[] getResponseFrameContainers(  );
+    ResponseFrameContainer[] getResponseFrameContainers();
 
-    int getResponseFrameContainerCount(  );
+    int getResponseFrameContainerCount();
 
     int responseFrameContainerIndexOf(ResponseFrameContainer rfc);
 }

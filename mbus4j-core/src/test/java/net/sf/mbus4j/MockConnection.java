@@ -1,39 +1,41 @@
+package net.sf.mbus4j;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.mbus4j.decoder.Decoder;
-
-import org.slf4j.Logger;
+import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
@@ -42,16 +44,18 @@ import org.slf4j.Logger;
  */
 public abstract class MockConnection extends Connection {
 
+    protected static final Logger log = LogUtils.getMasterLogger();
+
     public MockConnection(int bitPerSecond, int responseTimeoutOffset) {
         super(bitPerSecond, responseTimeoutOffset);
     }
 
     protected MBusTestInputStream getMockIs() {
-        return (MBusTestInputStream)is;
+        return (MBusTestInputStream) is;
     }
 
     protected MBusTestOutputStream getMockOs() {
-        return (MBusTestOutputStream)os;
+        return (MBusTestOutputStream) os;
     }
 
     class Data {
@@ -100,10 +104,10 @@ public abstract class MockConnection extends Connection {
             synchronized (readLock) {
                 int result;
                 if (locked) {
-                    getLog().debug("ReadLock is locked ... will wait");
+                    log.fine("ReadLock is locked ... will wait");
                     try {
                         readLock.wait();
-                        getLog().debug("ReadLock released ... will read from is ");
+                        log.fine("ReadLock released ... will read from is ");
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -113,11 +117,11 @@ public abstract class MockConnection extends Connection {
                 }
                 result = buffer[readPtr++] & 0xFF;
                 if ((readPtr == buffer.length) && (buffer.length > 0)) {
-                    getLog().info(String.format("Readed from InputStream: %s", Decoder.bytes2Ascii(buffer)));
+                    log.info(String.format("Readed from InputStream: %s", Decoder.bytes2Ascii(buffer)));
                     this.locked = true;
                     lastByteReading(endWaitTime);
                 }
-                getLog().debug(String.format("Return from is.read 0x%08X", result));
+                log.fine(String.format("Return from is.read 0x%08X", result));
                 return result;
             }
         }
@@ -125,23 +129,23 @@ public abstract class MockConnection extends Connection {
         protected void releaseReadLock() {
             synchronized (readLock) {
                 if (buffer.length == 0) {
-                    getLog().info("Bufer is empty ReadLock NOT released");
+                    log.info("Bufer is empty ReadLock NOT released");
                     return;
                 }
                 locked = false;
                 readLock.notifyAll();
-                getLog().info("ReadLock released");
+                log.info("ReadLock released");
             }
         }
 
         public synchronized void setData(String string, long endWaitTime) {
-            getLog().info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
+            log.info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
             buffer = string != null ? Decoder.ascii2Bytes(string) : new byte[0];
             readPtr = 0;
             this.endWaitTime = endWaitTime;
             synchronized (readLock) {
                 this.locked = true;
-                getLog().info("ReadLock set");
+                log.info("ReadLock set");
             }
         }
     }
@@ -156,14 +160,14 @@ public abstract class MockConnection extends Connection {
         }
 
         public void setData(String data) {
-            getLog().info(String.format("Set OutputStream buffer: %s", data));
+            log.info(String.format("Set OutputStream buffer: %s", data));
             ptr = 0;
             expected = data != null ? Decoder.ascii2Bytes(data) : new byte[0];
         }
 
         @Override
         public synchronized void write(int b) throws IOException {
-            getLog().debug(String.format("Write to OutputStream: 0x%02X", b & 0xFF));
+            log.fine(String.format("Write to OutputStream: 0x%02X", b & 0xFF));
             if (ptr > expected.length - 1) {
                 ptr++;
                 throw new IOException(String.format("%s at outside pos: %d was: 0x%02x ", Decoder.bytes2Ascii(expected), ptr - 1, b & 0xFF));
@@ -175,7 +179,7 @@ public abstract class MockConnection extends Connection {
             }
             ptr++;
             if (expected.length == ptr) {
-                getLog().info(String.format("Written to OutputStream: %s", Decoder.bytes2Ascii(expected)));
+                log.info(String.format("Written to OutputStream: %s", Decoder.bytes2Ascii(expected)));
                 lastByteWriting();
             }
         }
@@ -201,8 +205,6 @@ public abstract class MockConnection extends Connection {
     protected abstract void lastByteReading(long endWaitTime) throws IOException;
 
     protected abstract void lastByteWriting() throws IOException;
-
-    protected abstract Logger getLog();
 
     public boolean isOK() {
         return data.isEmpty() && getMockIs().isOK() && getMockOs().isOK();

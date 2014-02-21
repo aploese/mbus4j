@@ -1,31 +1,35 @@
+package net.sf.mbus4j.decoder;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.decoder;
-
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -43,9 +47,7 @@ import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
@@ -61,8 +63,8 @@ public class Decoder {
     }
 
     private void printLoggedData() {
-        if (log.isTraceEnabled()) {
-            log.trace("Parsed Data: " + bytes2Ascii(loggedPackage));
+        if (log.isLoggable(Level.FINEST)) {
+            log.log(Level.FINEST, "Parsed Data: {0}", new Object[]{bytes2Ascii(loggedPackage)});
             loggedPackage = new byte[0];
         }
     }
@@ -104,16 +106,16 @@ public class Decoder {
         END_SIGN,
         ERROR;
     }
-    private final static Logger log = LoggerFactory.getLogger(Decoder.class);
+    private final static Logger log = LogUtils.getDecoderLogger();
     public static final byte EXTENTION_BIT = (byte) 0x80;
 
     public static byte[] ascii2Bytes(String s) {
         byte[] result = new byte[s.length() / 2];
 
         for (int i = 0; i < (s.length() / 2); i++) {
-            result[i] =
-                    (byte) Integer.parseInt(s.substring(i * 2, (i * 2) + 2),
-                    16);
+            result[i]
+                    = (byte) Integer.parseInt(s.substring(i * 2, (i * 2) + 2),
+                            16);
         }
 
         return result;
@@ -142,7 +144,7 @@ public class Decoder {
     }
 
     public Frame addByte(final byte b) {
-        if (log.isTraceEnabled()) {
+        if (log.isLoggable(Level.FINEST)) {
             loggedPackage = Arrays.copyOf(loggedPackage, loggedPackage.length + 1);
             loggedPackage[loggedPackage.length - 1] = b;
         }
@@ -255,7 +257,9 @@ public class Decoder {
 
                 if (parsingFrame instanceof PrimaryAddress) {
                     ((PrimaryAddress) parsingFrame).setAddress(b);
-                    log.debug(String.format("Primary Address: 0x%02X", b));
+                    if (log.isLoggable(Level.FINER)) {
+                        log.finer(String.format("Primary Address: 0x%02X", b));
+                    }
                 } else {
                     setState(DecodeState.ERROR);
                     throw new NotSupportedException("Cant set Address!");
@@ -325,10 +329,10 @@ public class Decoder {
                 if (stack.isFull()) {
                     if (parsingFrame instanceof SelectionOfSlaves) {
                         getSelectionOfSlaves().setBcdMaskedId(stack.popInteger(4));
-                        log.debug(String.format("Ident Number: 0x%08X", getSelectionOfSlaves().getBcdMaskedId()));
+                        log.finest(String.format("Ident Number: 0x%08X", getSelectionOfSlaves().getBcdMaskedId()));
                     } else {
                         getUserDataResponse().setIdentNumber(stack.popBcdInteger(8));
-                        log.debug(String.format("Ident Number: 0x%08d", getUserDataResponse().getIdentNumber()));
+                        log.finest(String.format("Ident Number: 0x%08d", getUserDataResponse().getIdentNumber()));
                     }
 
                     stack.init(2);
@@ -343,10 +347,10 @@ public class Decoder {
                 if (stack.isFull()) {
                     if (parsingFrame instanceof SelectionOfSlaves) {
                         getSelectionOfSlaves().setMaskedMan(stack.popShort());
-                        log.debug(String.format("Man: 0x%04X", getSelectionOfSlaves().getMaskedMan()));
+                        log.finest(String.format("Man: 0x%04X", getSelectionOfSlaves().getMaskedMan()));
                     } else {
                         getUserDataResponse().setManufacturer(stack.popMan());
-                        log.debug(String.format("Man: %s", getUserDataResponse().getManufacturer()));
+                        log.finest(String.format("Man: %s", getUserDataResponse().getManufacturer()));
                     }
 
                     stack.clear();
@@ -359,10 +363,10 @@ public class Decoder {
 
                 if (parsingFrame instanceof SelectionOfSlaves) {
                     getSelectionOfSlaves().setMaskedVersion((byte) (b & 0xFF));
-                    log.debug(String.format("Version: 0x%02X", getSelectionOfSlaves().getMaskedVersion()));
+                    log.finest(String.format("Version: 0x%02X", getSelectionOfSlaves().getMaskedVersion()));
                 } else {
                     getUserDataResponse().setVersion((byte) (b & 0x00FF));
-                    log.debug(String.format("Version: 0x%02X", getUserDataResponse().getVersion()));
+                    log.finest(String.format("Version: 0x%02X", getUserDataResponse().getVersion()));
                 }
 
                 setState(DecodeState.MEDIUM);
@@ -374,10 +378,10 @@ public class Decoder {
                 if (parsingFrame instanceof SelectionOfSlaves) {
                     getSelectionOfSlaves().setMaskedMedium((byte) (b & 0xFF));
                     setState(DecodeState.CHECKSUM);
-                    log.debug(String.format("Medium: 0x%02X", getSelectionOfSlaves().getMaskedMedium()));
+                    log.finest(String.format("Medium: 0x%02X", getSelectionOfSlaves().getMaskedMedium()));
                 } else {
                     getUserDataResponse().setMedium(MBusMedium.valueOf(b));
-                    log.debug(String.format("Medium: %s", getUserDataResponse().getMedium().getLabel()));
+                    log.finest(String.format("Medium: %s", getUserDataResponse().getMedium().getLabel()));
                     setState(DecodeState.ACCESS_NUMBER);
                 }
 
@@ -683,8 +687,8 @@ public class Decoder {
         if (DecodeState.ERROR.equals(state)) {
             printLoggedData();
         }
-        if (log.isTraceEnabled()) {
-            log.trace(String.format("%s => %s", oldState, state));
+        if (log.isLoggable(Level.FINER)) {
+            log.log(Level.FINER, "{0} => {1}", new Object[]{oldState, state});
         }
     }
 }

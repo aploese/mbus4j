@@ -1,29 +1,32 @@
+package net.sf.mbus4j.master.ui;
+
 /*
+ * #%L
+ * mbus4j-master-ui
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.master.ui;
 
 import java.util.logging.Level;
 
@@ -34,9 +37,6 @@ import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.Task;
 import org.jdesktop.application.TaskMonitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -44,6 +44,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.swing.Icon;
 import javax.swing.JDialog;
@@ -64,6 +65,7 @@ import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.devices.GenericDevice;
 import net.sf.mbus4j.devices.Sender;
+import net.sf.mbus4j.log.LogUtils;
 import net.sf.mbus4j.master.MBusMaster;
 
 /**
@@ -72,7 +74,7 @@ import net.sf.mbus4j.master.MBusMaster;
 public class MBusMasterUiView
         extends FrameView {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MBusMasterUiView.class);
+    private static final Logger LOG = LogUtils.getMasterLogger();
 
     public MBusMasterUiView(SingleFrameApplication app) {
         super(app);
@@ -82,15 +84,15 @@ public class MBusMasterUiView
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
-        messageTimer =
-                new Timer(messageTimeout,
-                new ActionListener() {
+        messageTimer
+                = new Timer(messageTimeout,
+                        new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        statusMessageLabel.setText("");
-                    }
-                });
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                statusMessageLabel.setText("");
+                            }
+                        });
         messageTimer.setRepeats(false);
 
         int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
@@ -99,16 +101,16 @@ public class MBusMasterUiView
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
         }
 
-        busyIconTimer =
-                new Timer(busyAnimationRate,
-                new ActionListener() {
+        busyIconTimer
+                = new Timer(busyAnimationRate,
+                        new ActionListener() {
 
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-                        statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
-                    }
-                });
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
+                                statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
+                            }
+                        });
         idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
         statusAnimationLabel.setIcon(idleIcon);
         progressBar.setVisible(false);
@@ -177,10 +179,10 @@ public class MBusMasterUiView
         MBusMasterUI.getApplication().show(aboutBox);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -490,9 +492,9 @@ public class MBusMasterUiView
             getMaster().close();
             //TODO QAD
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "searchDevicesSecondaryAddressing", ex);
         } catch (InterruptedException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "searchDevicesSecondaryAddressing", ex);
         } finally {
         }
     }
@@ -523,9 +525,9 @@ public class MBusMasterUiView
             getMaster().close();
             //TODO QAD
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "sendReqToDevice", ex);
         } catch (InterruptedException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "sendReqToDevice", ex);
         } finally {
         }
     }
@@ -537,7 +539,6 @@ public class MBusMasterUiView
 
     private class SearchDevicesTask extends org.jdesktop.application.Task<Object, Void> {
 
-
         SearchDevicesTask(org.jdesktop.application.Application app) {
             // Runs on the EDT.  Copy GUI state that
             // doInBackground() depends on from parameters
@@ -546,7 +547,7 @@ public class MBusMasterUiView
             try {
                 getMaster().open();
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "SearchDevicesTask", ex);
             }
             SearchDeviceFrame sdf = new SearchDeviceFrame();
             sdf.addCloseListenewr(new ActionListener() {
@@ -557,9 +558,7 @@ public class MBusMasterUiView
                         getMaster().close();
                         //TODO QAD
                     } catch (IOException ex) {
-                        java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InterruptedException ex) {
-                        java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                        LOG.log(Level.SEVERE, "SearchDevicesTask.actionPerformed", ex);
                     }
                 }
             });
@@ -593,14 +592,14 @@ public class MBusMasterUiView
                 devicesList.setSelectedIndex(0);
             }
         } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "openLast", ex);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "openLast", ex);
         } finally {
             try {
                 in.close();
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "openLast close", ex);
             }
         }
     }
@@ -651,14 +650,14 @@ public class MBusMasterUiView
             os.flush();
             os.close();
         } catch (FileNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "save", ex);
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, "save", ex);
         } finally {
             try {
                 os.close();
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "save close", ex);
             }
         }
     }
@@ -669,27 +668,32 @@ public class MBusMasterUiView
     }
 
     private class SearchBySecondaryAddressingTask extends org.jdesktop.application.Task<Object, Void> {
+
         SearchBySecondaryAddressingTask(org.jdesktop.application.Application app) {
             // Runs on the EDT.  Copy GUI state that
             // doInBackground() depends on from parameters
             // to SearchBySecondaryAddressingTask fields, here.
             super(app);
         }
-        @Override protected Object doInBackground() {
+
+        @Override
+        protected Object doInBackground() {
             try {
                 getMaster().open();
                 getMaster().searchDevicesBySecondaryAddressing(1);
                 getMaster().close();
                 return getMaster(); // return your result
             } catch (InterruptedException ex) {
-                java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "doInBackground", ex);
                 return ex;
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(MBusMasterUiView.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, "doInBackground", ex);
                 return ex;
             }
         }
-        @Override protected void succeeded(Object result) {
+
+        @Override
+        protected void succeeded(Object result) {
             if (result instanceof MBusMaster) {
 //                setMaster((MBusMaster)result);
             }

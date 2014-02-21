@@ -1,54 +1,53 @@
+package net.sf.mbus4j.decoder;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.decoder;
-
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.dataframes.datablocks.BigDecimalDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateAndTimeDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.DateDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.EmptyDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.EnhancedIdentificationDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.IntegerDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.RawDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.ReadOutDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.RealDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
-import net.sf.mbus4j.dataframes.datablocks.VariableLengthDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 import net.sf.mbus4j.dataframes.datablocks.dif.VariableLengthType;
 import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
-import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
@@ -59,9 +58,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
@@ -73,9 +70,7 @@ public class VariableDataBlockDecoder {
     private void createDataBlock() {
         try {
             db = DataBlock.getDataBlockClass(vif, vifes, dfc, variableLengthType).newInstance();
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
+        } catch (IllegalAccessException | InstantiationException ex) {
             throw new RuntimeException(ex);
         }
         db.setVif(vif);
@@ -83,9 +78,9 @@ public class VariableDataBlockDecoder {
         if (vifes == null) {
             db.clearVifes();
         } else {
-            for (int i = 0; i < vifes.length; i++) {
-            db.addVife(vifes[i]);
-        }
+            for (Vife vife : vifes) {
+                db.addVife(vife);
+            }
         }
         db.setStorageNumber(storageNumber);
         db.setTariff(tariff);
@@ -110,7 +105,7 @@ public class VariableDataBlockDecoder {
         ERROR,
         RESULT_AVAIL;
     }
-    private final static Logger LOG = LoggerFactory.getLogger(VariableDataBlockDecoder.class);
+    private final static Logger LOG = LogUtils.getDecoderLogger();
     private DecodeState ds;
     private int difePos;
     private ObjectAction objectAction;
@@ -124,7 +119,7 @@ public class VariableDataBlockDecoder {
     private Vife[] vifes;
     private DataBlock db;
     private LongFrame frame;
-    private Stack stack = new Stack();
+    private final Stack stack = new Stack();
 
     public VariableDataBlockDecoder() {
         super();
@@ -211,7 +206,7 @@ public class VariableDataBlockDecoder {
                 break;
 
             default:
-                LOG.error("Unknown state: " + ds);
+                LOG.log(Level.SEVERE, "Unknown state: {0}", ds);
                 setState(DecodeState.ERROR);
         }
 
@@ -220,7 +215,7 @@ public class VariableDataBlockDecoder {
 
     /**
      *
-     * @param dataField lengt encoding see table 5 chapter 6.3
+     * @param dataField length encoding see table 5 chapter 6.3
      */
     private void decodeDif(final byte dataField) {
         switch (dataField) {
@@ -320,7 +315,7 @@ public class VariableDataBlockDecoder {
                 try {
                     decodeDif((byte) (b & 0x0F));
                 } catch (Exception e) {
-                    LOG.error("HALLO: " + b);
+                    LOG.log(Level.SEVERE, "HALLO: {0}", b);
                     throw new RuntimeException(e);
                 }
 
@@ -376,7 +371,7 @@ public class VariableDataBlockDecoder {
     }
 
     private void decodeValueFromStack() {
-       createDataBlock();
+        createDataBlock();
         switch (dfc) {
             case NO_DATA:
                 break;
@@ -490,7 +485,7 @@ public class VariableDataBlockDecoder {
             case _64_BIT_INTEGER:
 
                 if (db instanceof EnhancedIdentificationDataBlock) {
-                    decodeEnhancedIdentificationDataBlock((EnhancedIdentificationDataBlock)db);
+                    decodeEnhancedIdentificationDataBlock((EnhancedIdentificationDataBlock) db);
                 } else {
                     ((LongDataBlock) db).setValue(stack.popLong());
                 }
@@ -526,8 +521,9 @@ public class VariableDataBlockDecoder {
 
     /**
      * see chapter 8.4.3
-     * @param b
-     * b will be expanded to int, so clear the sign, wich will be nagative in the case extention bit is set
+     *
+     * @param b b will be expanded to int, so clear the sign, wich will be
+     * nagative in the case extention bit is set
      */
     private void decodeVIF(final byte b) {
         switch (b & ~Decoder.EXTENTION_BIT) {
@@ -641,7 +637,7 @@ public class VariableDataBlockDecoder {
         if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.VIFE);
         } else {
-            if ((dfc == DataFieldCode.SELECTION_FOR_READOUT) || (dfc == DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST)){
+            if ((dfc == DataFieldCode.SELECTION_FOR_READOUT) || (dfc == DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST)) {
                 createDataBlock();
                 setState(DecodeState.RESULT_AVAIL);
             } else {
@@ -676,9 +672,7 @@ public class VariableDataBlockDecoder {
         DecodeState oldState = this.ds;
         this.ds = ds;
 
-        if (LOG.isTraceEnabled()) {
-            LOG.trace(String.format("%s => %s", oldState, ds));
-        }
+        LOG.log(Level.FINER, "{0} => {1}", new Object[]{oldState, ds});
     }
 
     private void startCollectingValue() {

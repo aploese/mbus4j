@@ -1,30 +1,32 @@
+package net.sf.mbus4j.decoder;
+
 /*
+ * #%L
+ * mbus4j-core
+ * %%
+ * Copyright (C) 2009 - 2014 MBus4J
+ * %%
  * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2010, mbus4j.sf.net, and individual contributors as indicated
+ * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- *
+ * 
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- *
+ * 
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- *
- * @author Arne Plöse
- *
+ * #L%
  */
-package net.sf.mbus4j.decoder;
-
 import net.sf.mbus4j.dataframes.Frame;
 
 import static org.junit.Assert.assertEquals;
@@ -262,95 +264,95 @@ public class UserDataResponseTest {
         resultStr.close();
 
         assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
-   }
+    }
 
-        @Test
+    @Test
     public void testBCD() throws Exception {
-            UserDataResponse udr = new UserDataResponse();
-            udr.setManufacturer("BCD");
-            udr.setMedium(MBusMedium.OTHER);
-            udr.setStatus(new UserDataResponse.StatusCode[] {UserDataResponse.StatusCode.APPLICATION_NO_ERROR});
+        UserDataResponse udr = new UserDataResponse();
+        udr.setManufacturer("BCD");
+        udr.setMedium(MBusMedium.OTHER);
+        udr.setStatus(new UserDataResponse.StatusCode[]{UserDataResponse.StatusCode.APPLICATION_NO_ERROR});
 
-            ByteDataBlock bdb = new ByteDataBlock();
-            bdb.setDataFieldCode(DataFieldCode._2_DIGIT_BCD);
-            bdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            bdb.setVif(VifPrimary.ENERGY_J_E_0);
-            bdb.setValue((byte)-1);
-            udr.addDataBlock(bdb);
-            bdb = new ByteDataBlock();
-            bdb.setDataFieldCode(DataFieldCode._2_DIGIT_BCD);
-            bdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            bdb.setVif(VifPrimary.ENERGY_J_E_0);
-            bdb.setBcdError("-E");
-            udr.addDataBlock(bdb);
-            ShortDataBlock sdb = new ShortDataBlock();
-            sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
-            sdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            sdb.setVif(VifPrimary.ENERGY_J_E_0);
-            sdb.setValue((short)-1);
-            udr.addDataBlock(sdb);
-            sdb = new ShortDataBlock();
-            sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
-            sdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            sdb.setVif(VifPrimary.ENERGY_J_E_0);
-            sdb.setBcdError("-EE-");
-            udr.addDataBlock(sdb);
-            IntegerDataBlock idb = new IntegerDataBlock();
-            idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
-            idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setValue(-1);
-            udr.addDataBlock(idb);
-            idb = new IntegerDataBlock();
-            idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
-            idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setBcdError("--EE  ");
-            udr.addDataBlock(idb);
-            idb = new IntegerDataBlock();
-            idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
-            idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setValue(-1);
-            udr.addDataBlock(idb);
-            idb = new IntegerDataBlock();
-            idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
-            idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            idb.setVif(VifPrimary.ENERGY_J_E_0);
-            idb.setBcdError("--EE  CC");
-            udr.addDataBlock(idb);
-            LongDataBlock ldb = new LongDataBlock();
-            ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
-            ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            ldb.setVif(VifPrimary.ENERGY_J_E_0);
-            ldb.setValue(-1);
-            udr.addDataBlock(ldb);
-            ldb = new LongDataBlock();
-            ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
-            ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            ldb.setVif(VifPrimary.ENERGY_J_E_0);
-            ldb.setBcdError("--EE  CCbbAA");
-            udr.addDataBlock(ldb);
-            ldb = new LongDataBlock();
-            ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
-            ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
-            ldb.setStorageNumber(1);
-            ldb.setVif(VifPrimary.ENERGY_J_E_0);
-            ldb.setBcdError("00--EE  CC90");
-            udr.addDataBlock(ldb);
+        ByteDataBlock bdb = new ByteDataBlock();
+        bdb.setDataFieldCode(DataFieldCode._2_DIGIT_BCD);
+        bdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        bdb.setVif(VifPrimary.ENERGY_J_E_0);
+        bdb.setValue((byte) -1);
+        udr.addDataBlock(bdb);
+        bdb = new ByteDataBlock();
+        bdb.setDataFieldCode(DataFieldCode._2_DIGIT_BCD);
+        bdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        bdb.setVif(VifPrimary.ENERGY_J_E_0);
+        bdb.setBcdError("-E");
+        udr.addDataBlock(bdb);
+        ShortDataBlock sdb = new ShortDataBlock();
+        sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
+        sdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        sdb.setVif(VifPrimary.ENERGY_J_E_0);
+        sdb.setValue((short) -1);
+        udr.addDataBlock(sdb);
+        sdb = new ShortDataBlock();
+        sdb.setDataFieldCode(DataFieldCode._4_DIGIT_BCD);
+        sdb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        sdb.setVif(VifPrimary.ENERGY_J_E_0);
+        sdb.setBcdError("-EE-");
+        udr.addDataBlock(sdb);
+        IntegerDataBlock idb = new IntegerDataBlock();
+        idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
+        idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        idb.setVif(VifPrimary.ENERGY_J_E_0);
+        idb.setValue(-1);
+        udr.addDataBlock(idb);
+        idb = new IntegerDataBlock();
+        idb.setDataFieldCode(DataFieldCode._6_DIGIT_BCD);
+        idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        idb.setVif(VifPrimary.ENERGY_J_E_0);
+        idb.setBcdError("--EE  ");
+        udr.addDataBlock(idb);
+        idb = new IntegerDataBlock();
+        idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
+        idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        idb.setVif(VifPrimary.ENERGY_J_E_0);
+        idb.setValue(-1);
+        udr.addDataBlock(idb);
+        idb = new IntegerDataBlock();
+        idb.setDataFieldCode(DataFieldCode._8_DIGIT_BCD);
+        idb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        idb.setVif(VifPrimary.ENERGY_J_E_0);
+        idb.setBcdError("--EE  CC");
+        udr.addDataBlock(idb);
+        LongDataBlock ldb = new LongDataBlock();
+        ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
+        ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        ldb.setVif(VifPrimary.ENERGY_J_E_0);
+        ldb.setValue(-1);
+        udr.addDataBlock(ldb);
+        ldb = new LongDataBlock();
+        ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
+        ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        ldb.setVif(VifPrimary.ENERGY_J_E_0);
+        ldb.setBcdError("--EE  CCbbAA");
+        udr.addDataBlock(ldb);
+        ldb = new LongDataBlock();
+        ldb.setDataFieldCode(DataFieldCode._12_DIGIT_BCD);
+        ldb.setFunctionField(FunctionField.INSTANTANEOUS_VALUE);
+        ldb.setStorageNumber(1);
+        ldb.setVif(VifPrimary.ENERGY_J_E_0);
+        ldb.setBcdError("00--EE  CC90");
+        udr.addDataBlock(ldb);
 
-            System.out.print(udr);
-            JSONObject jsonUdr = udr.toJSON(JsonSerializeType.ALL);
-            System.out.print(jsonUdr.toString(1));
-            UserDataResponse udr1 = (UserDataResponse)JSONFactory.createFrame(jsonUdr);
-            udr1.fromJSON(jsonUdr);
-            System.out.print(udr1);
-            
-            assertEquals(udr.toString(), udr1.toString());
+        System.out.print(udr);
+        JSONObject jsonUdr = udr.toJSON(JsonSerializeType.ALL);
+        System.out.print(jsonUdr.toString(1));
+        UserDataResponse udr1 = (UserDataResponse) JSONFactory.createFrame(jsonUdr);
+        udr1.fromJSON(jsonUdr);
+        System.out.print(udr1);
 
-            Encoder enc = new Encoder();
-            byte[] data = enc.encode(udr);
-            System.out.print(Decoder.bytes2Ascii(data));
+        assertEquals(udr.toString(), udr1.toString());
+
+        Encoder enc = new Encoder();
+        byte[] data = enc.encode(udr);
+        System.out.print(Decoder.bytes2Ascii(data));
 
         try {
             for (byte b : data) {
@@ -364,8 +366,7 @@ public class UserDataResponseTest {
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
         assertNotNull("DataValue not available", instance.getFrame());
         assertEquals(udr.toString(), instance.getFrame().toString());
-        }
-
+    }
 
     @Test
     public void testUnknown() throws Exception {

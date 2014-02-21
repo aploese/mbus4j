@@ -12,24 +12,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.rxtx</groupId>
-            <artifactId>rxtx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jdesktop</groupId>
@@ -56,10 +40,6 @@
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
         </dependency>
     </dependencies>
@@ -78,7 +58,7 @@
                     <!-- set alternative assemble directory -->
                     <assembleDirectory>${project.build.directory}/slaves-ui</assembleDirectory>
                     <!-- Extra JVM arguments that will be included in the bin scripts -->
-                    <extraJvmArguments>-javaagent:repo/aspectjweaver-1.6.11.jar</extraJvmArguments>
+                    <extraJvmArguments>-javaagent:repo/aspectjweaver-${aspectj.version}.jar</extraJvmArguments>
                     <!-- Generate bin scripts for windows and unix pr default -->
                     <platforms>
                         <platform>windows</platform>
@@ -125,7 +105,7 @@
 
     <!--
 <plugin>  <artifactId>maven-surefire-plugin</artifactId>  <configuration>  <forkMode>once</forkMode>
-<argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/1.6.11/aspectjweaver-1.6.11.jar</argLine> </configuration> </plugin>
+<argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine> </configuration> </plugin>
 
     -->
 </project>
