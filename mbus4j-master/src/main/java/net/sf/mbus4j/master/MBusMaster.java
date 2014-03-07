@@ -201,7 +201,10 @@ public class MBusMaster
                         log.log(Level.INFO, "finished waiting for packages", e);
                     }
                 }
+            } catch (Throwable t) {
+                 log.log(Level.SEVERE, "END", t);
             } finally {
+            log.fine("READ TREAD STOPPED");
                 parser.reset();
             }
         }
@@ -283,13 +286,24 @@ public class MBusMaster
     @Override
     public void close() throws IOException {
         if (conn != null) {
+            log.fine("TRY CLOSING");
             conn.close();
+            log.fine("CLOSED");
+/* TODO thread.interrrupt does not work in native posix blocking read ...
             try {
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException ex) {
                 throw new IOException(ex);
             }
+            log.fine("Do INterrupt");
             t.interrupt();
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException ex) {
+                throw new IOException(ex);
+            }
+            */
+            t = null;
         }
     }
 
@@ -492,7 +506,7 @@ public class MBusMaster
     public Closeable open() throws IOException {
         conn.open();
         t = new Thread(streamListener);
-        t.setDaemon(true);
+       // t.setDaemon(true);
         t.start();
         return this;
     }
