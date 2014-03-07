@@ -19,6 +19,12 @@
             <groupId>jssc</groupId>
             <artifactId>jssc</artifactId>
         </dependency-->
+        
+        <dependency>
+            <groupId>net.sf.atmodem4j</groupId>
+            <artifactId>spsw-java</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>

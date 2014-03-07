@@ -30,7 +30,13 @@ package net.sf.mbus4j;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import net.sf.mbus4j.serial.SerialStreamFactory;
+import java.util.Set;
+import net.sf.atmodem4j.spsw.Baudrate;
+import net.sf.atmodem4j.spsw.DataBits;
+import net.sf.atmodem4j.spsw.FlowControl;
+import net.sf.atmodem4j.spsw.Parity;
+import net.sf.atmodem4j.spsw.SerialPortSocket;
+import net.sf.atmodem4j.spsw.StopBits;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.json.JsonSerializeType;
 
@@ -43,12 +49,13 @@ public class SerialPortConnection extends Connection {
     static final String SERIAL_CONNECTION = "serialConnection";
 
     public static final int DEFAULT_RESPONSE_TIMEOUT_OFFSET = 50;
-    public static final int FLOW_CONTROL = SerialStreamFactory.FLOWCONTROL_NONE;
-    public static final SerialStreamFactory.DataBits DATABITS = SerialStreamFactory.DataBits.DB_8;
-    public static final SerialStreamFactory.StopBits STOPBITS = SerialStreamFactory.StopBits.SB_1;
-    public static final SerialStreamFactory.Parity PARITY = SerialStreamFactory.Parity.EVEN;
-    private SerialStreamFactory sPort;
+    public static final Set<FlowControl> FLOW_CONTROL = FlowControl.getFC_NONE();
+    public static DataBits DATA_BITS = DataBits.DB_8;
+    public static StopBits STOP_BITS = StopBits.SB_1;
+    public static Parity PARITY = Parity.EVEN;
+
     private String portName;
+    private SerialPortSocket sPort;
 
     public SerialPortConnection() {
         super(DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
@@ -68,11 +75,8 @@ public class SerialPortConnection extends Connection {
     public void open() throws IOException {
         try {
             setConnState(State.OPENING);
-            sPort = new SerialStreamFactory(portName);
-            sPort.open();
-            sPort.setParams(getBitPerSecond(), DATABITS, STOPBITS, PARITY, false, false);
-//            sPort.setFlowControlMode(FLOW_CONTROL);
-            // load here to sppeddup furher access!!!
+            sPort = SerialPortSocket.FACTORY.createSerialPortSocket(portName);
+            sPort.openRaw(Baudrate.fromValue(getBitPerSecond()), DATA_BITS, STOP_BITS, PARITY, FlowControl.getFC_NONE());
             is = sPort.getInputStream();
             os = sPort.getOutputStream();
 
@@ -160,28 +164,28 @@ public class SerialPortConnection extends Connection {
     /**
      * @return the dataBits
      */
-    public SerialStreamFactory.DataBits getDataBits() {
-        return DATABITS;
+    public DataBits getDataBits() {
+        return DATA_BITS;
     }
 
     /**
      * @return the flowControl
      */
-    public int getFlowControl() {
+    public Set<FlowControl> getFlowControl() {
         return FLOW_CONTROL;
     }
 
     /**
      * @return the stopBits
      */
-    public SerialStreamFactory.StopBits getStopBits() {
-        return STOPBITS;
+    public StopBits getStopBits() {
+        return STOP_BITS;
     }
 
     /**
      * @return the parity
      */
-    public SerialStreamFactory.Parity getParity() {
+    public Parity getParity() {
         return PARITY;
     }
 

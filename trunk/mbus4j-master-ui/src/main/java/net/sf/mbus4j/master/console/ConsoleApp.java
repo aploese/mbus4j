@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.atmodem4j.spsw.SerialPortSocket;
 import net.sf.mbus4j.MBusUtils;
 
 import org.apache.commons.cli.CommandLine;
@@ -67,6 +68,7 @@ public class ConsoleApp {
      */
     public ConsoleApp() {
         super();
+        
     }
 
     /**
@@ -216,6 +218,7 @@ public class ConsoleApp {
 //                    System.out.println("FOUND SLAVES: " + master.sendSlaveSelect(bcdId, manufacturer, version, medium, 1));
                     master.widcardSearch(bcdId, manufacturer, version, medium, 3);
                     Thread.sleep(1000 * 5); // 20 sec
+                    LOG.info("Reading done - Closing down");
                 }
                 if (cmd.hasOption("json")) {
                     System.out.print(master.toJSON(JsonSerializeType.ALL).toString(2));
@@ -245,6 +248,7 @@ public class ConsoleApp {
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "Error", e);
         }
+            LOG.log(Level.INFO, "Finished!");
     }
 
     private static void printHelp(Options opts) {
