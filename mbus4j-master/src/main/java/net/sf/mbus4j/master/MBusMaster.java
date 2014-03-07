@@ -286,9 +286,9 @@ public class MBusMaster
     @Override
     public void close() throws IOException {
         if (conn != null) {
-            log.fine("TRY CLOSING");
+            log.info("TRY CLOSING");
             conn.close();
-            log.fine("CLOSED");
+            log.info("CLOSED");
 /* TODO thread.interrrupt does not work in native posix blocking read ...
             try {
                 Thread.sleep(10);
@@ -506,7 +506,7 @@ public class MBusMaster
     public Closeable open() throws IOException {
         conn.open();
         t = new Thread(streamListener);
-       // t.setDaemon(true);
+        t.setDaemon(true);
         t.start();
         return this;
     }
