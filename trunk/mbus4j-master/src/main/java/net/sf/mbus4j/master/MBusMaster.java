@@ -158,6 +158,7 @@ public class MBusMaster
 
         @Override
         public void run() {
+           log.info("Thread MBus StreamListener Started");
             try {
                 int theData;
                 try {
@@ -186,6 +187,7 @@ public class MBusMaster
                             }
                         }
                     }
+                    log.info("Thread MBus StreamListener Will stop");
 
                     log.info("closing down - finish waiting for new data");
                 } catch (IOException e) {
@@ -204,7 +206,7 @@ public class MBusMaster
             } catch (Throwable t) {
                  log.log(Level.SEVERE, "END", t);
             } finally {
-            log.fine("READ TREAD STOPPED");
+            log.info("Thread MBus StreamListener Stopped");
                 parser.reset();
             }
         }
@@ -411,7 +413,8 @@ public class MBusMaster
                 Thread.sleep(getIdleTime());
             }
         }
-        log.log(Level.INFO, "max tries({0}) reached .. aborting send to: {1} ", new Object[]{maxTries, frame});
+        log.log(Level.INFO, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, frame});
+        
         return null;
     }
 
@@ -633,7 +636,7 @@ public class MBusMaster
     public void readValues(ValueRequest<?> requests)
             throws IOException, InterruptedException {
         //Create devices if neccecary
-        HashMap<GenericDevice, MBusAddressing> deviceMap = new HashMap<GenericDevice, MBusAddressing>();
+        HashMap<GenericDevice, MBusAddressing> result = new HashMap<>();
 
         for (ValueRequestPointLocator locator : requests) {
             GenericDevice myDevice = getDevice(devices, locator);
@@ -648,16 +651,16 @@ public class MBusMaster
                 addDevice(myDevice);
             }
 
-            deviceMap.put(myDevice, locator.getAddressing());
+            result.put(myDevice, locator.getAddressing());
         }
 
         //get data from devices
         //TODO honor frames 
-        Map<GenericDevice, Frame> responses = sendRequestUserData(deviceMap);
+        Map<GenericDevice, Frame> responses = sendRequestUserData(result);
 
         //pack response
         for (ValueRequestPointLocator locator : requests) {
-            GenericDevice dev = getDevice(deviceMap.keySet(), locator);
+            GenericDevice dev = getDevice(result.keySet(), locator);
             DataBlock db = getDataBlock(responses.get(dev),
                     locator);
             locator.setDb(db);
