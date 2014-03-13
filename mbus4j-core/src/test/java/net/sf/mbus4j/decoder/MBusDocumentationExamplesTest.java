@@ -34,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
@@ -58,8 +60,10 @@ import org.junit.Test;
  * @version $Id: MBusDocumentationExamplesTest.java 18 2010-03-20 16:15:49Z
  * arnep $
  */
-public class MBusDocumentationExamplesTest {
+public class MBusDocumentationExamplesTest implements DecoderListener {
 
+    List<Frame> frames;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -67,6 +71,7 @@ public class MBusDocumentationExamplesTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
+    
     private Decoder instance;
 
     private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws Exception {
@@ -79,11 +84,11 @@ public class MBusDocumentationExamplesTest {
             instance.addByte(b);
         }
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
-        assertNotNull("DataValue not available", instance.getFrame());
-        assertEquals(clazz, instance.getFrame().getClass());
-        testJSON(instance.getFrame(), chapter, exampleIndex);
+        assertEquals("DataValue not available", 1, frames.size());
+        assertEquals(clazz, frames.get(0).getClass());
+        testJSON(frames.get(0), chapter, exampleIndex);
 //        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
-        BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
+        BufferedReader resultStr = new BufferedReader(new StringReader(frames.get(0).toString()));
         int line = 1;
         String dataLine = br.readLine();
         String parsedLine = resultStr.readLine();
@@ -101,11 +106,13 @@ public class MBusDocumentationExamplesTest {
 
     @Before
     public void setUp() {
-        instance = new Decoder();
+        frames = new ArrayList<>();
+        instance = new Decoder(this);
     }
 
     @After
     public void tearDown() {
+        frames = null;
         instance = null;
     }
 
@@ -195,11 +202,10 @@ public class MBusDocumentationExamplesTest {
     }
 
     public void testRequestClass2Data() throws Exception {
-        Frame dv = null;
         for (byte b : Decoder.ascii2Bytes("107BFE7916")) {
-            dv = instance.addByte(b);
+            instance.addByte(b);
         }
-        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());
+        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", frames.get(0).toString());
     }
 
     private void testJSON(Frame frame, String chapter, int exampleIndex) throws Exception {
@@ -225,6 +231,11 @@ public class MBusDocumentationExamplesTest {
         resultStr.close();
 
         assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
+    }
+
+    @Override
+    public void success(Frame parsingFrame) {
+        frames.add(parsingFrame);
     }
 
 }

@@ -36,6 +36,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -62,7 +64,7 @@ import org.junit.Test;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class UserDataResponseTest {
+public class UserDataResponseTest implements DecoderListener {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -72,13 +74,15 @@ public class UserDataResponseTest {
     public static void tearDownClass() throws Exception {
     }
     private Decoder instance;
+    private List<Frame> frames;
 
     public UserDataResponseTest() {
     }
 
     @Before
     public void setUp() {
-        instance = new Decoder();
+        frames = new ArrayList<>();
+        instance = new Decoder(this);
     }
 
     @After
@@ -127,7 +131,7 @@ public class UserDataResponseTest {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.err.println("PARSED PACKAGE DATA >>>>");
-            System.err.println(instance.getFrame().toString());
+            System.err.println(frames.get(0).toString());
             System.err.println("<<<< PARSED PACKAGE DATA");
             throw ex;
         }
@@ -154,13 +158,13 @@ public class UserDataResponseTest {
                 instance.addByte(b);
             }
         } catch (RuntimeException ex) {
-            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getFrame().toString()));
+            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", frames.get(0).toString()));
             throw ex;
         }
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
-        assertNotNull("DataValue not available", instance.getFrame());
-        testJSON(instance.getFrame(), man, deviceName);
-        BufferedReader resultStr = new BufferedReader(new StringReader(instance.getFrame().toString()));
+        assertEquals("DataValue not available", 1, frames.size());
+        testJSON(frames.get(0), man, deviceName);
+        BufferedReader resultStr = new BufferedReader(new StringReader(frames.get(0).toString()));
         int line = 1;
         String dataLine = br.readLine();
         String parsedLine = resultStr.readLine();
@@ -359,13 +363,13 @@ public class UserDataResponseTest {
                 instance.addByte(b);
             }
         } catch (RuntimeException ex) {
-            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getFrame().toString()));
+            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", frames.get(0).toString()));
             throw ex;
         }
-        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getFrame().toString()));
+        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", frames.get(0).toString()));
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
-        assertNotNull("DataValue not available", instance.getFrame());
-        assertEquals(udr.toString(), instance.getFrame().toString());
+        assertEquals("DataValue not available", 1, frames.size());
+        assertEquals(udr.toString(), frames.get(0).toString());
     }
 
     @Test
@@ -381,17 +385,17 @@ public class UserDataResponseTest {
         //final String dataStr = "";
         //final String dataStr = "";
         final byte[] data = Decoder.ascii2Bytes(dataStr);
-        try {
-            for (byte b : data) {
-                instance.addByte(b);
-            }
-        } catch (RuntimeException ex) {
-            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getFrame().toString()));
-            throw ex;
+        for (byte b : data) {
+            instance.addByte(b);
         }
-        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getFrame().toString()));
+        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", frames.get(0).toString()));
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
-        assertNotNull("DataValue not available", instance.getFrame());
+        assertNotNull("DataValue not available", frames.get(0));
+    }
+
+    @Override
+    public void success(Frame parsingFrame) {
+        frames.add(parsingFrame);
     }
 
 }

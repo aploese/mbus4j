@@ -27,10 +27,11 @@ package net.sf.mbus4j.slaves.ui;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-
 import java.awt.event.ActionListener;
+import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.decoder.Decoder;
+import net.sf.mbus4j.decoder.DecoderListener;
 import net.sf.mbus4j.slaves.Slave;
 import org.jdesktop.application.Action;
 
@@ -149,16 +150,22 @@ public class ParseBinaryPackageFrame extends javax.swing.JFrame {
 
     @Action
     public void parsePackage() {
-        Decoder decoder = new Decoder();
+        Decoder decoder = new Decoder(new DecoderListener() {
+
+            @Override
+            public void success(Frame frame) {
+                if (frame instanceof UserDataResponse) {
+                    Slave s = Slave.fromResponse((UserDataResponse) frame);
+                    slavePane1.setSlave(s);
+                } else {
+                    slavePane1.setSlave(null);
+                }
+            }
+
+        });
         byte[] data = Decoder.ascii2Bytes(binaryPackageTextField.getText());
         for (byte b : data) {
             decoder.addByte(b);
-        }
-        if (decoder.getFrame() instanceof UserDataResponse) {
-            Slave s = Slave.fromResponse((UserDataResponse) decoder.getFrame());
-            slavePane1.setSlave(s);
-        } else {
-            slavePane1.setSlave(null);
         }
     }
 

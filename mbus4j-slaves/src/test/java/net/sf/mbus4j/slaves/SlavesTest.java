@@ -83,6 +83,7 @@ public class SlavesTest {
      * Test of addSlave method, of class Slaves.
      */
     @Test(timeout = 10000)
+    @Ignore
     public void testUserDataResponse()
             throws Exception {
         System.out.println("userDataResponse");
