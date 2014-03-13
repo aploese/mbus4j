@@ -35,6 +35,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -44,6 +46,7 @@ import net.sf.mbus4j.dataframes.SetBaudrate;
 import net.sf.mbus4j.dataframes.SynchronizeAction;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.decoder.Decoder;
+import net.sf.mbus4j.decoder.DecoderListener;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -57,7 +60,7 @@ import org.junit.Test;
  * @version $Id: MBusDocumentationExamplesTest.java 18 2010-03-20 16:15:49Z
  * arnep $
  */
-public class MBusDocumentationExamplesTest {
+public class MBusDocumentationExamplesTest implements DecoderListener {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -68,6 +71,7 @@ public class MBusDocumentationExamplesTest {
     }
     private Decoder parser;
     private Encoder instance;
+    private List<Frame> frames;
 
     private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws IOException {
         System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
@@ -79,15 +83,16 @@ public class MBusDocumentationExamplesTest {
             parser.addByte(b);
         }
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, parser.getState());
-        assertNotNull("DataValue not available", parser.getFrame());
-        assertEquals(clazz, parser.getFrame().getClass());
-        byte[] result = instance.encode(parser.getFrame());
+        assertEquals("DataValue not available", 1, frames.size());
+        assertEquals(clazz, frames.get(0).getClass());
+        byte[] result = instance.encode(frames.get(0));
         assertArrayEquals(data, result);
     }
 
     @Before
     public void setUp() {
-        parser = new Decoder();
+        frames = new ArrayList<>();
+        parser = new Decoder(this);
         instance = new Encoder();
     }
 
@@ -183,10 +188,15 @@ public class MBusDocumentationExamplesTest {
     }
 
     public void testRequestClass2Data() throws Exception {
-        Frame dv = null;
         for (byte b : Decoder.ascii2Bytes("107BFE7916")) {
-            dv = parser.addByte(b);
+            parser.addByte(b);
         }
-        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", dv.toString());
+        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", frames.get(0).toString());
     }
+
+    @Override
+    public void success(Frame parsingFrame) {
+        frames.add(parsingFrame);
+    }
+
 }

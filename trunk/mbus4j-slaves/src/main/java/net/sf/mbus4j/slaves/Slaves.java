@@ -27,7 +27,6 @@ package net.sf.mbus4j.slaves;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-
 import java.io.UnsupportedEncodingException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -65,6 +64,7 @@ import java.util.logging.Logger;
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import net.sf.mbus4j.decoder.DecoderListener;
 import net.sf.mbus4j.log.LogUtils;
 
 /**
@@ -239,7 +239,7 @@ public class Slaves implements JSONSerializable {
     }
 
     private class StreamListener
-            implements Runnable {
+            implements Runnable, DecoderListener {
 
         ThreadPoolExecutor tpe
                 = new ThreadPoolExecutor(5, 20, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
@@ -249,7 +249,7 @@ public class Slaves implements JSONSerializable {
         public void run() {
             try {
                 int theData;
-                Decoder parser = new Decoder();
+                Decoder parser = new Decoder(this);
                 LOG.info("Wait for data to process");
 
                 try {
@@ -262,22 +262,7 @@ public class Slaves implements JSONSerializable {
                             }
 
                             try {
-                                Frame frame = parser.addByte((byte) theData);
-
-                                if (frame != null) {
-                                    if (LOG.isLoggable(Level.FINEST)) {
-                                        LOG.log(Level.FINEST, "Frame parsed ... will process: ", frame);
-                                    } else {
-                                        LOG.fine("Frame parsed ... will process");
-                                    }
-
-                                    for (Slave slave : slaves) {
-                                        if (slave.willHandleRequest(frame)) {
-                                            LOG.log(Level.FINE, "Frame will be handled by slave {}", slave.slaveIdToString());
-                                            tpe.submit(new RequestHandler(frame, slave));
-                                        }
-                                    }
-                                }
+                                parser.addByte((byte) theData);
                             } catch (Exception e) {
                                 LOG.log(Level.SEVERE, "Error during createPackage()", e);
                             }
@@ -298,6 +283,25 @@ public class Slaves implements JSONSerializable {
         private boolean isClosed() {
             return conn == null ? true : conn.getConnState().equals(Connection.State.CLOSED) || conn.getConnState().equals(Connection.State.CLOSING);
         }
+
+        @Override
+        public void success(Frame frame) {
+            if (frame != null) {
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.log(Level.FINEST, "Frame parsed ... will process: ", frame);
+                } else {
+                    LOG.fine("Frame parsed ... will process");
+                }
+
+                for (Slave slave : slaves) {
+                    if (slave.willHandleRequest(frame)) {
+                        LOG.log(Level.FINE, "Frame will be handled by slave {}", slave.slaveIdToString());
+                        tpe.submit(new RequestHandler(frame, slave));
+                    }
+                }
+            }
+        }
+
     }
     private static Logger LOG = LogUtils.getSlaveLogger();
 

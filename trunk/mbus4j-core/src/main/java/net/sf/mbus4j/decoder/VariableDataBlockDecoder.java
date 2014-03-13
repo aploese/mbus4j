@@ -213,6 +213,11 @@ public class VariableDataBlockDecoder {
         return ds;
     }
 
+    
+    public void reset() {
+        stack.clear();
+        setState(DecodeState.WAIT_FOR_INIT);
+    }
     /**
      *
      * @param dataField length encoding see table 5 chapter 6.3
@@ -672,7 +677,7 @@ public class VariableDataBlockDecoder {
         DecodeState oldState = this.ds;
         this.ds = ds;
 
-        LOG.log(Level.FINER, "{0} => {1}", new Object[]{oldState, ds});
+        LOG.log(Level.FINEST, "{0} => {1}", new Object[]{oldState, ds});
     }
 
     private void startCollectingValue() {

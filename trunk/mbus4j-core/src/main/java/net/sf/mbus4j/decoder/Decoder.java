@@ -56,33 +56,6 @@ import net.sf.mbus4j.log.LogUtils;
  */
 public class Decoder {
 
-    private boolean collectGarbage = false;
-
-    public void reset() {
-        setState(DecodeState.EXPECT_START);
-    }
-
-    private void printLoggedData() {
-        if (log.isLoggable(Level.FINEST)) {
-            log.log(Level.FINEST, "Parsed Data: {0}", new Object[]{bytes2Ascii(loggedPackage)});
-            loggedPackage = new byte[0];
-        }
-    }
-
-    /**
-     * @return the collectGarbage
-     */
-    public boolean isCollectGarbage() {
-        return collectGarbage;
-    }
-
-    /**
-     * @param collectGarbage the collectGarbage to set
-     */
-    public void setCollectGarbage(boolean collectGarbage) {
-        this.collectGarbage = collectGarbage;
-    }
-
     public enum DecodeState {
 
         EXPECT_START,
@@ -103,9 +76,9 @@ public class Decoder {
         SIGNATURE,
         VARIABLE_DATA_BLOCK,
         CHECKSUM,
-        END_SIGN,
-        ERROR;
+        END_SIGN;
     }
+
     private final static Logger log = LogUtils.getDecoderLogger();
     public static final byte EXTENTION_BIT = (byte) 0x80;
 
@@ -133,325 +106,345 @@ public class Decoder {
     private int expectedLengt;
     private byte checksum;
     private Frame parsingFrame;
-    private Stack stack = new Stack();
+    private final Stack stack = new Stack();
     private int dataPos;
     private byte start;
-    private VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
+    private final VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
     private DecodeState state = DecodeState.EXPECT_START;
-    private byte[] loggedPackage = new byte[0];
+    private final DecoderListener listener;
 
-    public Decoder() {
+    public Decoder(DecoderListener listener) {
+        this.listener = listener;
     }
 
-    public Frame addByte(final byte b) {
-        if (log.isLoggable(Level.FINEST)) {
-            loggedPackage = Arrays.copyOf(loggedPackage, loggedPackage.length + 1);
-            loggedPackage[loggedPackage.length - 1] = b;
-        }
+    public void addByte(final byte b) {
         checksum += b;
         dataPos++;
 
-        if (DecodeState.ERROR.equals(state)) {
-            if ((b == 0x10) || (b == 0x68) || (b == 0xE5)) {
-                setState(DecodeState.EXPECT_START);
-            } //try to recover
+        if (start != 0) {
+            if (expectedLengt == dataPos - 1) {
+                if (state != DecodeState.CHECKSUM) {
+                    log.fine("expectedLengt reached: data discarted!");
+                    reset();
+                    return;
+                }
+            }
         }
 
         switch (state) {
             case EXPECT_START:
-
-                if (b == 0x68) {
-                    parsingFrame = null;
-                    start = b;
-                    setState(DecodeState.LONG_LENGTH_1);
-                } else if (b == 0x10) {
-                    parsingFrame = null;
-                    start = b;
-                    setState(DecodeState.C_FIELD);
-                } else if ((b & 0xFF) == 0xE5) {
-                    parsingFrame = SingleCharFrame.SINGLE_CHAR_FRAME;
-                    printLoggedData();
-                    return parsingFrame;
-                } else {
-                    if (collectGarbage) {
-                        parsingFrame = new GarbageCharFrame(b);
-                        return parsingFrame;
-                    } else {
-                        log.info(String.format("State: %s expect package start (0x68|0x10|0xE5), but found: 0x%02x",
-                                state, b));
-                    }
+                switch (b & 0xFF) {
+                    case 0x68:
+                        dataPos = -3;
+                        parsingFrame = null;
+                        start = b;
+                        expectedLengt = 0xFF;//max possible
+                        setState(DecodeState.LONG_LENGTH_1);
+                        return;
+                    case 0x10:
+                        dataPos = -1;
+                        parsingFrame = null;
+                        start = b;
+                        expectedLengt = 2;
+                        setState(DecodeState.C_FIELD);
+                        return;
+                    case 0xE5:
+                        parsingFrame = SingleCharFrame.SINGLE_CHAR_FRAME;
+                        listener.success(parsingFrame);
+                        reset();
+                        return;
+                    default:
+                        if (log.isLoggable(Level.FINEST)) {
+                            log.finest(String.format("Garbage: %02x", b));
+                        }
+                        // Drop the garbage
+                        return;
                 }
-                break;
 
             case LONG_LENGTH_1:
                 expectedLengt = b & 0xFF;
                 setState(DecodeState.LONG_LENGTH_2);
 
-                break;
+                return;
 
             case LONG_LENGTH_2:
 
                 if (expectedLengt != (b & 0xFF)) {
-                    setState(DecodeState.ERROR);
-                    throw new DecodeException(String.format("expected length: 0x%02x found: 0x%02x", expectedLengt, b));
+                    //Try to synchronize test last byte was start.
+                    if (expectedLengt == 0x68) {
+                        //last byte was start
+                        expectedLengt = b & 0xFF;
+                        dataPos = -2;
+                        return;
+                    } else if (0x68 == (b & 0xFF)) {
+                        //this byte is start
+                        setState(DecodeState.LONG_LENGTH_1);
+                        dataPos = -3;
+                        return;
+                    } else {
+                        log.fine("got to second lengt byte, but nowhere to go!");
+                        reset();
+                        return;
+                    }
                 } else {
                     setState(DecodeState.START_LONG_PACK);
-
-                    break;
+                    return;
                 }
 
             case START_LONG_PACK:
-                dataPos = 0;
 
                 if (b == 0x68) {
                     setState(DecodeState.C_FIELD);
-
-                    break;
+                    return;
                 } else {
-                    setState(DecodeState.ERROR);
-                    throw new DecodeException(String.format("expected Long package end (0x68) but found: (0x%02x)", b));
+                    log.fine("second start byte of long/control frame mismatch: data discarted!");
+                    reset();
+                    return;
                 }
 
             case C_FIELD:
                 checksum = b;
+                setState(DecodeState.A_FIELD);
 
                 switch (start) {
                     case 0x10:
 
-                        if (b == 0x40) {
-                            parsingFrame = new SendInitSlave();
-                        } else if ((b == 0x5B) || (b == 0x7B)) {
-                            parsingFrame = new RequestClassXData((b & 0x20) == 0x20, (b & 0x10) == 0x10,
-                                    Frame.ControlCode.REQ_UD2);
-                        } else if ((b == 0x5A) || (b == 0x7A)) {
-                            parsingFrame = new RequestClassXData((b & 0x20) == 0x20, (b & 0x10) == 0x10,
-                                    Frame.ControlCode.REQ_UD1);
-                        } else {
-                            setState(DecodeState.ERROR);
-                            throw new NotSupportedException(String.format("C-Field = 0x%02X", b));
+                        switch (b & 0xFF) {
+                            case 0x40://SND_NKE
+                                parsingFrame = new SendInitSlave();
+                                return;
+                            case 0x5A://REQ_UD1 FCB is clear
+                                parsingFrame = new RequestClassXData(false, true, Frame.ControlCode.REQ_UD1);
+                                return;
+                            case 0x5B://REQ_UD2 FCB is clear
+                                parsingFrame = new RequestClassXData(false, true, Frame.ControlCode.REQ_UD2);
+                                return;
+                            case 0x7A://REQ_UD1 FCB is set
+                                parsingFrame = new RequestClassXData(true, false, Frame.ControlCode.REQ_UD1);
+                                return;
+                            case 0x7B://REQ_UD2 FCB is set
+                                parsingFrame = new RequestClassXData(false, true, Frame.ControlCode.REQ_UD2);
+                                return;
+                            default:
+                                // are we collecting garbage? - maybe try to recover.
+                                log.fine("short frame c field reached: data discarted!");
+                                reset();
+                                return;
                         }
-
-                        break;
 
                     case 0x68:
 
-                        if ((b == 0x53) || (b == 0x73)) {
-                            parsingFrame = new SendUserData((b & 0x20) == 0x20);
-                        } else if ((b == 0x08) || (b == 0x18) || (b == 0x28) || (b == 0x38)) {
-                            parsingFrame = new UserDataResponse((b & 0x20) == 0x20, (b & 0x10) == 0x10);
-                        } else {
-                            setState(DecodeState.ERROR);
-                            throw new NotSupportedException(String.format("C-Field = 0x02X", b));
+                        switch (b & 0xFF) {
+                            case 0x08://RSP_UD ACD is clear DFC is clear
+                                parsingFrame = new UserDataResponse(false, false);
+                                return;
+                            case 0x18://RSP_UD ACD is clear DFC is set
+                                parsingFrame = new UserDataResponse(false, true);
+                                return;
+                            case 0x28://RSP_UD ACD is set DFC is clear
+                                parsingFrame = new UserDataResponse(true, false);
+                                return;
+                            case 0x38://RSP_UD ACD is set DFC is set
+                                parsingFrame = new UserDataResponse(true, true);
+                                return;
+                            case 0x53://SND_UD FCB is clear 
+                                parsingFrame = new SendUserData(false);
+                                return;
+                            case 0x73://SND_UD FCB is set
+                                parsingFrame = new SendUserData(true);
+                                return;
+                            default:
+                                // are we collecting garbage? - maybe try to recover.
+                                log.fine("control/long frame c field reached: data discarted!");
+                                reset();
+                                return;
                         }
 
-                        break;
-
                     default:
+                        log.log(Level.SEVERE, String.format("C Field dont know where to go: %02x", b));
+                        reset();
+                        throw new NotSupportedException("Should never ever happen!: C Field dont know where to go!");
                 }
-
-                setState(DecodeState.A_FIELD);
-
-                break;
 
             case A_FIELD:
 
-                if (parsingFrame instanceof PrimaryAddress) {
+                try {
                     ((PrimaryAddress) parsingFrame).setAddress(b);
-                    if (log.isLoggable(Level.FINER)) {
-                        log.finer(String.format("Primary Address: 0x%02X", b));
-                    }
-                } else {
-                    setState(DecodeState.ERROR);
-                    throw new NotSupportedException("Cant set Address!");
+                } catch (ClassCastException e) {
+                    // are we collecting garbage? - maybe try to recover.
+                    log.fine("a field: data discarted!");
+                    reset();
+                    return;
                 }
 
                 switch (start) {
                     case 0x10:
                         setState(DecodeState.CHECKSUM);
-
-                        break;
-
+                        return;
                     case 0x68:
                         setState(DecodeState.CI_FIELD);
-
-                        break;
-
+                        return;
                     default:
-                        setState(DecodeState.ERROR);
-                        throw new NotSupportedException("A Field dont know where to go!");
+                        log.log(Level.SEVERE, String.format("A Field dont know where to go start: %02x", start));
+                        reset();
+                        throw new NotSupportedException("Should never ever happen!: A Field dont know where to go!");
                 }
-
-                break;
 
             case CI_FIELD:
-
+                //ControlFrame or LongFrame 
                 if (parsingFrame instanceof SendUserData) {
                     decodeCiSendUserData(b & 0xFF);
+                    return;
                 } else if (parsingFrame instanceof UserDataResponse) {
                     decodeCiUserDataResponse(b & 0xFF);
+                    return;
                 } else {
-                    setState(DecodeState.ERROR);
-                    throw new NotSupportedException(String.format(
-                            "CI Field expected: 0x51 | 0x72, but found: 0x%02x | %s",
-                            b,
-                            parsingFrame.getClass().getName()));
+                    log.log(Level.SEVERE, "CI Field dont know where to go: {0}", parsingFrame.getClass());
+                    reset();
+                    throw new NotSupportedException("Should never ever happen!: CI Field dont know where to go!");
                 }
-
-                break;
 
             case GENERAL_APPLICATION_ERRORCODE:
 
-                if (!(parsingFrame instanceof GeneralApplicationError)) {
-                    setState(DecodeState.ERROR);
+                try {
+                    ((GeneralApplicationError) parsingFrame).setError(b);
+                    setState(DecodeState.CHECKSUM);
+                    return;
+                } catch (ClassCastException e) {
+                    log.log(Level.SEVERE, "GENERAL_APPLICATION_ERRORCODE Field dont know where to go: {0}", parsingFrame.getClass());
+                    reset();
                     throw new NotSupportedException("General Application Error Expected");
                 }
 
-                ((GeneralApplicationError) parsingFrame).setError(b);
-                setState(DecodeState.CHECKSUM);
-
-                break;
-
             case APPLICATION_RESET_SUBCODE:
 
-                if (!(parsingFrame instanceof ApplicationReset)) {
-                    setState(DecodeState.ERROR);
+                try {
+                    ((ApplicationReset) parsingFrame).setTelegramTypeAndSubTelegram(b);
+                    setState(DecodeState.CHECKSUM);
+                    return;
+                } catch (ClassCastException e) {
+                    log.log(Level.SEVERE, "APPLICATION_RESET_SUBCODE Field dont know where to go: {0}", parsingFrame.getClass());
+                    reset();
                     throw new NotSupportedException("Application Reset Expected");
                 }
-
-                ((ApplicationReset) parsingFrame).setTelegramTypeAndSubTelegram(b);
-                setState(DecodeState.CHECKSUM);
-
-                break;
 
             case IDENT_NUMBER:
                 stack.push(b);
 
                 if (stack.isFull()) {
                     if (parsingFrame instanceof SelectionOfSlaves) {
-                        getSelectionOfSlaves().setBcdMaskedId(stack.popInteger(4));
-                        log.finest(String.format("Ident Number: 0x%08X", getSelectionOfSlaves().getBcdMaskedId()));
+                        ((SelectionOfSlaves) parsingFrame).setBcdMaskedId(stack.popInteger(4));
                     } else {
-                        getUserDataResponse().setIdentNumber(stack.popBcdInteger(8));
-                        log.finest(String.format("Ident Number: 0x%08d", getUserDataResponse().getIdentNumber()));
+                        ((UserDataResponse) parsingFrame).setIdentNumber(stack.popBcdInteger(8));
                     }
 
                     stack.init(2);
                     setState(DecodeState.MANUFACTURER);
                 }
 
-                break;
+                return;
 
             case MANUFACTURER:
                 stack.push(b);
 
                 if (stack.isFull()) {
                     if (parsingFrame instanceof SelectionOfSlaves) {
-                        getSelectionOfSlaves().setMaskedMan(stack.popShort());
-                        log.finest(String.format("Man: 0x%04X", getSelectionOfSlaves().getMaskedMan()));
+                        ((SelectionOfSlaves) parsingFrame).setMaskedMan(stack.popShort());
                     } else {
-                        getUserDataResponse().setManufacturer(stack.popMan());
-                        log.finest(String.format("Man: %s", getUserDataResponse().getManufacturer()));
+                        ((UserDataResponse) parsingFrame).setManufacturer(stack.popMan());
                     }
 
                     stack.clear();
                     setState(DecodeState.VERSION);
                 }
 
-                break;
+                return;
 
             case VERSION:
 
                 if (parsingFrame instanceof SelectionOfSlaves) {
-                    getSelectionOfSlaves().setMaskedVersion((byte) (b & 0xFF));
-                    log.finest(String.format("Version: 0x%02X", getSelectionOfSlaves().getMaskedVersion()));
+                    ((SelectionOfSlaves) parsingFrame).setMaskedVersion((byte) (b & 0xFF));
                 } else {
-                    getUserDataResponse().setVersion((byte) (b & 0x00FF));
-                    log.finest(String.format("Version: 0x%02X", getUserDataResponse().getVersion()));
+                    ((UserDataResponse) parsingFrame).setVersion((byte) (b & 0x00FF));
                 }
 
                 setState(DecodeState.MEDIUM);
 
-                break;
+                return;
 
             case MEDIUM:
 
                 if (parsingFrame instanceof SelectionOfSlaves) {
-                    getSelectionOfSlaves().setMaskedMedium((byte) (b & 0xFF));
+                    ((SelectionOfSlaves) parsingFrame).setMaskedMedium((byte) (b & 0xFF));
                     setState(DecodeState.CHECKSUM);
-                    log.finest(String.format("Medium: 0x%02X", getSelectionOfSlaves().getMaskedMedium()));
                 } else {
-                    getUserDataResponse().setMedium(MBusMedium.valueOf(b));
-                    log.finest(String.format("Medium: %s", getUserDataResponse().getMedium().getLabel()));
+                    ((UserDataResponse) parsingFrame).setMedium(MBusMedium.valueOf(b));
                     setState(DecodeState.ACCESS_NUMBER);
                 }
 
-                break;
+                return;
 
             case ACCESS_NUMBER:
-                getUserDataResponse().setAccessNumber((short) (b & 0x00FF));
+                ((UserDataResponse) parsingFrame).setAccessNumber((short) (b & 0x00FF));
                 setState(DecodeState.STATUS);
 
-                break;
+                return;
 
             case STATUS:
-                getUserDataResponse().setStatus(new UserDataResponse.StatusCode[0]);
+                ((UserDataResponse) parsingFrame).setStatus(new UserDataResponse.StatusCode[0]);
 
                 switch (b & 0x03) {
                     case 0x00:
-                        getUserDataResponse().addStatus(UserDataResponse.StatusCode.APPLICATION_NO_ERROR);
-
+                        ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.APPLICATION_NO_ERROR);
                         break;
 
                     case 0x01:
-                        getUserDataResponse().addStatus(UserDataResponse.StatusCode.APPLICATION_BUSY);
-
+                        ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.APPLICATION_BUSY);
                         break;
 
                     case 0x02:
-                        getUserDataResponse().addStatus(UserDataResponse.StatusCode.APPLICATION_ANY_ERROR);
-
+                        ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.APPLICATION_ANY_ERROR);
                         break;
 
                     case 0x03:
-                        getUserDataResponse().addStatus(UserDataResponse.StatusCode.APPLICATION_RESERVED);
-
+                        ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.APPLICATION_RESERVED);
                         break;
                 }
 
                 if ((b & 0x04) == 0x04) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.POWER_LOW);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.POWER_LOW);
                 }
 
                 if ((b & 0x08) == 0x08) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.PERMANENT_ERROR);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.PERMANENT_ERROR);
                 }
 
                 if ((b & 0x10) == 0x10) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.TEMPORARY_ERROR);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.TEMPORARY_ERROR);
                 }
 
                 if ((b & 0x20) == 0x20) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X20);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X20);
                 }
 
                 if ((b & 0x40) == 0x40) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X40);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X40);
                 }
 
                 if ((b & 0x80) == 0x80) {
-                    getUserDataResponse().addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X80);
+                    ((UserDataResponse) parsingFrame).addStatus(UserDataResponse.StatusCode.MAN_SPEC_0X80);
                 }
 
                 stack.init(2);
                 setState(DecodeState.SIGNATURE);
 
-                break;
+                return;
 
             case SIGNATURE:
                 stack.push(b);
 
                 if (stack.isFull()) {
-                    getUserDataResponse().setSignature(stack.popShort());
+                    ((UserDataResponse) parsingFrame).setSignature(stack.popShort());
                     stack.clear();
 
                     if (expectedLengt == dataPos) {
@@ -461,32 +454,37 @@ public class Decoder {
                     }
                 }
 
-                break;
+                return;
 
             case VARIABLE_DATA_BLOCK:
 
                 if (vdbd.getState().equals(VariableDataBlockDecoder.DecodeState.WAIT_FOR_INIT)) {
-                    vdbd.init(getLongFrame());
+                    vdbd.init(((LongFrame) parsingFrame));
                 }
+                try {
+                    switch (vdbd.addByte(b, expectedLengt - dataPos)) {
+                        case ERROR:
+                            vdbd.setState(VariableDataBlockDecoder.DecodeState.WAIT_FOR_INIT);
+                            return;
 
-                switch (vdbd.addByte(b, expectedLengt - dataPos)) {
-                    case ERROR:
-                        vdbd.setState(VariableDataBlockDecoder.DecodeState.WAIT_FOR_INIT);
+                        case RESULT_AVAIL:
+                            ((LongFrame) parsingFrame).addDataBlock(vdbd.getDataBlock());
+                            vdbd.setState(VariableDataBlockDecoder.DecodeState.WAIT_FOR_INIT);
 
-                        break;
-
-                    case RESULT_AVAIL:
-                        getLongFrame().addDataBlock(vdbd.getDataBlock());
-                        vdbd.setState(VariableDataBlockDecoder.DecodeState.WAIT_FOR_INIT);
-
-                        if ((expectedLengt - dataPos) == 0) {
-                            setState(DecodeState.CHECKSUM);
-                        }
-
-                        break;
+                            if ((expectedLengt - dataPos) == 0) {
+                                setState(DecodeState.CHECKSUM);
+                            }
+                            return;
+                        default:
+                            return;
+                    }
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    //try to sync again (for the event that one byte got missing on the serial line due to parity check .... THis happend when the decoder hangs on old input and this is the start of a new frame
+                    log.fine("collect variable data block: data discarted!");
+                    reset();
+                    addByte(b);
+                    return;
                 }
-
-                break;
 
             case CHECKSUM:
                 checksum -= b;
@@ -496,28 +494,23 @@ public class Decoder {
 
                     break;
                 } else {
-                    setState(DecodeState.ERROR);
-                    throw new DecodeException(String.format("Checksum mismatch expected: 0x%02x but found: 0x%02x",
-                            checksum, b));
+                    log.fine("checksum mismatch: data discarted!");
+                    reset();
                 }
 
             case END_SIGN:
-
-                //TODO
                 if (b == 0x16) {
-                    setState(DecodeState.EXPECT_START);
-                    printLoggedData();
-                    return parsingFrame;
+                    listener.success(parsingFrame);
                 } else {
-                    setState(DecodeState.ERROR);
-                    throw new DecodeException(String.format("Excpected Endsign (0x16) but found: 0x%02x", b));
+                             log.fine("end sign not found: data discarted!");
                 }
-
+                reset();
+                break;
             default:
-                return null;
+                log.log(Level.SEVERE, "Unknown state: {0}", state);
+                reset();
+                throw new NotSupportedException("Should never ever happen!: Unknown State!");
         }
-
-        return null;
     }
 
     private int bcd2Int(byte[] data) {
@@ -629,11 +622,13 @@ public class Decoder {
                 break;
 
             default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format(
+                NotSupportedException e = new NotSupportedException(String.format(
                         "CI field of SND_UD: 0x%02x | %s",
                         b,
                         parsingFrame.getClass().getName()));
+                log.log(Level.SEVERE, "decodeCiSendUserData", e);
+                reset();
+                throw e;
         }
     }
 
@@ -652,43 +647,34 @@ public class Decoder {
                 break;
 
             default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format(
+                NotSupportedException e = new NotSupportedException(String.format(
                         "CI field of UD_RESP: 0x%02x | %s",
                         b,
                         parsingFrame.getClass().getName()));
+                log.log(Level.SEVERE, "decodeCiUserDataResponse", e);
+                reset();
+                throw e;
         }
-    }
-
-    public Frame getFrame() {
-        return parsingFrame;
-    }
-
-    private LongFrame getLongFrame() {
-        return (LongFrame) parsingFrame;
-    }
-
-    private SelectionOfSlaves getSelectionOfSlaves() {
-        return (SelectionOfSlaves) parsingFrame;
     }
 
     public DecodeState getState() {
         return state;
     }
 
-    private UserDataResponse getUserDataResponse() {
-        return (UserDataResponse) parsingFrame;
-    }
-
     private void setState(DecodeState state) {
         DecodeState oldState = this.state;
         this.state = state;
 
-        if (DecodeState.ERROR.equals(state)) {
-            printLoggedData();
-        }
-        if (log.isLoggable(Level.FINER)) {
-            log.log(Level.FINER, "{0} => {1}", new Object[]{oldState, state});
+        if (log.isLoggable(Level.FINEST)) {
+            log.log(Level.FINEST, "{0} => {1}", new Object[]{oldState, state});
         }
     }
+
+    public void reset() {
+        start = 0;
+        expectedLengt = 0;
+        vdbd.reset();
+        setState(DecodeState.EXPECT_START);
+    }
+
 }

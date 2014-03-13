@@ -47,7 +47,7 @@ public class SendUserData
         implements LongFrame {
 
     public static String SEND_USER_DATA_SUBTYPE = "send user data";
-    private List<DataBlock> dataBlocks = new ArrayList<DataBlock>();
+    private final List<DataBlock> dataBlocks = new ArrayList<>();
     private byte address;
     private boolean fcb;
 

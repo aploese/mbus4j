@@ -510,10 +510,10 @@ public class MBusMasterUiView
                 appReset.setFcb(true);
                 appReset.setTelegramType(ApplicationReset.TelegramType.ALL);
                 appReset.setSubTelegram(i);
-                getMaster().send(appReset, false, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
+                getMaster().send(appReset, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
                 RequestClassXData request = new RequestClassXData(true, true, ControlCode.REQ_UD2);
                 request.setAddress(device.getAddress());
-                Frame f = getMaster().send(request, false, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
+                Frame f = getMaster().send(request, Sender.DEFAULT_SEND_TRIES, getMaster().getResponseTimeout());
                 if (f instanceof UserDataResponse) {
                     ResponseFrameContainer container = new ResponseFrameContainer();
                     container.setSelectFrame(appReset);

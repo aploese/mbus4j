@@ -35,9 +35,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import net.sf.mbus4j.dataframes.Frame;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.decoder.Decoder;
+import net.sf.mbus4j.decoder.DecoderListener;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,7 +54,7 @@ import org.junit.Test;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class UserDataResponseTest {
+public class UserDataResponseTest implements DecoderListener {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -61,13 +65,15 @@ public class UserDataResponseTest {
     }
     private Decoder parser;
     private Encoder instance;
+    private List<Frame> frames;
 
     public UserDataResponseTest() {
     }
 
     @Before
     public void setUp() {
-        parser = new Decoder();
+        frames = new ArrayList<>();
+        parser = new Decoder(this);
         instance = new Encoder();
     }
 
@@ -127,8 +133,8 @@ public class UserDataResponseTest {
             parser.addByte(b);
         }
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, parser.getState());
-        assertNotNull("DataValue not available", parser.getFrame());
-        byte[] result = instance.encode(parser.getFrame());
+        assertEquals("DataValue not available", 1, frames.size());
+        byte[] result = instance.encode(frames.get(0));
         assertArrayEquals(data, result);
     }
 
@@ -196,4 +202,10 @@ public class UserDataResponseTest {
     public void testTCH_HEAT_38_21519982_1() throws Exception {
         testPackage("TCH", MBusMedium.HEAT, 38, 21519982, 1);
     }
+
+    @Override
+    public void success(Frame parsingFrame) {
+        frames.add(parsingFrame);
+    }
+
 }

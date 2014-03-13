@@ -27,7 +27,6 @@ package net.sf.mbus4j.master;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.FileOutputStream;
@@ -67,6 +66,7 @@ import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.dataframes.GarbageCharFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.SendInitSlave;
+import net.sf.mbus4j.decoder.DecoderListener;
 import net.sf.mbus4j.json.JSONSerializable;
 import net.sf.mbus4j.json.JsonSerializeType;
 import net.sf.mbus4j.log.LogUtils;
@@ -151,34 +151,30 @@ public class MBusMaster
         return lastByteSended;
     }
 
-    private class StreamListener
-            implements Runnable {
+    private class StreamListener implements Runnable, DecoderListener {
 
-        private Decoder parser = new Decoder();
+        private Decoder parser = new Decoder(this);
 
         @Override
         public void run() {
-           log.info("Thread MBus StreamListener Started");
+            log.info("Thread MBus StreamListener Started");
+            parser.reset();  // Just to make sure to have a clean parser
             try {
-                int theData;
                 try {
                     while (!isClosed()) {
                         try {
+                            int theData;
                             if ((theData = conn.getInputStream().read()) == -1) {
                                 if (log.isLoggable(Level.FINEST)) {
                                     log.finest("Thread interrupted or eof on waiting occured");
                                 }
                             } else {
-                                if (log.isLoggable(Level.FINEST)) {
-                                    log.finest(String.format("Data received 0x%02x", theData));
-                                }
-
                                 try {
-                                    if (parser.addByte((byte) theData) != null) {
-                                        setLastFrame(parser.getFrame());
-                                    }
+                                    //TODO LOGGIN 
+                                    parser.addByte((byte) theData);
                                 } catch (Exception e) {
                                     log.log(Level.SEVERE, "Error during createPackage()", e);
+                                    parser.reset();
                                 }
                             }
                         } catch (NullPointerException npe) {
@@ -188,8 +184,6 @@ public class MBusMaster
                         }
                     }
                     log.info("Thread MBus StreamListener Will stop");
-
-                    log.info("closing down - finish waiting for new data");
                 } catch (IOException e) {
                     if (isClosed()) {
                         log.log(Level.FINE, "Port Closed", e);
@@ -204,9 +198,9 @@ public class MBusMaster
                     }
                 }
             } catch (Throwable t) {
-                 log.log(Level.SEVERE, "END", t);
+                log.log(Level.SEVERE, "END", t);
             } finally {
-            log.info("Thread MBus StreamListener Stopped");
+                log.info("Thread MBus StreamListener Stopped");
                 parser.reset();
             }
         }
@@ -214,6 +208,21 @@ public class MBusMaster
         private boolean isClosed() {
             return conn == null ? true : conn.getConnState().equals(Connection.State.CLOSED) || conn.getConnState().equals(Connection.State.CLOSING);
         }
+
+        @Override
+        public void success(Frame frame) {
+            log.log(Level.FINER, "New frame parsed {0}", frame);
+
+            synchronized (frameQueue) {
+                frameQueue.add(frame);
+                frameQueue.notifyAll();
+            }
+        }
+
+        void resetDecoder() {
+            parser.reset();
+        }
+        
     }
     private final static Logger log = LogUtils.getMasterLogger();
     private final List<GenericDevice> devices = new ArrayList<>();
@@ -278,9 +287,8 @@ public class MBusMaster
         devices.clear();
     }
 
-    private void clearFrameQueue(boolean collectGarbage) {
+    private void clearFrameQueue() {
         synchronized (frameQueue) {
-            streamListener.parser.setCollectGarbage(collectGarbage);
             frameQueue.clear();
         }
     }
@@ -291,20 +299,20 @@ public class MBusMaster
             log.info("TRY CLOSING");
             conn.close();
             log.info("CLOSED");
-/* TODO thread.interrrupt does not work in native posix blocking read ...
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                throw new IOException(ex);
-            }
-            log.fine("Do INterrupt");
-            t.interrupt();
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException ex) {
-                throw new IOException(ex);
-            }
-            */
+            /* TODO thread.interrrupt does not work in native posix blocking read ...
+             try {
+             Thread.sleep(10);
+             } catch (InterruptedException ex) {
+             throw new IOException(ex);
+             }
+             log.fine("Do INterrupt");
+             t.interrupt();
+             try {
+             Thread.sleep(10);
+             } catch (InterruptedException ex) {
+             throw new IOException(ex);
+             }
+             */
             t = null;
         }
     }
@@ -368,6 +376,8 @@ public class MBusMaster
      * addres to all devices
      *
      * @return
+     * @throws java.io.IOException
+     * @throws java.lang.InterruptedException
      */
     public GenericDevice[] searchDevicesByPrimaryAddress()
             throws IOException, InterruptedException {
@@ -389,12 +399,16 @@ public class MBusMaster
     }
 
     @Override
-    public Frame send(Frame frame, boolean collectGarbage, int maxTries, long timeout)
+    public Frame send(Frame frame, int maxTries, long timeout)
             throws IOException, InterruptedException {
         for (int tries = 0; tries <= maxTries; tries++) {
-            clearFrameQueue(collectGarbage);
+            clearFrameQueue();
 
             final byte[] b = encoder.encode(frame);
+            
+            //Reset the decoder from old leftovers...
+            streamListener.resetDecoder();
+            
             conn.getOutputStrteam().write(b);
             conn.getOutputStrteam().flush();
             lastByteSended = System.currentTimeMillis();
@@ -414,7 +428,7 @@ public class MBusMaster
             }
         }
         log.log(Level.INFO, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, frame});
-        
+
         return null;
     }
 
@@ -429,14 +443,14 @@ public class MBusMaster
 
     public Frame sendInitSlave(byte address) throws IOException, InterruptedException {
         SendInitSlave req = new SendInitSlave(address);
-        return send(req, false, DEFAULT_SEND_TRIES, getResponseTimeout());
+        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
     }
 
     public Frame sendRequestUserData(byte address)
             throws IOException, InterruptedException {
         RequestClassXData req = new RequestClassXData(Frame.ControlCode.REQ_UD2, address);
         req.setFcb(true);
-        return send(req, false, DEFAULT_SEND_TRIES, getResponseTimeout());
+        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
     }
 
     public Map<GenericDevice, Frame> sendRequestUserData(Map<GenericDevice, MBusAddressing> devices)
@@ -474,7 +488,7 @@ public class MBusMaster
         selOfSl.setMaskedMedium(maskedMedium);
 
         int result;
-        Frame resultFrame = send(selOfSl, true, maxTries, getShortResponseTimeout());
+        Frame resultFrame = send(selOfSl, maxTries, getShortResponseTimeout());
         if (resultFrame == null) {
             return 0;
         }
@@ -491,15 +505,6 @@ public class MBusMaster
         log.fine("Wait for more Answers of slave select");
         result += waitForSingleCharsOrGarbage(getShortResponseTimeout());
         return result;
-    }
-
-    private void setLastFrame(Frame frame) {
-        log.log(Level.FINER, "New frame parsed {0}", frame);
-
-        synchronized (frameQueue) {
-            frameQueue.add(frame);
-            frameQueue.notifyAll();
-        }
     }
 
     public void setConnection(Connection conn) {
