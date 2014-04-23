@@ -136,12 +136,12 @@ public class MBusMaster
     }
 
     public void writeJsonStream(FileOutputStream os) throws UnsupportedEncodingException, IOException {
-        OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
-        JSONObject json = toJSON(JsonSerializeType.SLAVE_CONFIG);
-        String text = json.toString(1);
-        osw.write(text, 0, text.length());
-        osw.flush();
-        osw.close();
+        try (OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8")) {
+            JSONObject json = toJSON(JsonSerializeType.SLAVE_CONFIG);
+            String text = json.toString(1);
+            osw.write(text, 0, text.length());
+            osw.flush();
+        }
     }
 
     /**
@@ -153,11 +153,11 @@ public class MBusMaster
 
     private class StreamListener implements Runnable, DecoderListener {
 
-        private Decoder parser = new Decoder(this);
+        private final Decoder parser = new Decoder(this);
 
         @Override
         public void run() {
-            log.info("Thread MBus StreamListener Started");
+            log.fine("Thread MBus StreamListener Started");
             parser.reset();  // Just to make sure to have a clean parser
             try {
                 try {
@@ -200,7 +200,7 @@ public class MBusMaster
             } catch (Throwable t) {
                 log.log(Level.SEVERE, "END", t);
             } finally {
-                log.info("Thread MBus StreamListener Stopped");
+                log.fine("Thread MBus StreamListener Stopped");
                 parser.reset();
             }
         }
@@ -296,9 +296,9 @@ public class MBusMaster
     @Override
     public void close() throws IOException {
         if (conn != null) {
-            log.info("TRY CLOSING");
+            log.fine("TRY CLOSING");
             conn.close();
-            log.info("CLOSED");
+            log.fine("CLOSED");
             /* TODO thread.interrrupt does not work in native posix blocking read ...
              try {
              Thread.sleep(10);

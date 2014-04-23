@@ -40,7 +40,7 @@ public enum MBusMedium {
     GAS(0x03, "Gas"),
     HEAT(0x04, "Heat"),
     STEAM(0x05, "Stream"),
-    HOT_WATER(0x06, "Warm Water (30°C...90°C"),
+    HOT_WATER(0x06, "Warm Water (30°C...90°C)"),
     WATER(0x07, "Water"),
     HEAT_COST_ALLOCATOR(0x08, "Heat Cost Allocator"),
     COMPRESSED_AIR(0x09, "Compressed Air"),
