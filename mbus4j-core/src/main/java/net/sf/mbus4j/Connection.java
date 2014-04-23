@@ -119,8 +119,6 @@ public abstract class Connection implements JSONSerializable, Serializable, Clos
 
     public abstract void open() throws IOException;
 
-    public abstract void close() throws IOException;
-
     @Override
     public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
         JSONObject result = new JSONObject();

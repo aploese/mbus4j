@@ -7,8 +7,10 @@
         <version>0.1.5-SNAPSHOT</version>
     </parent>
 
+    <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j-master-ui</artifactId>
     <packaging>jar</packaging>
+    <version>0.1.5-SNAPSHOT</version>
     <name>mbus4j-master-ui</name>
 
     <dependencies>
@@ -21,14 +23,6 @@
             <artifactId>commons-cli</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.jdesktop</groupId>
-            <artifactId>appframework</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jdesktop</groupId>
-            <artifactId>swing-worker</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <classifier>jdk15</classifier>
@@ -36,89 +30,17 @@
         <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-core</artifactId>
-            <version>${project.version}</version>
+            <version>0.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-master</artifactId>
-            <version>${project.version}</version>
+            <version>0.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
+            <groupId>net.sf.atmodem4j</groupId>
+            <artifactId>spsw-nativelibs-bundle</artifactId>
         </dependency>
-            <dependency>
-                <groupId>net.sf.atmodem4j</groupId>
-                <artifactId>spsw-native-lib-resources</artifactId>
-            </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>appassembler-maven-plugin</artifactId>
-                <configuration>
-                    <repositoryLayout>flat</repositoryLayout>
-                    <!-- Include etc/ in the beginning of the classpath declaration in the bin scripts -->
-                    <includeConfigurationDirectoryInClasspath>false</includeConfigurationDirectoryInClasspath>
-                    <!-- prefix all bin files with "apl" -->
-                    <binPrefix>apl</binPrefix>
-                    <!-- set alternative assemble directory -->
-                    <assembleDirectory>${project.build.directory}/master-ui</assembleDirectory>
-                    <!-- Extra JVM arguments that will be included in the bin scripts -->
-                    <extraJvmArguments>-javaagent:repo/aspectjweaver-${aspectj.version}.jar</extraJvmArguments>
-                    <!-- Generate bin scripts for windows and unix pr default -->
-                    <platforms>
-                        <platform>windows</platform>
-                        <platform>unix</platform>
-                    </platforms>
-                    <programs>
-                        <program>
-                            <mainClass>net.sf.mbus4j.master.ui.MBusMasterUI</mainClass>
-                            <name>master-ui</name>
-                        </program>
-                        <program>
-                            <mainClass>net.sf.mbus4j.master.console.ConsoleApp</mainClass>
-                            <name>master-console</name>
-                        </program>
-                    </programs>
-                </configuration>
-            </plugin>
-            <!--plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>aspectj-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <!- - mvn package appassembler:assemble - ->
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>net.sf.mbus4j.slaves.ui.SlavesUI</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin-->
-
-            <!--plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>unix-maven-plugin</artifactId>
-                <configuration>
-                    <contact>arnep@users.sf.net</contact>
-                </configuration>
-
-            </plugin-->
-            <plugin>  
-                <artifactId>maven-surefire-plugin</artifactId>  
-                <configuration>  
-                    <forkMode>once</forkMode>
-                    <argLine>-javaagent:${user.home}/.m2/repository/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar</argLine> 
-                </configuration> 
-                <version>2.12</version>
-            </plugin>
-        </plugins>
-    </build>
-
 
 </project>
