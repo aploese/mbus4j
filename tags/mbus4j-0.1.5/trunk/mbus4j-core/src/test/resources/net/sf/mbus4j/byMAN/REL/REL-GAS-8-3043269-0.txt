@@ -1,0 +1,24 @@
+681B1B6808007269320403AC4808037F00000006150D87080000000F0101016316
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x00
+ident number = 03043269
+manufacturer = REL
+version = 0x08
+accessnumber = 127
+status = [No application error]
+signature = 0x0000
+medium = Gas
+lastPackage = true
+datablock[0]:
+  dataType = 48 Bit Integer
+  description = Volume
+  value = 558861 * 100 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = Special Function Manufacturer specific data
+  value = 010101
