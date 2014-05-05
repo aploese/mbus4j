@@ -1,0 +1,8 @@
+{
+ "controlCode": "RSP_UD",
+ "subType": "general application error",
+ "acd": false,
+ "dfc": false,
+ "address": 1,
+ "error": "unimplemented ci-field"
+}
