@@ -1,0 +1,81 @@
+6836366808007292203300A815090220000200046D3A22BF0804222F5A00000403F649A001442BC80C000002FD60260001FD1704446D1A22A708F016
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x00
+ident number = 00332092
+manufacturer = EMH
+version = 0x09
+accessnumber = 32
+status = [No application error]
+signature = 0x0002
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 31.08.2005 02:58:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = true
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = On Time
+  value = 23087 [h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 27281910 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 3272 [W]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 16 Bit Integer
+  description = Reset counter
+  value = 38
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 8 Bit Integer
+  description = Error flags (binary)
+  value = 4
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 07.08.2005 02:26:00
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = true
