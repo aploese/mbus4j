@@ -1,4 +1,0 @@
-6803036853FE54A516
-control code = SND_UD
-isFcb = false
-address = 0xFE
