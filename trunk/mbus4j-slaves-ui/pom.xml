@@ -31,12 +31,12 @@
         <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-core</artifactId>
-            <version>${project.version}</version>
+            <version>0.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-slaves</artifactId>
-            <version>${project.version}</version>
+            <version>0.1.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
