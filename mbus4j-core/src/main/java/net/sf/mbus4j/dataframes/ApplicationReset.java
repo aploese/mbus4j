@@ -43,7 +43,7 @@ import java.util.Iterator;
 public class ApplicationReset
         implements LongFrame {
 
-    public static String SEND_USER_DATA_SUBTYPE = "application reset";
+    public static final String SEND_USER_DATA_SUBTYPE = "application reset";
 
     public ApplicationReset() {
     }

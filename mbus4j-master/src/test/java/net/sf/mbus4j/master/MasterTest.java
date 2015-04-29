@@ -93,18 +93,6 @@ public class MasterTest {
         slaves = null;
     }
 
-    /**
-     * Test of deselectBySecondaryAddress method, of class MBusMaster.
-     */
-    @Test
-    @Ignore
-    public void testDeselectBySecondaryAddress() {
-        System.out.println("deselectBySecondaryAddress");
-        master.deselectBySecondaryAddress();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
     /*        @Test
      public void testTest() throws Exception {
      int value = 0x12FFFFFF;

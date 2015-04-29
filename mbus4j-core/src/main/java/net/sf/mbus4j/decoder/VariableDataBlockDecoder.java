@@ -106,7 +106,7 @@ public class VariableDataBlockDecoder {
         RESULT_AVAIL;
     }
     private final static Logger LOG = LogUtils.getDecoderLogger();
-    private DecodeState ds;
+    private DecodeState ds = DecodeState.WAIT_FOR_INIT;
     private int difePos;
     private ObjectAction objectAction;
     private DataFieldCode dfc;
@@ -123,33 +123,24 @@ public class VariableDataBlockDecoder {
 
     public VariableDataBlockDecoder() {
         super();
-        setState(DecodeState.WAIT_FOR_INIT);
     }
 
-    public DecodeState addByte(byte b, int bytesLeft) {
+    public DecodeState addByte(final byte b, final int bytesLeft) {
         switch (ds) {
             case DIF:
                 decodeDif(b, bytesLeft);
                 difePos = 0;
-
-                break;
-
+                return ds;
             case DIFE:
                 decodeDIFE(b, difePos++);
-
-                break;
-
+                return ds;
             case VIF:
                 decodeVIF(b);
-
                 break;
-
             case ASCII_VIF_LENGTH:
                 stack.init(b & 0xFF);
                 setState(DecodeState.ASCII_VIF_COLLECT);
-
-                break;
-
+                return ds;
             case ASCII_VIF_COLLECT:
                 stack.push(b);
 
@@ -157,35 +148,23 @@ public class VariableDataBlockDecoder {
                     ((VifAscii) vif).setValue(stack.popString());
                     startCollectingValue();
                 }
-
-                break;
-
+                return ds;
             case VIF_FB:
                 decodeVifExtention_FB(b);
-
-                break;
-
+                return ds;
             case VIF_FD:
                 decodeVifExtention_FD(b);
-
-                break;
-
+                return ds;
             case VIFE:
                 decodeVIFE(b);
-
-                break;
-
+                return ds;
             case COLLECTING_VALUE:
                 stack.push(b);
-
                 if (stack.isFull()) {
                     decodeValueFromStack();
                 }
-
-                break;
-
+                return ds;
             case SET_VARIABLE_LENGTH:
-
                 if ((b & 0xFF) < 0xBF) {
                     variableLengthType = VariableLengthType.STRING;
                     startCollectingValue((b & 0xFF));
@@ -202,80 +181,17 @@ public class VariableDataBlockDecoder {
                 } else {
                     throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF));
                 }
-
-                break;
-
+                return ds;
             default:
                 LOG.log(Level.SEVERE, "Unknown state: {0}", ds);
                 setState(DecodeState.ERROR);
         }
-
         return ds;
     }
 
-    
     public void reset() {
         stack.clear();
         setState(DecodeState.WAIT_FOR_INIT);
-    }
-    /**
-     *
-     * @param dataField length encoding see table 5 chapter 6.3
-     */
-    private void decodeDif(final byte dataField) {
-        switch (dataField) {
-            case 0x00:
-                dfc = DataFieldCode.NO_DATA;
-                break;
-            case 0x01:
-                dfc = DataFieldCode._8_BIT_INTEGER;
-                break;
-            case 0x02:
-                dfc = DataFieldCode._16_BIT_INTEGER;
-                break;
-            case 0x03:
-                dfc = DataFieldCode._24_BIT_INTEGER;
-                break;
-            case 0x04:
-                dfc = DataFieldCode._32_BIT_INTEGER;
-                break;
-            case 0x05:
-                dfc = DataFieldCode._32_BIT_REAL;
-                break;
-            case 0x06:
-                dfc = DataFieldCode._48_BIT_INTEGER;
-                break;
-            case 0x07:
-                dfc = DataFieldCode._64_BIT_INTEGER;
-                break;
-            case 0x08:
-                dfc = DataFieldCode.SELECTION_FOR_READOUT;
-                break;
-            case 0x09:
-                dfc = DataFieldCode._2_DIGIT_BCD;
-                break;
-            case 0x0A:
-                dfc = DataFieldCode._4_DIGIT_BCD;
-                break;
-            case 0x0B:
-                dfc = DataFieldCode._6_DIGIT_BCD;
-                break;
-            case 0x0C:
-                dfc = DataFieldCode._8_DIGIT_BCD;
-                break;
-            case 0x0D:
-                dfc = DataFieldCode.VARIABLE_LENGTH;
-                break;
-            case 0x0E:
-                dfc = DataFieldCode._12_DIGIT_BCD;
-                break;
-            case 0x0F:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException("data field 0x0f not supported");
-            default:
-                setState(DecodeState.ERROR);
-                throw new NotSupportedException(String.format("data field 0x%02x not supported", dataField));
-        }
     }
 
     private void decodeDif(final byte b, int bytesLeft) {
@@ -283,58 +199,97 @@ public class VariableDataBlockDecoder {
             case 0x0F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET;
                 startCollectingValue(bytesLeft);
-
                 return;
-
             case 0x1F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS;
-
                 if (bytesLeft == 0) {
                     createDataBlock();
                     setState(DecodeState.RESULT_AVAIL);
                 } else {
                     startCollectingValue(bytesLeft);
                 }
-
                 return;
-
             case 0x2F:
-
                 // Skip idlefiller next byte is DIF
                 return;
-
             case 0x3F:
             case 0x4F:
             case 0x5F:
             case 0x6F:
                 setState(DecodeState.ERROR);
-                throw new DecodeException("reserved"); // Reserverd,
-
+                throw new DecodeException(String.format("DIF reserved 0x%02x ", b & 0xFF)); // Reserverd,
             case 0x7F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST;
-
                 break;
-
             default:
 
-                try {
-                    decodeDif((byte) (b & 0x0F));
-                } catch (Exception e) {
-                    LOG.log(Level.SEVERE, "HALLO: {0}", b);
-                    throw new RuntimeException(e);
+                // decode data field
+                switch (b & 0x0F) {
+                    case 0x00:
+                        dfc = DataFieldCode.NO_DATA;
+                        break;
+                    case 0x01:
+                        dfc = DataFieldCode._8_BIT_INTEGER;
+                        break;
+                    case 0x02:
+                        dfc = DataFieldCode._16_BIT_INTEGER;
+                        break;
+                    case 0x03:
+                        dfc = DataFieldCode._24_BIT_INTEGER;
+                        break;
+                    case 0x04:
+                        dfc = DataFieldCode._32_BIT_INTEGER;
+                        break;
+                    case 0x05:
+                        dfc = DataFieldCode._32_BIT_REAL;
+                        break;
+                    case 0x06:
+                        dfc = DataFieldCode._48_BIT_INTEGER;
+                        break;
+                    case 0x07:
+                        dfc = DataFieldCode._64_BIT_INTEGER;
+                        break;
+                    case 0x08:
+                        dfc = DataFieldCode.SELECTION_FOR_READOUT;
+                        break;
+                    case 0x09:
+                        dfc = DataFieldCode._2_DIGIT_BCD;
+                        break;
+                    case 0x0A:
+                        dfc = DataFieldCode._4_DIGIT_BCD;
+                        break;
+                    case 0x0B:
+                        dfc = DataFieldCode._6_DIGIT_BCD;
+                        break;
+                    case 0x0C:
+                        dfc = DataFieldCode._8_DIGIT_BCD;
+                        break;
+                    case 0x0D:
+                        dfc = DataFieldCode.VARIABLE_LENGTH;
+                        break;
+                    case 0x0E:
+                        dfc = DataFieldCode._12_DIGIT_BCD;
+                        break;
+                    case 0x0F:
+                        setState(DecodeState.ERROR);
+                        throw new NotSupportedException("data field 0x0f not supported");
+                    default:
+                        setState(DecodeState.ERROR);
+                        throw new NotSupportedException(String.format("data field of DIF 0x%02x not supported", b & 0xFF));
                 }
 
-                switch ((b >> 4) & 0x03) {
+                // decode function field
+                switch (b & 0x30) {
                     case 0x00:
                         functionField = FunctionField.INSTANTANEOUS_VALUE;
                         break;
-                    case 0x01:
+                    case 0x10:
                         functionField = FunctionField.MAXIMUM_VALUE;
                         break;
-                    case 0x02:
+                    case 0x20:
                         functionField = FunctionField.MINIMUM_VALUE;
                         break;
-                    case 0x03:
+                    case 0x30:
                         functionField = FunctionField.VALUE_DURING_ERROR_STATE;
                         break;
                     default:
@@ -342,9 +297,7 @@ public class VariableDataBlockDecoder {
                 }
         }
 
-        if (DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST != dfc) {
-            storageNumber = (b >> 6) & 0x01;
-        }
+        storageNumber = (b >> 6) & 0x01;
 
         if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.DIFE);
@@ -674,7 +627,7 @@ public class VariableDataBlockDecoder {
             throw new RuntimeException("DB IST NULL");
         }
 
-        DecodeState oldState = this.ds;
+        final DecodeState oldState = this.ds;
         this.ds = ds;
 
         LOG.log(Level.FINEST, "{0} => {1}", new Object[]{oldState, ds});

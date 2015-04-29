@@ -66,6 +66,10 @@ import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.dataframes.GarbageCharFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.SendInitSlave;
+import net.sf.mbus4j.dataframes.SendUserData;
+import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.decoder.DecoderListener;
 import net.sf.mbus4j.json.JSONSerializable;
 import net.sf.mbus4j.json.JsonSerializeType;
@@ -163,14 +167,14 @@ public class MBusMaster
                 try {
                     while (!isClosed()) {
                         try {
-                            int theData;
-                            if ((theData = conn.getInputStream().read()) == -1) {
+                            final int theData = conn.getInputStream().read();
+                            if (theData == -1) {
                                 if (log.isLoggable(Level.FINEST)) {
                                     log.finest("Thread interrupted or eof on waiting occured");
                                 }
                             } else {
                                 try {
-                                    //TODO LOGGIN 
+                                    //TODO LOGGING 
                                     parser.addByte((byte) theData);
                                 } catch (Exception e) {
                                     log.log(Level.SEVERE, "Error during createPackage()", e);
@@ -222,7 +226,7 @@ public class MBusMaster
         void resetDecoder() {
             parser.reset();
         }
-        
+
     }
     private final static Logger log = LogUtils.getMasterLogger();
     private final List<GenericDevice> devices = new ArrayList<>();
@@ -317,12 +321,6 @@ public class MBusMaster
         }
     }
 
-    /**
-     * @TODO implement
-     */
-    public void deselectBySecondaryAddress() {
-    }
-
     public int deviceCount() {
         return devices.size();
     }
@@ -405,10 +403,10 @@ public class MBusMaster
             clearFrameQueue();
 
             final byte[] b = encoder.encode(frame);
-            
+
             //Reset the decoder from old leftovers...
             streamListener.resetDecoder();
-            
+
             conn.getOutputStrteam().write(b);
             conn.getOutputStrteam().flush();
             lastByteSended = System.currentTimeMillis();
@@ -443,6 +441,13 @@ public class MBusMaster
 
     public Frame sendInitSlave(byte address) throws IOException, InterruptedException {
         SendInitSlave req = new SendInitSlave(address);
+        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
+    }
+
+    public Frame sendSetNewAddress(byte address, byte newAddress) throws InterruptedException, IOException {
+        SendUserData req = new SendUserData();
+        req.setAddress(address);
+        req.addDataBlock(new ByteDataBlock(DataFieldCode._8_BIT_INTEGER, VifPrimary.BUS_ADDRESS, newAddress));
         return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
     }
 
@@ -573,7 +578,7 @@ public class MBusMaster
     //TODO all BCD
     public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium, int maxTries)
             throws IOException, InterruptedException {
-        List<GenericDevice> result = new ArrayList<GenericDevice>();
+        List<GenericDevice> result = new ArrayList<>();
         log.fine(String.format("widcardSearch bcdMaskedId: 0x%08X", bcdMaskedId));
         int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, maxTries);
         if (answers == 0) {
@@ -629,6 +634,33 @@ public class MBusMaster
             log.warning(String.format("Can't select select (none) Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
         }
         return answers == 1;
+    }
+
+    public boolean selectDevice(int id, String manufacturer, byte version, MBusMedium medium) throws IOException, InterruptedException {
+        return selectDevice(MBusUtils.int2Bcd(id),
+                MBusUtils.man2Short(manufacturer),
+                version,
+                (byte) medium.getId(), DEFAULT_SEND_TRIES);
+    }
+
+    public boolean setPrimaryAddressOfDevice(byte newAddress, MBusResponseFramesContainer dev) throws IOException, InterruptedException {
+        if (selectDevice(dev)) {
+            final Frame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
+            sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+            return f instanceof SingleCharFrame;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean setPrimaryAddressOfDevice(byte newAddress, int id, String manufacturer, byte version, MBusMedium medium) throws IOException, InterruptedException {
+        if (selectDevice(id, manufacturer, version, medium)) {
+            final Frame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
+            sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+            return f instanceof SingleCharFrame;
+        } else {
+            return false;
+        }
     }
 
     public boolean selectDevice(MBusResponseFramesContainer dev) throws IOException, InterruptedException {
