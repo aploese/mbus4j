@@ -100,16 +100,17 @@ public class JSONFactory {
                         return new UserDataResponse();
                     }
                 case SND_UD:
-                    if (SendUserData.SEND_USER_DATA_SUBTYPE.equals(sendUsedDataSubtype)) {
-                        return new SendUserData();
-                    } else if (ApplicationReset.SEND_USER_DATA_SUBTYPE.equals(sendUsedDataSubtype)) {
-                        return new ApplicationReset();
-                    } else if (SynchronizeAction.SEND_USER_DATA_SUBTYPE.equals(sendUsedDataSubtype)) {
-                        return new SynchronizeAction();
-                    } else if (SetBaudrate.SEND_USER_DATA_SUBTYPE.equals(sendUsedDataSubtype)) {
-                        return new SetBaudrate();
-                    } else {
-                        throw new UnsupportedOperationException("Unknown Send User Data Subcode: " + sendUsedDataSubtype);
+                    switch (sendUsedDataSubtype) {
+                        case SendUserData.SEND_USER_DATA_SUBTYPE:
+                            return new SendUserData();
+                        case ApplicationReset.SEND_USER_DATA_SUBTYPE:
+                            return new ApplicationReset();
+                        case SynchronizeAction.SEND_USER_DATA_SUBTYPE:
+                            return new SynchronizeAction();
+                        case SetBaudrate.SEND_USER_DATA_SUBTYPE:
+                            return new SetBaudrate();
+                        default:
+                            throw new UnsupportedOperationException("Unknown Send User Data Subcode: " + sendUsedDataSubtype);
                     }
                 case REQ_UD1:
                     return new RequestClassXData(ControlCode.REQ_UD1);

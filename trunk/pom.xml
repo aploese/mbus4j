@@ -95,12 +95,12 @@
             <dependency>
                 <groupId>net.sf.atmodem4j</groupId>
                 <artifactId>spsw-java</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.5-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.atmodem4j</groupId>
                 <artifactId>spsw-nativelibs-bundle</artifactId>
-                <version>0.0.4</version>
+                <version>0.0.5-SNAPSHOT</version>
             </dependency>
             
             <dependency>

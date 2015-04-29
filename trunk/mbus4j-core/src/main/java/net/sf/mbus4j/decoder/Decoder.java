@@ -27,13 +27,11 @@ package net.sf.mbus4j.decoder;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
-import net.sf.mbus4j.dataframes.GarbageCharFrame;
 import net.sf.mbus4j.dataframes.GeneralApplicationError;
 import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;

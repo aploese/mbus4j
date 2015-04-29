@@ -30,7 +30,6 @@ package net.sf.mbus4j.decoder;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.mbus4j.dataframes.Frame;
-import net.sf.mbus4j.dataframes.UserDataResponse;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

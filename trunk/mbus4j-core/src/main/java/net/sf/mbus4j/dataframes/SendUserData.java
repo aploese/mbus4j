@@ -46,7 +46,7 @@ import java.util.List;
 public class SendUserData
         implements LongFrame {
 
-    public static String SEND_USER_DATA_SUBTYPE = "send user data";
+    public static final String SEND_USER_DATA_SUBTYPE = "send user data";
     private final List<DataBlock> dataBlocks = new ArrayList<>();
     private byte address;
     private boolean fcb;

@@ -50,9 +50,9 @@ public class ByteDataBlock extends DataBlock implements BcdValue {
         super();
     }
 
-    @Deprecated
-    public ByteDataBlock(DataFieldCode dif, Vif vif) {
+    public ByteDataBlock(DataFieldCode dif, Vif vif, byte value) {
         super(dif, vif);
+        this.value = value;
     }
 
     /**
