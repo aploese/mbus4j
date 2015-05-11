@@ -647,7 +647,12 @@ public class MBusMaster
         if (selectDevice(dev)) {
             final Frame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
             sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-            return f instanceof SingleCharFrame;
+            if (f instanceof SingleCharFrame) {
+                dev.setAddress(newAddress);
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
