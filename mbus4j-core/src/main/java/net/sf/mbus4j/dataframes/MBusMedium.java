@@ -296,30 +296,7 @@ public enum MBusMedium {
 
     final public int id;
     final public String label;
-    final static public Set<MBusMedium> REGULAR_VALUES = EnumSet.noneOf(MBusMedium.class);
-
-    static {
-        REGULAR_VALUES.add(OTHER);
-        REGULAR_VALUES.add(OIL);
-        REGULAR_VALUES.add(ELECTRICITY);
-        REGULAR_VALUES.add(GAS);
-        REGULAR_VALUES.add(HEAT);
-        REGULAR_VALUES.add(STEAM);
-        REGULAR_VALUES.add(HOT_WATER);
-        REGULAR_VALUES.add(WATER);
-        REGULAR_VALUES.add(HEAT_COST_ALLOCATOR);
-        REGULAR_VALUES.add(COMPRESSED_AIR);
-        REGULAR_VALUES.add(COOLING_LOAD_METER_OUTLET);
-        REGULAR_VALUES.add(COOLING_LOAD_METER_INLET);
-        REGULAR_VALUES.add(HEAT_INLET);
-        REGULAR_VALUES.add(HEAT_COOLING_LOAD_METER);
-        REGULAR_VALUES.add(BUS_SYSTEM);
-        REGULAR_VALUES.add(UNKNOWN_MEDIUM);
-        REGULAR_VALUES.add(COLD_WATER);
-        REGULAR_VALUES.add(DUAL_WATER);
-        REGULAR_VALUES.add(PRESSURE);
-        REGULAR_VALUES.add(AD_CONVERTER);
-    }
+    static private Set<MBusMedium> REGULAR_VALUES;
 
     MBusMedium(int id, String label) {
         this.id = id;
@@ -366,6 +343,33 @@ public enum MBusMedium {
         }
 
         throw new IllegalArgumentException(String.format("Cant get MBusMedium from 0x%02x", b & 0xFF));
+    }
+
+    public static synchronized Set<MBusMedium> getRegularValues() {
+        if (REGULAR_VALUES == null) {
+            REGULAR_VALUES = EnumSet.noneOf(MBusMedium.class);
+            REGULAR_VALUES.add(OTHER);
+            REGULAR_VALUES.add(OIL);
+            REGULAR_VALUES.add(ELECTRICITY);
+            REGULAR_VALUES.add(GAS);
+            REGULAR_VALUES.add(HEAT);
+            REGULAR_VALUES.add(STEAM);
+            REGULAR_VALUES.add(HOT_WATER);
+            REGULAR_VALUES.add(WATER);
+            REGULAR_VALUES.add(HEAT_COST_ALLOCATOR);
+            REGULAR_VALUES.add(COMPRESSED_AIR);
+            REGULAR_VALUES.add(COOLING_LOAD_METER_OUTLET);
+            REGULAR_VALUES.add(COOLING_LOAD_METER_INLET);
+            REGULAR_VALUES.add(HEAT_INLET);
+            REGULAR_VALUES.add(HEAT_COOLING_LOAD_METER);
+            REGULAR_VALUES.add(BUS_SYSTEM);
+            REGULAR_VALUES.add(UNKNOWN_MEDIUM);
+            REGULAR_VALUES.add(COLD_WATER);
+            REGULAR_VALUES.add(DUAL_WATER);
+            REGULAR_VALUES.add(PRESSURE);
+            REGULAR_VALUES.add(AD_CONVERTER);
+        }
+        return REGULAR_VALUES;
     }
 
 }
