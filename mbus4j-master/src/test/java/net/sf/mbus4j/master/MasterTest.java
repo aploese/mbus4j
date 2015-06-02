@@ -211,7 +211,7 @@ public class MasterTest {
         slaves.respondToRequest("680B0B6853FD52FFFFFF8FFFFFFFFF2A16", 3);
         slaves.respondToRequest("680B0B6853FD52FFFFFF9FFFFFFFFF3A16", 3);
         slaves.replay();
-        master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, Sender.DEFAULT_SEND_TRIES);
+        master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
         assertTrue(slaves.isOK());
         log.info("widcardSearch finished");
         assertEquals(4,

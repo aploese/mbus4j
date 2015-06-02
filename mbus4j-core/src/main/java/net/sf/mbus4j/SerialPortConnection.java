@@ -34,6 +34,7 @@ import java.util.Set;
 import net.sf.atmodem4j.spsw.Baudrate;
 import net.sf.atmodem4j.spsw.DataBits;
 import net.sf.atmodem4j.spsw.FlowControl;
+import net.sf.atmodem4j.spsw.LoggingSerialPortSocket;
 import net.sf.atmodem4j.spsw.Parity;
 import net.sf.atmodem4j.spsw.SerialPortSocket;
 import net.sf.atmodem4j.spsw.StopBits;
@@ -76,6 +77,9 @@ public class SerialPortConnection extends Connection {
         try {
             setConnState(State.OPENING);
             sPort = SerialPortSocket.FACTORY.createSerialPortSocket(portName);
+            if (getLoggingStream() != null) {
+                sPort = new LoggingSerialPortSocket(sPort, getLoggingStream());
+            }
             sPort.openRaw(Baudrate.fromValue(getBitPerSecond()), DATA_BITS, STOP_BITS, PARITY, FlowControl.getFC_NONE());
             is = sPort.getInputStream();
             os = sPort.getOutputStream();

@@ -27,7 +27,6 @@ package net.sf.mbus4j.devices;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.io.Closeable;
 import java.io.IOException;
 import net.sf.mbus4j.dataframes.Frame;
 
@@ -39,6 +38,6 @@ public interface Sender {
 
     Frame send(Frame frame, int maxTries, long timeout) throws IOException, InterruptedException;
 
-    public final static int DEFAULT_SEND_TRIES = 2;
+    public final static int DEFAULT_SEND_TRIES = 3;
 
 }

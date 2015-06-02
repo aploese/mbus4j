@@ -259,8 +259,8 @@ public class MBusMaster
         return devices.add(device);
     }
 
-    //TDOD whwn to use this? ... 
-    public GenericDevice addDeviceByAddress(byte address)
+    
+    public GenericDevice searchDeviceByAddress(byte address)
             throws InterruptedException, IOException {
         Frame f = sendRequestUserData(address);
 //        Frame f = sendInitSlave(address);
@@ -365,8 +365,8 @@ public class MBusMaster
         return frameQueue.remove();
     }
 
-    public GenericDevice[] searchDevicesBySecondaryAddressing(int maxTries) throws IOException, InterruptedException {
-        return widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF, maxTries);
+    public GenericDevice[] searchDevicesBySecondaryAddressing() throws IOException, InterruptedException {
+        return widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF);
     }
 
     /**
@@ -388,7 +388,7 @@ public class MBusMaster
         final short fAddr = (short) (first & 0xFF);
         final short lAddr = (short) (last & 0xFF);
         for (short i = fAddr; i <= lAddr; i++) {
-            GenericDevice c = addDeviceByAddress((byte) i);
+            GenericDevice c = searchDeviceByAddress((byte) i);
             if (c != null) {
                 result.add(c);
             }
@@ -399,7 +399,7 @@ public class MBusMaster
     @Override
     public Frame send(Frame frame, int maxTries, long timeout)
             throws IOException, InterruptedException {
-        for (int tries = 0; tries <= maxTries; tries++) {
+        for (int tries = 0; tries < maxTries; tries++) {
             clearFrameQueue();
 
             final byte[] b = encoder.encode(frame);
@@ -411,13 +411,7 @@ public class MBusMaster
             conn.getOutputStrteam().flush();
             lastByteSended = System.currentTimeMillis();
 
-            if (log.isLoggable(Level.FINE)) {
-                log.log(Level.FINE, "Data Sent (try: {0}): {} ",
-                        new Object[]{tries, Decoder.bytes2Ascii(b)});
-            }
-
             Frame result = pollFrameOrWaitUntil(lastByteSended + timeout);
-            log.log(Level.FINE, "Answer took {0} ms", System.currentTimeMillis() - lastByteSended);
 
             if (result != null) {
                 return result;
@@ -425,8 +419,9 @@ public class MBusMaster
                 Thread.sleep(getIdleTime());
             }
         }
-        log.log(Level.INFO, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, frame});
-
+        if (log.isLoggable(Level.FINE)) {
+            log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, frame});
+        }
         return null;
     }
 
@@ -576,23 +571,23 @@ public class MBusMaster
     }
 
     //TODO all BCD
-    public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium, int maxTries)
+    public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium)
             throws IOException, InterruptedException {
         List<GenericDevice> result = new ArrayList<>();
         log.fine(String.format("widcardSearch bcdMaskedId: 0x%08X", bcdMaskedId));
-        int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, maxTries);
+        int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, DEFAULT_SEND_TRIES);
         if (answers == 0) {
             log.fine(String.format("no slave with mask: 0x%08X", bcdMaskedId));
         } else if (answers == 1) {
             log.fine(String.format("detect slave with mask: 0x%08X", bcdMaskedId));
-            GenericDevice dev = addDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+            GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
             result.add(dev);
         } else {
             log.fine(String.format("multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
             int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
             if (leftmostMaskedNibble >= 0) {
                 for (int i = 0; i <= 9; i++) {
-                    GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, maxTries);
+                    GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
                     result.addAll(Arrays.asList(devs));
                 }
             } else {
