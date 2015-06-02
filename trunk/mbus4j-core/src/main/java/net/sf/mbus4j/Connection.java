@@ -60,6 +60,20 @@ public abstract class Connection implements JSONSerializable, Serializable, Clos
         this.connState = connState;
     }
 
+    /**
+     * @return the loggingStream
+     */
+    public OutputStream getLoggingStream() {
+        return loggingStream;
+    }
+
+    /**
+     * @param loggingStream the loggingStream to set
+     */
+    public void setLoggingStream(OutputStream loggingStream) {
+        this.loggingStream = loggingStream;
+    }
+
     public enum State {
 
         OPENING, OPEN, CLOSING, CLOSED
@@ -71,6 +85,7 @@ public abstract class Connection implements JSONSerializable, Serializable, Clos
     protected transient InputStream is;
     protected transient OutputStream os;
     private transient State connState = State.CLOSED;
+    private transient OutputStream loggingStream; 
 
     public Connection() {
 

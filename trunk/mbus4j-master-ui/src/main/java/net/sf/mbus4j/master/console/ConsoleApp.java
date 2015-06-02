@@ -30,6 +30,7 @@ package net.sf.mbus4j.master.console;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,6 +158,11 @@ public class ConsoleApp {
         opt.setType(String.class);
         options.addOption(opt);
 
+        opt = new Option(null, "logFile", true, "logFile");
+        opt.setArgName("log file of serial data");
+        opt.setType(String.class);
+        options.addOption(opt);
+
         CommandLineParser parser = new PosixParser();
         CommandLine cmd = null;
 
@@ -190,6 +196,12 @@ public class ConsoleApp {
             responseTimeoutOffset = Integer.parseInt(cmd.getOptionValue("timeout"));
         }
 
+        FileOutputStream logStream = null;
+        
+        if (cmd.hasOption("logFile")) {
+            logStream = new FileOutputStream(cmd.getOptionValue("logFile"), true);
+        }
+
         if (cmd.hasOption("tcpip")) {
             final String tcpAddr = cmd.getOptionValue("tcpip").split(":")[0];
             final int tcpPort = Integer.parseInt(cmd.getOptionValue("tcpip").split(":")[1]);
@@ -197,12 +209,14 @@ public class ConsoleApp {
                 responseTimeoutOffset = TcpIpConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET;
             }
             TcpIpConnection conn = new TcpIpConnection(tcpAddr, tcpPort, bitPerSecond, responseTimeoutOffset);
+            conn.setLoggingStream(logStream);
             master.setConnection(conn);
         } else if (cmd.hasOption("port")) {
             if (responseTimeoutOffset == -1) {
                 responseTimeoutOffset = SerialPortConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET;
             }
             SerialPortConnection conn = new SerialPortConnection(cmd.getOptionValue("port"), bitPerSecond, responseTimeoutOffset);
+            conn.setLoggingStream(logStream);
             master.setConnection(conn);
         }
 
@@ -216,7 +230,7 @@ public class ConsoleApp {
                     byte medium = cmd.hasOption("medium") ? (byte) MBusMedium.fromLabel(cmd.getOptionValue("medium")).getId() : (byte) 0xFF;
                     short manufacturer = cmd.hasOption("manufacturer") ? MBusUtils.man2Short(cmd.getOptionValue("manufacturer")) : (short) 0xFFFF;
 //                    System.out.println("FOUND SLAVES: " + master.sendSlaveSelect(bcdId, manufacturer, version, medium, 1));
-                    master.widcardSearch(bcdId, manufacturer, version, medium, 3);
+                    master.widcardSearch(bcdId, manufacturer, version, medium);
                     Thread.sleep(1000 * 5); // 20 sec
                     LOG.info("Reading done - Closing down");
                 }

@@ -40,7 +40,52 @@
         <dependency>
             <groupId>net.sf.atmodem4j</groupId>
             <artifactId>spsw-nativelibs-bundle</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.sf.atmodem4j</groupId>
+                    <artifactId>libspsw-linux-amd64</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.atmodem4j</groupId>
+                    <artifactId>libspsw-linux-armhf</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.atmodem4j</groupId>
+                    <artifactId>libspsw-linux-i386</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.atmodem4j</groupId>
+                    <artifactId>spsw-windows-x86</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.atmodem4j</groupId>
+                    <artifactId>spsw-windows-x86_64</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
-
+    
+<build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>net.sf.mbus4j.master.console.ConsoleApp</mainClass>
+            </manifest>
+          </archive>
+          <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+          </executions>
+        </configuration>
+      </plugin>
+    </plugins>
+</build>
 </project>
