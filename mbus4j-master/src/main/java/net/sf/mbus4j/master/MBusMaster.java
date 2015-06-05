@@ -259,7 +259,6 @@ public class MBusMaster
         return devices.add(device);
     }
 
-    
     public GenericDevice searchDeviceByAddress(byte address)
             throws InterruptedException, IOException {
         Frame f = sendRequestUserData(address);
@@ -270,7 +269,7 @@ public class MBusMaster
             //TODO detect dev and create
             result = DeviceFactory.createDevice(udr, new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address));
             addDevice(result);
-            log.info(String.format("added device: address = 0x%02X, id = %08d, man = %s, medium = %s, version = 0x%02X",
+            log.info(String.format("found device: address = 0x%02X, id = %08d, man = %s, medium = %s, version = 0x%02X",
                     udr.getAddress(),
                     udr.getIdentNumber(),
                     udr.getManufacturer(),
@@ -570,18 +569,33 @@ public class MBusMaster
         return (value & mask) | nibbleToSet;
     }
 
-    //TODO all BCD
+    //TODO detect end change all maked BCD
     public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium)
             throws IOException, InterruptedException {
         List<GenericDevice> result = new ArrayList<>();
         log.fine(String.format("widcardSearch bcdMaskedId: 0x%08X", bcdMaskedId));
         int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, DEFAULT_SEND_TRIES);
         if (answers == 0) {
-            log.fine(String.format("no slave with mask: 0x%08X", bcdMaskedId));
+            log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
         } else if (answers == 1) {
-            log.fine(String.format("detect slave with mask: 0x%08X", bcdMaskedId));
+            log.fine(String.format("detect slave with bcdMaskedId: 0x%08X", bcdMaskedId));
             GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-            result.add(dev);
+            if (dev == null) {
+                // someone does not play by the rule so try to fint them nevertheless
+                log.info(String.format("maybe multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
+                int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
+                if (leftmostMaskedNibble >= 0) {
+                    for (int i = 0; i <= 9; i++) {
+                        GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
+                        result.addAll(Arrays.asList(devs));
+                    }
+                } else {
+                    log.warning(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
+                            bcdMaskedId));
+                }
+            } else {
+                result.add(dev);
+            }
         } else {
             log.fine(String.format("multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
             int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
@@ -591,7 +605,7 @@ public class MBusMaster
                     result.addAll(Arrays.asList(devs));
                 }
             } else {
-                log.fine(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
+                log.warning(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
                         bcdMaskedId));
             }
         }
