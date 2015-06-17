@@ -27,7 +27,6 @@ package net.sf.mbus4j.master;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-
 import java.util.logging.Logger;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
@@ -115,10 +114,9 @@ public class MasterTest {
     /**
      * Test of widcardSearch method, of class MBusMaster.
      */
-    @Test(timeout = 60000)
-    @Ignore
-    public void testWidcardSearch()
-            throws Exception {
+    @Test//(timeout = 60000)
+    //  @Ignore
+    public void testWidcardSearch() throws Exception {
         System.out.println("widcardSearch");
 
         int bcdMaskedId = 0xFFFFFFFF;
@@ -126,136 +124,238 @@ public class MasterTest {
         byte bcdMaskedVersion = (byte) 0xFF;
         byte bcdMaskedMedium = (byte) 0xFF;
         slaves.respondToRequest("680B0B6853FD52FFFFFFFFFFFFFFFF9A16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FFFFFF0FFFFFFFFFAA16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF1FFFFFFFFFBA16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FFFFFF10FFFFFFFFAB16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF11FFFFFFFFAC16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF12FFFFFFFFAD16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF13FFFFFFFFAE16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF14FFFFFFFFAF16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FFFF0F14FFFFFFFFBF16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF1F14FFFFFFFFCF16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF2F14FFFFFFFFDF16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF3F14FFFFFFFFEF16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4F14FFFFFFFFFF16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FFFF4014FFFFFFFFF016", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4114FFFFFFFFF116", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4214FFFFFFFFF216", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4314FFFFFFFFF316", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4414FFFFFFFFF416", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4514FFFFFFFFF516", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4614FFFFFFFFF616", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4714FFFFFFFFF716", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4814FFFFFFFFF816", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF4914FFFFFFFFF916", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FF0F4914FFFFFFFF0916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF1F4914FFFFFFFF1916", "E5E5");
-        slaves.respondToRequest("680B0B6853FD52FF104914FFFFFFFF0A16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD520F104914FFFFFFFF1A16", "E5E5");
-        slaves.respondToRequest("680B0B6853FD5200104914FFFFFFFF0B16", 3);
-        slaves.respondToRequest("680B0B6853FD5201104914FFFFFFFF0C16", "E5");
-        slaves.respondToRequest("105BFD5816", "680F0F680801720110491457100106000000005716");
-        slaves.respondToRequest("680B0B6853FD5202104914FFFFFFFF0D16", 3);
-        slaves.respondToRequest("680B0B6853FD5203104914FFFFFFFF0E16", 3);
-        slaves.respondToRequest("680B0B6853FD5204104914FFFFFFFF0F16", 3);
-        slaves.respondToRequest("680B0B6853FD5205104914FFFFFFFF1016", 3);
-        slaves.respondToRequest("680B0B6853FD5206104914FFFFFFFF1116", 3);
-        slaves.respondToRequest("680B0B6853FD5207104914FFFFFFFF1216", 3);
-        slaves.respondToRequest("680B0B6853FD5208104914FFFFFFFF1316", "E5");
-        slaves.respondToRequest("105BFD5816", "680F0F68080172081049146745010600000000A316");
-        slaves.respondToRequest("680B0B6853FD5209104914FFFFFFFF1416", 3);
-        slaves.respondToRequest("680B0B6853FD521F104914FFFFFFFF2A16", 3);
-        slaves.respondToRequest("680B0B6853FD522F104914FFFFFFFF3A16", 3);
-        slaves.respondToRequest("680B0B6853FD523F104914FFFFFFFF4A16", 3);
-        slaves.respondToRequest("680B0B6853FD524F104914FFFFFFFF5A16", 3);
-        slaves.respondToRequest("680B0B6853FD525F104914FFFFFFFF6A16", 3);
-        slaves.respondToRequest("680B0B6853FD526F104914FFFFFFFF7A16", 3);
-        slaves.respondToRequest("680B0B6853FD527F104914FFFFFFFF8A16", 3);
-        slaves.respondToRequest("680B0B6853FD528F104914FFFFFFFF9A16", 3);
-        slaves.respondToRequest("680B0B6853FD529F104914FFFFFFFFAA16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF114914FFFFFFFF0B16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF124914FFFFFFFF0C16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF134914FFFFFFFF0D16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF144914FFFFFFFF0E16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF154914FFFFFFFF0F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FF164914FFFFFFFF1016", 3);
-        slaves.respondToRequest("680B0B6853FD52FF174914FFFFFFFF1116", 3);
-        slaves.respondToRequest("680B0B6853FD52FF184914FFFFFFFF1216", 3);
-        slaves.respondToRequest("680B0B6853FD52FF194914FFFFFFFF1316", 3);
-        slaves.respondToRequest("680B0B6853FD52FF2F4914FFFFFFFF2916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF3F4914FFFFFFFF3916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF4F4914FFFFFFFF4916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF5F4914FFFFFFFF5916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF6F4914FFFFFFFF6916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF7F4914FFFFFFFF7916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF8F4914FFFFFFFF8916", 3);
-        slaves.respondToRequest("680B0B6853FD52FF9F4914FFFFFFFF9916", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF5F14FFFFFFFF0F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF6F14FFFFFFFF1F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF7F14FFFFFFFF2F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF8F14FFFFFFFF3F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFF9F14FFFFFFFF4F16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF15FFFFFFFFB016", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF16FFFFFFFFB116", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF17FFFFFFFFB216", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF18FFFFFFFFB316", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF19FFFFFFFFB416", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF2FFFFFFFFFCA16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF3FFFFFFFFFDA16", "E5");
-        slaves.respondToRequest("105BFD5816", "680F0F680801723348103210200102000000006B16");
-        slaves.respondToRequest("680B0B6853FD52FFFFFF4FFFFFFFFFEA16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF5FFFFFFFFFFA16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF6FFFFFFFFF0A16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF7FFFFFFFFF1A16", "E5");
-        slaves.respondToRequest("105BFD5816", "680F0F68080172103254761020010300000000BB16");
-        slaves.respondToRequest("680B0B6853FD52FFFFFF8FFFFFFFFF2A16", 3);
-        slaves.respondToRequest("680B0B6853FD52FFFFFF9FFFFFFFFF3A16", 3);
+        slaves.respondToRequest("680B0B6853FD52F0FFFFFFFFFFFFFF8B16", 3);
+        slaves.respondToRequest("680B0B6853FD52F1FFFFFFFFFFFFFF8C16", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5201FFFFFFFFFFFFFF9C16", 3);
+        slaves.respondToRequest("680B0B6853FD5211FFFFFFFFFFFFFFAC16", 3);
+        slaves.respondToRequest("680B0B6853FD5221FFFFFFFFFFFFFFBC16", 3);
+        slaves.respondToRequest("680B0B6853FD5231FFFFFFFFFFFFFFCC16", 3);
+        slaves.respondToRequest("680B0B6853FD5241FFFFFFFFFFFFFFDC16", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5241F0FFFFFFFFFFFFCD16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F1FFFFFFFFFFFFCE16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F2FFFFFFFFFFFFCF16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F3FFFFFFFFFFFFD016", 3);
+        slaves.respondToRequest("680B0B6853FD5241F4FFFFFFFFFFFFD116", "E5E5");
+        slaves.respondToRequest("680B0B6853FD524104FFFFFFFFFFFFE116", 3);
+        slaves.respondToRequest("680B0B6853FD524114FFFFFFFFFFFFF116", 3);
+        slaves.respondToRequest("680B0B6853FD524124FFFFFFFFFFFF0116", 3);
+        slaves.respondToRequest("680B0B6853FD524134FFFFFFFFFFFF1116", 3);
+        slaves.respondToRequest("680B0B6853FD524144FFFFFFFFFFFF2116", 3);
+        slaves.respondToRequest("680B0B6853FD524154FFFFFFFFFFFF3116", 3);
+        slaves.respondToRequest("680B0B6853FD524164FFFFFFFFFFFF4116", 3);
+        slaves.respondToRequest("680B0B6853FD524174FFFFFFFFFFFF5116", 3);
+        slaves.respondToRequest("680B0B6853FD524184FFFFFFFFFFFF6116", 3);
+        slaves.respondToRequest("680B0B6853FD524194FFFFFFFFFFFF7116", "E5E5");
+        slaves.respondToRequest("680B0B6853FD524194F0FFFFFFFFFF6216", 3);
+        slaves.respondToRequest("680B0B6853FD524194F1FFFFFFFFFF6316", "E5E5");
+        slaves.respondToRequest("680B0B6853FD52419401FFFFFFFFFF7316", "E5E5");
+        slaves.respondToRequest("680B0B6853FD52419401F0FFFFFFFF6416", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5241940100FFFFFFFF7416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940110FFFFFFFF8416", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F680801720110491457100106000000005716");
+        slaves.respondToRequest("680B0B6853FD5241940120FFFFFFFF9416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940130FFFFFFFFA416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940140FFFFFFFFB416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940150FFFFFFFFC416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940160FFFFFFFFD416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940170FFFFFFFFE416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940180FFFFFFFFF416", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F68080172081049146745010600000000A316");
+        slaves.respondToRequest("680B0B6853FD5241940190FFFFFFFF0416", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F1FFFFFFFF6516", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F2FFFFFFFF6616", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F3FFFFFFFF6716", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F4FFFFFFFF6816", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F5FFFFFFFF6916", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F6FFFFFFFF6A16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F7FFFFFFFF6B16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F8FFFFFFFF6C16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F9FFFFFFFF6D16", 3);
+        slaves.respondToRequest("680B0B6853FD52419411FFFFFFFFFF8316", 3);
+        slaves.respondToRequest("680B0B6853FD52419421FFFFFFFFFF9316", 3);
+        slaves.respondToRequest("680B0B6853FD52419431FFFFFFFFFFA316", 3);
+        slaves.respondToRequest("680B0B6853FD52419441FFFFFFFFFFB316", 3);
+        slaves.respondToRequest("680B0B6853FD52419451FFFFFFFFFFC316", 3);
+        slaves.respondToRequest("680B0B6853FD52419461FFFFFFFFFFD316", 3);
+        slaves.respondToRequest("680B0B6853FD52419471FFFFFFFFFFE316", 3);
+        slaves.respondToRequest("680B0B6853FD52419481FFFFFFFFFFF316", 3);
+        slaves.respondToRequest("680B0B6853FD52419491FFFFFFFFFF0316", 3);
+        slaves.respondToRequest("680B0B6853FD524194F2FFFFFFFFFF6416", 3);
+        slaves.respondToRequest("680B0B6853FD524194F3FFFFFFFFFF6516", 3);
+        slaves.respondToRequest("680B0B6853FD524194F4FFFFFFFFFF6616", 3);
+        slaves.respondToRequest("680B0B6853FD524194F5FFFFFFFFFF6716", 3);
+        slaves.respondToRequest("680B0B6853FD524194F6FFFFFFFFFF6816", 3);
+        slaves.respondToRequest("680B0B6853FD524194F7FFFFFFFFFF6916", 3);
+        slaves.respondToRequest("680B0B6853FD524194F8FFFFFFFFFF6A16", 3);
+        slaves.respondToRequest("680B0B6853FD524194F9FFFFFFFFFF6B16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F5FFFFFFFFFFFFD216", 3);
+        slaves.respondToRequest("680B0B6853FD5241F6FFFFFFFFFFFFD316", 3);
+        slaves.respondToRequest("680B0B6853FD5241F7FFFFFFFFFFFFD416", 3);
+        slaves.respondToRequest("680B0B6853FD5241F8FFFFFFFFFFFFD516", 3);
+        slaves.respondToRequest("680B0B6853FD5241F9FFFFFFFFFFFFD616", 3);
+        slaves.respondToRequest("680B0B6853FD5251FFFFFFFFFFFFFFEC16", 3);
+        slaves.respondToRequest("680B0B6853FD5261FFFFFFFFFFFFFFFC16", 3);
+        slaves.respondToRequest("680B0B6853FD5271FFFFFFFFFFFFFF0C16", 3);
+        slaves.respondToRequest("680B0B6853FD5281FFFFFFFFFFFFFF1C16", 3);
+        slaves.respondToRequest("680B0B6853FD5291FFFFFFFFFFFFFF2C16", 3);
+        slaves.respondToRequest("680B0B6853FD52F2FFFFFFFFFFFFFF8D16", 3);
+        slaves.respondToRequest("680B0B6853FD52F3FFFFFFFFFFFFFF8E16", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F680801723348103210200102000000006B16");
+        slaves.respondToRequest("680B0B6853FD52F4FFFFFFFFFFFFFF8F16", 3);
+        slaves.respondToRequest("680B0B6853FD52F5FFFFFFFFFFFFFF9016", 3);
+        slaves.respondToRequest("680B0B6853FD52F6FFFFFFFFFFFFFF9116", 3);
+        slaves.respondToRequest("680B0B6853FD52F7FFFFFFFFFFFFFF9216", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F68080172103254761020010300000000BB16");
+        slaves.respondToRequest("680B0B6853FD52F8FFFFFFFFFFFFFF9316", 3);
+        slaves.respondToRequest("680B0B6853FD52F9FFFFFFFFFFFFFF9416", 3);
         slaves.replay();
         master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
         assertTrue(slaves.isOK());
         log.info("widcardSearch finished");
-        assertEquals(4,
-                master.deviceCount());
-        assertEquals(1,
-                master.getDevice(0).getAddress());
-        assertEquals(14491001,
-                master.getDevice(0).getIdentNumber());
-        assertEquals("DBW",
-                master.getDevice(0).getManufacturer());
-        assertEquals(MBusMedium.HOT_WATER,
-                master.getDevice(0).getMedium());
-        assertEquals(1,
-                master.getDevice(0).getVersion());
-        assertEquals(1,
-                master.getDevice(1).getAddress());
-        assertEquals(14491008,
-                master.getDevice(1).getIdentNumber());
-        assertEquals("QKG",
-                master.getDevice(1).getManufacturer());
-        assertEquals(MBusMedium.HOT_WATER,
-                master.getDevice(1).getMedium());
-        assertEquals(1,
-                master.getDevice(1).getVersion());
-        assertEquals(1,
-                master.getDevice(2).getAddress());
-        assertEquals(32104833,
-                master.getDevice(2).getIdentNumber());
-        assertEquals("H@P",
-                master.getDevice(2).getManufacturer());
-        assertEquals(MBusMedium.ELECTRICITY,
-                master.getDevice(2).getMedium());
-        assertEquals(1,
-                master.getDevice(2).getVersion());
-        assertEquals(1,
-                master.getDevice(3).getAddress());
-        assertEquals(76543210,
-                master.getDevice(3).getIdentNumber());
-        assertEquals("H@P",
-                master.getDevice(3).getManufacturer());
-        assertEquals(MBusMedium.GAS,
-                master.getDevice(3).getMedium());
-        assertEquals(1,
-                master.getDevice(3).getVersion());
+        assertEquals(4, master.deviceCount());
+        
+        assertEquals(1, master.getDevice(0).getAddress());
+        assertEquals(14491001, master.getDevice(0).getIdentNumber());
+        assertEquals("DBW", master.getDevice(0).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(0).getMedium());
+        assertEquals(1, master.getDevice(0).getVersion());
+        assertEquals(1, master.getDevice(1).getAddress());
+        assertEquals(14491008, master.getDevice(1).getIdentNumber());
+        assertEquals("QKG", master.getDevice(1).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(1).getMedium());
+        assertEquals(1, master.getDevice(1).getVersion());
+        assertEquals(1, master.getDevice(2).getAddress());
+        assertEquals(32104833, master.getDevice(2).getIdentNumber());
+        assertEquals("H@P", master.getDevice(2).getManufacturer());
+        assertEquals(MBusMedium.ELECTRICITY, master.getDevice(2).getMedium());
+        assertEquals(1, master.getDevice(2).getVersion());
+        assertEquals(1, master.getDevice(3).getAddress());
+        assertEquals(76543210, master.getDevice(3).getIdentNumber());
+        assertEquals("H@P", master.getDevice(3).getManufacturer());
+        assertEquals(MBusMedium.GAS, master.getDevice(3).getMedium());
+        assertEquals(1, master.getDevice(3).getVersion());
+    }
+
+    @Test//(timeout = 60000)
+    //  @Ignore
+    public void testWidcardSearch_1()            throws Exception {
+        System.out.println("widcardSearch");
+
+        int bcdMaskedId = 0xFFFFFFFF;
+        short bcdMaskedMan = (short) 0xFFFF;
+        byte bcdMaskedVersion = (byte) 0xFF;
+        byte bcdMaskedMedium = (byte) 0xFF;
+        slaves.respondToRequest("680B0B6853FD52FFFFFFFFFFFFFFFF9A16", "E5E5");
+        slaves.respondToRequest("680B0B6853FD52F0FFFFFFFFFFFFFF8B16", 3);
+        slaves.respondToRequest("680B0B6853FD52F1FFFFFFFFFFFFFF8C16", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5201FFFFFFFFFFFFFF9C16", 3);
+        slaves.respondToRequest("680B0B6853FD5211FFFFFFFFFFFFFFAC16", 3);
+        slaves.respondToRequest("680B0B6853FD5221FFFFFFFFFFFFFFBC16", 3);
+        slaves.respondToRequest("680B0B6853FD5231FFFFFFFFFFFFFFCC16", 3);
+        slaves.respondToRequest("680B0B6853FD5241FFFFFFFFFFFFFFDC16", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5241F0FFFFFFFFFFFFCD16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F1FFFFFFFFFFFFCE16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F2FFFFFFFFFFFFCF16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F3FFFFFFFFFFFFD016", 3);
+        slaves.respondToRequest("680B0B6853FD5241F4FFFFFFFFFFFFD116", "E5E5");
+        slaves.respondToRequest("680B0B6853FD524104FFFFFFFFFFFFE116", 3);
+        slaves.respondToRequest("680B0B6853FD524114FFFFFFFFFFFFF116", 3);
+        slaves.respondToRequest("680B0B6853FD524124FFFFFFFFFFFF0116", 3);
+        slaves.respondToRequest("680B0B6853FD524134FFFFFFFFFFFF1116", 3);
+        slaves.respondToRequest("680B0B6853FD524144FFFFFFFFFFFF2116", 3);
+        slaves.respondToRequest("680B0B6853FD524154FFFFFFFFFFFF3116", 3);
+        slaves.respondToRequest("680B0B6853FD524164FFFFFFFFFFFF4116", 3);
+        slaves.respondToRequest("680B0B6853FD524174FFFFFFFFFFFF5116", 3);
+        slaves.respondToRequest("680B0B6853FD524184FFFFFFFFFFFF6116", 3);
+        slaves.respondToRequest("680B0B6853FD524194FFFFFFFFFFFF7116", "E5E5");
+        slaves.respondToRequest("680B0B6853FD524194F0FFFFFFFFFF6216", 3);
+        slaves.respondToRequest("680B0B6853FD524194F1FFFFFFFFFF6316", "E5E5");
+        slaves.respondToRequest("680B0B6853FD52419401FFFFFFFFFF7316", "E5E5");
+        slaves.respondToRequest("680B0B6853FD52419401F0FFFFFFFF6416", "E5E5");
+        slaves.respondToRequest("680B0B6853FD5241940100FFFFFFFF7416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940110FFFFFFFF8416", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F680801720110491457100106000000005716");
+        slaves.respondToRequest("680B0B6853FD5241940120FFFFFFFF9416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940130FFFFFFFFA416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940140FFFFFFFFB416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940150FFFFFFFFC416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940160FFFFFFFFD416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940170FFFFFFFFE416", 3);
+        slaves.respondToRequest("680B0B6853FD5241940180FFFFFFFFF416", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F68080172081049146745010600000000A316");
+        slaves.respondToRequest("680B0B6853FD5241940190FFFFFFFF0416", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F1FFFFFFFF6516", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F2FFFFFFFF6616", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F3FFFFFFFF6716", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F4FFFFFFFF6816", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F5FFFFFFFF6916", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F6FFFFFFFF6A16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F7FFFFFFFF6B16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F8FFFFFFFF6C16", 3);
+        slaves.respondToRequest("680B0B6853FD52419401F9FFFFFFFF6D16", 3);
+        slaves.respondToRequest("680B0B6853FD52419411FFFFFFFFFF8316", 3);
+        slaves.respondToRequest("680B0B6853FD52419421FFFFFFFFFF9316", 3);
+        slaves.respondToRequest("680B0B6853FD52419431FFFFFFFFFFA316", 3);
+        slaves.respondToRequest("680B0B6853FD52419441FFFFFFFFFFB316", 3);
+        slaves.respondToRequest("680B0B6853FD52419451FFFFFFFFFFC316", 3);
+        slaves.respondToRequest("680B0B6853FD52419461FFFFFFFFFFD316", 3);
+        slaves.respondToRequest("680B0B6853FD52419471FFFFFFFFFFE316", 3);
+        slaves.respondToRequest("680B0B6853FD52419481FFFFFFFFFFF316", 3);
+        slaves.respondToRequest("680B0B6853FD52419491FFFFFFFFFF0316", 3);
+        slaves.respondToRequest("680B0B6853FD524194F2FFFFFFFFFF6416", 3);
+        slaves.respondToRequest("680B0B6853FD524194F3FFFFFFFFFF6516", 3);
+        slaves.respondToRequest("680B0B6853FD524194F4FFFFFFFFFF6616", 3);
+        slaves.respondToRequest("680B0B6853FD524194F5FFFFFFFFFF6716", 3);
+        slaves.respondToRequest("680B0B6853FD524194F6FFFFFFFFFF6816", 3);
+        slaves.respondToRequest("680B0B6853FD524194F7FFFFFFFFFF6916", 3);
+        slaves.respondToRequest("680B0B6853FD524194F8FFFFFFFFFF6A16", 3);
+        slaves.respondToRequest("680B0B6853FD524194F9FFFFFFFFFF6B16", 3);
+        slaves.respondToRequest("680B0B6853FD5241F5FFFFFFFFFFFFD216", 3);
+        slaves.respondToRequest("680B0B6853FD5241F6FFFFFFFFFFFFD316", 3);
+        slaves.respondToRequest("680B0B6853FD5241F7FFFFFFFFFFFFD416", 3);
+        slaves.respondToRequest("680B0B6853FD5241F8FFFFFFFFFFFFD516", 3);
+        slaves.respondToRequest("680B0B6853FD5241F9FFFFFFFFFFFFD616", 3);
+        slaves.respondToRequest("680B0B6853FD5251FFFFFFFFFFFFFFEC16", 3);
+        slaves.respondToRequest("680B0B6853FD5261FFFFFFFFFFFFFFFC16", 3);
+        slaves.respondToRequest("680B0B6853FD5271FFFFFFFFFFFFFF0C16", 3);
+        slaves.respondToRequest("680B0B6853FD5281FFFFFFFFFFFFFF1C16", 3);
+        slaves.respondToRequest("680B0B6853FD5291FFFFFFFFFFFFFF2C16", 3);
+        slaves.respondToRequest("680B0B6853FD52F2FFFFFFFFFFFFFF8D16", 3);
+        slaves.respondToRequest("680B0B6853FD52F3FFFFFFFFFFFFFF8E16", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F680801723348103210200102000000006B16");
+        slaves.respondToRequest("680B0B6853FD52F4FFFFFFFFFFFFFF8F16", 3);
+        slaves.respondToRequest("680B0B6853FD52F5FFFFFFFFFFFFFF9016", 3);
+        slaves.respondToRequest("680B0B6853FD52F6FFFFFFFFFFFFFF9116", 3);
+        slaves.respondToRequest("680B0B6853FD52F7FFFFFFFFFFFFFF9216", "E5");
+        slaves.respondToRequest("107BFD7816", "680F0F68080172103254761020010300000000BB16");
+        slaves.respondToRequest("680B0B6853FD52F8FFFFFFFFFFFFFF9316", 3);
+        slaves.respondToRequest("680B0B6853FD52F9FFFFFFFFFFFFFF9416", 3);
+        slaves.replay();
+        master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
+        assertTrue(slaves.isOK());
+        log.info("widcardSearch finished");
+        assertEquals(4, master.deviceCount());
+        
+        assertEquals(1, master.getDevice(0).getAddress());
+        assertEquals(14491001, master.getDevice(0).getIdentNumber());
+        assertEquals("DBW", master.getDevice(0).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(0).getMedium());
+        assertEquals(1, master.getDevice(0).getVersion());
+        assertEquals(1, master.getDevice(1).getAddress());
+        assertEquals(14491008, master.getDevice(1).getIdentNumber());
+        assertEquals("QKG", master.getDevice(1).getManufacturer());
+        assertEquals(MBusMedium.HOT_WATER, master.getDevice(1).getMedium());
+        assertEquals(1, master.getDevice(1).getVersion());
+        assertEquals(1, master.getDevice(2).getAddress());
+        assertEquals(32104833, master.getDevice(2).getIdentNumber());
+        assertEquals("H@P", master.getDevice(2).getManufacturer());
+        assertEquals(MBusMedium.ELECTRICITY, master.getDevice(2).getMedium());
+        assertEquals(1, master.getDevice(2).getVersion());
+        assertEquals(1, master.getDevice(3).getAddress());
+        assertEquals(76543210, master.getDevice(3).getIdentNumber());
+        assertEquals("H@P", master.getDevice(3).getManufacturer());
+        assertEquals(MBusMedium.GAS, master.getDevice(3).getMedium());
+        assertEquals(1, master.getDevice(3).getVersion());
     }
 
     @Test

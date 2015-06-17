@@ -50,11 +50,14 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,6 +91,17 @@ public class MBusMaster
         Sender,
         JSONSerializable,
         Closeable {
+
+    private class MaskedQueueEntry {
+
+        private final SelectionOfSlaves.WildcardNibbles nibble;
+        private final byte value;
+
+        private MaskedQueueEntry(SelectionOfSlaves.WildcardNibbles nibble, byte value) {
+            this.nibble = nibble;
+            this.value = value;
+        }
+    }
 
     public void cancel() {
 //TODO impement        throw new UnsupportedOperationException("Not yet implemented");
@@ -364,7 +378,7 @@ public class MBusMaster
         return frameQueue.remove();
     }
 
-    public GenericDevice[] searchDevicesBySecondaryAddressing() throws IOException, InterruptedException {
+    public Collection<GenericDevice> searchDevicesBySecondaryAddressing() throws IOException, InterruptedException {
         return widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF);
     }
 
@@ -477,28 +491,28 @@ public class MBusMaster
     public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion,
             byte maskedMedium, int maxTries) throws IOException, InterruptedException {
 
+        return sendSlaveSelect(new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS));
+    }
+
+    private int sendSlaveSelect(SelectionOfSlaves selectionOfSlaves) throws IOException, InterruptedException {
+
         if (log.isLoggable(Level.FINE)) {
-            log.fine(String.format("Will select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+            log.fine(String.format("Will select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", selectionOfSlaves.getBcdMaskedId(), selectionOfSlaves.getMaskedMan(), selectionOfSlaves.getMaskedVersion(), selectionOfSlaves.getMaskedMedium()));
         }
-        SelectionOfSlaves selOfSl = new SelectionOfSlaves((byte) MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-        selOfSl.setBcdMaskedId(bcdMaskedId);
-        selOfSl.setMaskedMan(maskedMan);
-        selOfSl.setMaskedVersion(maskedVersion);
-        selOfSl.setMaskedMedium(maskedMedium);
 
         int result;
-        Frame resultFrame = send(selOfSl, maxTries, getShortResponseTimeout());
+        Frame resultFrame = send(selectionOfSlaves, Sender.DEFAULT_SEND_TRIES, getShortResponseTimeout());
         if (resultFrame == null) {
             return 0;
         }
         if (resultFrame instanceof SingleCharFrame) {
-            log.log(Level.FINE, "Slave selected {0}", bcdMaskedId);
+            log.log(Level.FINE, "Slave selected {0}", selectionOfSlaves.getBcdMaskedId());
             result = 1;
         } else if (resultFrame instanceof GarbageCharFrame) {
-            log.log(Level.FINE, "Multiple Slaves selected {0}", bcdMaskedId);
+            log.log(Level.FINE, "Multiple Slaves selected {0}", selectionOfSlaves.getBcdMaskedId());
             result = 2;
         } else {
-            log.severe(String.format("unexpected Frame received \n \"%s\" \n tried to select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", resultFrame.toString(), bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
+            log.severe(String.format("unexpected Frame received \n \"%s\" \n tried to select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", resultFrame.toString(), selectionOfSlaves.getBcdMaskedId(), selectionOfSlaves.getMaskedMan(), selectionOfSlaves.getMaskedVersion(), selectionOfSlaves.getMaskedMedium()));
             return 0;
         }
         log.fine("Wait for more Answers of slave select");
@@ -551,65 +565,76 @@ public class MBusMaster
         return result;
     }
 
-    private int getLeftmostMaskedNibble(int value) {
-        int mask = 0xF0000000;
-        for (int nibblePos = 7; nibblePos >= 0; nibblePos--) {
-            if ((value & mask) == mask) {
-                return nibblePos;
-            } else {
-                mask >>>= 4;
-            }
-        }
-        return -1;
-    }
-
-    private int exchangeNibbleAtPos(int nibblePos, int value, int nibbleValue) {
-        int mask = ~(0x0F << (nibblePos * 4));
-        int nibbleToSet = (nibbleValue & 0x0F) << (nibblePos * 4);
-        return (value & mask) | nibbleToSet;
-    }
-
-    //TODO detect end change all maked BCD
-    public GenericDevice[] widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium)
+    public Collection<GenericDevice> widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium)
             throws IOException, InterruptedException {
-        List<GenericDevice> result = new ArrayList<>();
-        log.fine(String.format("widcardSearch bcdMaskedId: 0x%08X", bcdMaskedId));
-        int answers = sendSlaveSelect(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium, DEFAULT_SEND_TRIES);
-        if (answers == 0) {
-            log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
-        } else if (answers == 1) {
-            log.fine(String.format("detect slave with bcdMaskedId: 0x%08X", bcdMaskedId));
-            GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-            if (dev == null) {
-                // someone does not play by the rule so try to fint them nevertheless
-                log.info(String.format("maybe multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
-                int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
-                if (leftmostMaskedNibble >= 0) {
-                    for (int i = 0; i <= 9; i++) {
-                        GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
-                        result.addAll(Arrays.asList(devs));
+
+        final Collection<GenericDevice> result = new LinkedList<>();
+
+        final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+        selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
+        selectionOfSlaves.setMaskedMan(bcdMaskedMan);
+        selectionOfSlaves.setMaskedMedium(bcdMaskedMedium);
+        selectionOfSlaves.setMaskedVersion(bcdMaskedVersion);
+
+        switch (sendSlaveSelect(selectionOfSlaves)) {
+            case 0:
+                // No devices found
+                log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
+                return result;
+            case 1: {
+                GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+                if (dev != null) {
+                    // one device found
+                    result.add(dev);
+                    return result;
+                }
+                //one anser, but maybe more then one is there on the bus, so falltrough
+            }
+            default:
+                Deque<MaskedQueueEntry> stack = new LinkedList<>();
+
+                SelectionOfSlaves.WildcardNibbles currentNibble = SelectionOfSlaves.WildcardNibbles.ID_0;
+                byte currentNibbleValue = 0;
+                boolean finished = false;
+                while (!finished) {
+                    selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
+                    switch (sendSlaveSelect(selectionOfSlaves)) {
+                        case 0:
+                            log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
+                            currentNibbleValue++;
+                            break;
+                        case 1:
+                            GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+                            if (dev != null) {
+                                // We foud exactly one device so no further seraching is needed at this nibble.
+                                result.add(dev);
+                                currentNibbleValue++;
+                                break;
+                            }
+                        //Collision?!, search further on
+                        default:
+                            stack.add(new MaskedQueueEntry(currentNibble, selectionOfSlaves.getWildcardNibble(currentNibble)));
+                            currentNibbleValue = 0;
+                            while (!selectionOfSlaves.isWildcardNibble(currentNibble) && !currentNibble.isLast()) {
+                                currentNibble = currentNibble.next();
+                            }
+                            selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
+
                     }
-                } else {
-                    log.warning(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
-                            bcdMaskedId));
+                    while (currentNibbleValue == 10) {
+                        if (stack.isEmpty()) {
+                            return result;
+                        } else {
+                            selectionOfSlaves.maskWildcardNibble(currentNibble);
+                            final MaskedQueueEntry nV = stack.pollLast();
+                            currentNibbleValue = (byte)(nV.value + 1);
+                            currentNibble = nV.nibble;
+                        }
+                    }
                 }
-            } else {
-                result.add(dev);
-            }
-        } else {
-            log.fine(String.format("multiple slaves (%d) with mask: 0x%08X", answers, bcdMaskedId));
-            int leftmostMaskedNibble = getLeftmostMaskedNibble(bcdMaskedId);
-            if (leftmostMaskedNibble >= 0) {
-                for (int i = 0; i <= 9; i++) {
-                    GenericDevice[] devs = widcardSearch(exchangeNibbleAtPos(leftmostMaskedNibble, bcdMaskedId, i), bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
-                    result.addAll(Arrays.asList(devs));
-                }
-            } else {
-                log.warning(String.format("Can't separate slaves (%d) with id: 0x%08X", answers,
-                        bcdMaskedId));
-            }
+
         }
-        return result.toArray(new GenericDevice[result.size()]);
+        return result;
     }
 
     public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium, int maxTries) throws IOException, InterruptedException {

@@ -116,8 +116,8 @@ public class MasterStreams extends MockConnection {
             notifyAll();
             return;
         }
-        getMockOs().setData(data.get(0).response);
-        getMockIs().setData(data.get(0).request, data.get(0).noResponseWaitTime);
+        getMockOs().setData(data.get(0));
+        getMockIs().setData(data.get(0));
         log.info(String.format("Setup data record: %04d data records left: %04d", handledData, data.size() - 1));
         handledData++;
         getMockIs().releaseReadLock();
