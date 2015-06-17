@@ -34,7 +34,7 @@ import java.util.Set;
 import net.sf.atmodem4j.spsw.Baudrate;
 import net.sf.atmodem4j.spsw.DataBits;
 import net.sf.atmodem4j.spsw.FlowControl;
-import net.sf.atmodem4j.spsw.LoggingSerialPortSocket;
+import net.sf.atmodem4j.spsw.logging.LoggingSerialPortSocket;
 import net.sf.atmodem4j.spsw.Parity;
 import net.sf.atmodem4j.spsw.SerialPortSocket;
 import net.sf.atmodem4j.spsw.StopBits;

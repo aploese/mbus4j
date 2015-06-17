@@ -63,17 +63,20 @@ public abstract class MockConnection extends Connection {
         final String request;
         final String response;
         final long noResponseWaitTime;
+        final StackTraceElement[] stackTrace;
 
         Data(String request, long noResponseWaitTime) {
             this.response = null;
             this.request = request;
             this.noResponseWaitTime = noResponseWaitTime;
+            this.stackTrace = new Error().fillInStackTrace().getStackTrace();
         }
 
         Data(String request, String response) {
             this.response = response;
             this.request = request;
             this.noResponseWaitTime = 0;
+            this.stackTrace = new Error().fillInStackTrace().getStackTrace();
         }
     }
 
@@ -82,6 +85,7 @@ public abstract class MockConnection extends Connection {
         byte[] buffer = new byte[0];
         int readPtr;
         long endWaitTime;
+        StackTraceElement[] stackTrace;
         private boolean closed;
         final Object readLock = new Object();
         boolean locked = true;
@@ -138,11 +142,12 @@ public abstract class MockConnection extends Connection {
             }
         }
 
-        public synchronized void setData(String string, long endWaitTime) {
-            log.info(String.format("Set InputStream buffer: %s timeout: %d", string, endWaitTime));
-            buffer = string != null ? Decoder.ascii2Bytes(string) : new byte[0];
+        public synchronized void setData(Data data) {
+            log.info(String.format("Set InputStream buffer: %s timeout: %d", data.response, data.noResponseWaitTime));
+            buffer = data.response != null ? Decoder.ascii2Bytes(data.response) : new byte[0];
             readPtr = 0;
-            this.endWaitTime = endWaitTime;
+            this.endWaitTime = data.noResponseWaitTime;
+            this.stackTrace = data.stackTrace;
             synchronized (readLock) {
                 this.locked = true;
                 log.info("ReadLock set");
@@ -154,15 +159,17 @@ public abstract class MockConnection extends Connection {
 
         private int ptr;
         private byte[] expected = new byte[0];
+        private StackTraceElement[] stackTrace;
 
         private boolean isOK() {
             return ptr == expected.length;
         }
 
-        public void setData(String data) {
-            log.info(String.format("Set OutputStream buffer: %s", data));
+        public void setData(Data data) {
+            log.info(String.format("Set OutputStream buffer: %s", data.request));
             ptr = 0;
-            expected = data != null ? Decoder.ascii2Bytes(data) : new byte[0];
+            expected = data.request != null ? Decoder.ascii2Bytes(data.request) : new byte[0];
+            this.stackTrace = data.stackTrace;
         }
 
         @Override
@@ -170,12 +177,16 @@ public abstract class MockConnection extends Connection {
             log.fine(String.format("Write to OutputStream: 0x%02X", b & 0xFF));
             if (ptr > expected.length - 1) {
                 ptr++;
-                throw new IOException(String.format("%s at outside pos: %d was: 0x%02x ", Decoder.bytes2Ascii(expected), ptr - 1, b & 0xFF));
+                IOException ioe = new IOException(String.format("%s at outside pos: %d was: 0x%02x ", Decoder.bytes2Ascii(expected), ptr - 1, b & 0xFF));
+                ioe.setStackTrace(stackTrace);
+                throw ioe;
             }
             if ((b & 0xFF) != (expected[ptr] & 0xFF)) {
                 ptr++;
                 String exp = Decoder.bytes2Ascii(expected);
-                throw new IOException(String.format("%s[%s]%s at pos: %d expected: 0x%02x but was: 0x%02x ", exp.substring(0, ptr * 2 - 2), exp.substring(ptr * 2 - 2, ptr * 2), exp.substring(ptr * 2, exp.length()), ptr - 1, expected[ptr - 1] & 0xFF, b & 0xFF));
+                IOException ioe = new IOException(String.format("%s[%s]%s at pos: %d expected: 0x%02x but was: 0x%02x ", exp.substring(0, ptr * 2 - 2), exp.substring(ptr * 2 - 2, ptr * 2), exp.substring(ptr * 2, exp.length()), ptr - 1, expected[ptr - 1] & 0xFF, b & 0xFF));
+                ioe.setStackTrace(stackTrace);
+                throw ioe;
             }
             ptr++;
             if (expected.length == ptr) {
@@ -184,7 +195,7 @@ public abstract class MockConnection extends Connection {
             }
         }
     }
-    List<Data> data = new ArrayList<Data>();
+    List<Data> data = new ArrayList<>();
 
     @Override
     public void close() throws IOException {
@@ -206,8 +217,13 @@ public abstract class MockConnection extends Connection {
 
     protected abstract void lastByteWriting() throws IOException;
 
-    public boolean isOK() {
-        return data.isEmpty() && getMockIs().isOK() && getMockOs().isOK();
+    public boolean isOK() throws IOException {
+        if (!data.isEmpty()) {
+            IOException ioe = new IOException("Was not called");
+            ioe.setStackTrace(data.get(0).stackTrace);
+            throw ioe;
+        }
+        return getMockIs().isOK() && getMockOs().isOK();
     }
 
     public void replay() {

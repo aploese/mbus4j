@@ -94,8 +94,8 @@ public class SlaveStreams extends MockConnection {
             }
             return;
         }
-        getMockOs().setData(data.get(0).request);
-        getMockIs().setData(data.get(0).response, data.get(0).noResponseWaitTime);
+        getMockOs().setData(data.get(0));
+        getMockIs().setData(data.get(0));
     }
 
     @Override
