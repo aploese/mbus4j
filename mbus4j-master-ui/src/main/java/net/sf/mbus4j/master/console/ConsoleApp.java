@@ -250,7 +250,7 @@ public class ConsoleApp {
                     Byte version = cmd.hasOption("version") ? (byte) Short.parseShort(cmd.getOptionValue("version")) : null;
                     MBusMedium medium = cmd.hasOption("medium") ? MBusMedium.fromLabel(cmd.getOptionValue("medium")) : null;
                     String manufacturer = cmd.hasOption("manufacturer") ? cmd.getOptionValue("manufacturer") : null;
-                    udr = master.readResponseBySecondary(bcdId, manufacturer, version, medium, bcdId);
+                    udr = master.readResponseBySecondary(bcdId, manufacturer, version, medium);
                 }
                 if (cmd.hasOption("json")) {
                     System.out.print(udr.toJSON(JsonSerializeType.ALL).toString(2));
