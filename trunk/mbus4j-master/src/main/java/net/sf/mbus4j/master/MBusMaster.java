@@ -489,9 +489,13 @@ public class MBusMaster
     }
 
     public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion,
-            byte maskedMedium, int maxTries) throws IOException, InterruptedException {
-
-        return sendSlaveSelect(new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS));
+            byte maskedMedium) throws IOException, InterruptedException {
+        final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+        selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
+        selectionOfSlaves.setMaskedMan(maskedMan);
+        selectionOfSlaves.setMaskedVersion(maskedVersion);
+        selectionOfSlaves.setMaskedMedium(maskedMedium);
+        return sendSlaveSelect(selectionOfSlaves);
     }
 
     private int sendSlaveSelect(SelectionOfSlaves selectionOfSlaves) throws IOException, InterruptedException {
@@ -637,12 +641,12 @@ public class MBusMaster
         return result;
     }
 
-    public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium, int maxTries) throws IOException, InterruptedException {
+    public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium) throws IOException, InterruptedException {
         final short bcdMan = (man == null || man.length() == 0) ? (short) 0xFFFF : MBusUtils.man2Short(man);
         byte bcdVersion = (version == null) ? (byte) 0xFF : version;
         byte bcdMedium = (medium == null) ? (byte) 0xFF : (byte) medium.getId();
 
-        if (selectDevice(bcdId, bcdMan, bcdVersion, bcdMedium, maxTries)) {
+        if (selectDevice(bcdId, bcdMan, bcdVersion, bcdMedium)) {
             return readResponse(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
         } else {
             return null;
@@ -660,8 +664,8 @@ public class MBusMaster
         }
     }
 
-    public boolean selectDevice(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium, int maxTries) throws IOException, InterruptedException {
-        int answers = sendSlaveSelect(bcdMaskedId, maskedMan, maskedVersion, maskedMedium, maxTries);
+    public boolean selectDevice(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium) throws IOException, InterruptedException {
+        int answers = sendSlaveSelect(bcdMaskedId, maskedMan, maskedVersion, maskedMedium);
         if (answers > 1) {
             log.warning(String.format("Can't select select (too many) Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
         } else if (answers == 0) {
@@ -674,7 +678,7 @@ public class MBusMaster
         return selectDevice(MBusUtils.int2Bcd(id),
                 MBusUtils.man2Short(manufacturer),
                 version,
-                (byte) medium.getId(), DEFAULT_SEND_TRIES);
+                (byte) medium.getId());
     }
 
     public boolean setPrimaryAddressOfDevice(byte newAddress, MBusResponseFramesContainer dev) throws IOException, InterruptedException {
@@ -706,7 +710,7 @@ public class MBusMaster
         return selectDevice(MBusUtils.int2Bcd(dev.getIdentNumber()),
                 MBusUtils.man2Short(dev.getManufacturer()),
                 dev.getVersion(),
-                (byte) dev.getMedium().getId(), DEFAULT_SEND_TRIES);
+                (byte) dev.getMedium().getId());
     }
 
     public void readValues(ValueRequest<?> requests)
