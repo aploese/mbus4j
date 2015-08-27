@@ -20,6 +20,7 @@
         <compile.source>1.7</compile.source>
         <compile.target>1.7</compile.target>
         <sourceEncoding>UTF-8</sourceEncoding>
+        <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
     </properties>
 
     <!-- Developers and Contributors -->
@@ -70,6 +71,16 @@
             <name>MBus4J Site</name>
             <url>scp://shell.sourceforge.net/home/project-web/mbus4j/htdocs</url>
         </site>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>${sonatypeOssDistMgmtSnapshotsUrl}</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <scm>
