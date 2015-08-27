@@ -28,7 +28,7 @@ package net.sf.mbus4j;
  * #L%
  */
 /**
- *
+ * This behaves like a slave
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */

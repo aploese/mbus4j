@@ -99,7 +99,7 @@ public abstract class MockConnection extends Connection {
             }
         }
 
-        private boolean isOK() {
+        private boolean isNoDataLeft() {
             return readPtr == buffer.length;
         }
 
@@ -161,7 +161,7 @@ public abstract class MockConnection extends Connection {
         private byte[] expected = new byte[0];
         private StackTraceElement[] stackTrace;
 
-        private boolean isOK() {
+        private boolean isNoDataLeft() {
             return ptr == expected.length;
         }
 
@@ -217,13 +217,18 @@ public abstract class MockConnection extends Connection {
 
     protected abstract void lastByteWriting() throws IOException;
 
-    public boolean isOK() throws IOException {
+    /**
+     * Checks if data is empty, if not throws an exception to mark the position
+     * @return
+     * @throws IOException if data is not empty
+     */
+    public boolean checkNoDataLeft() throws IOException {
         if (!data.isEmpty()) {
             IOException ioe = new IOException("Was not called");
             ioe.setStackTrace(data.get(0).stackTrace);
             throw ioe;
         }
-        return getMockIs().isOK() && getMockOs().isOK();
+        return getMockIs().isNoDataLeft()&& getMockOs().isNoDataLeft();
     }
 
     public void replay() {
