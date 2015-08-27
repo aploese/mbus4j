@@ -28,8 +28,6 @@ package net.sf.mbus4j;
  * #L%
  */
 import java.io.IOException;
-import java.util.logging.Logger;
-import net.sf.mbus4j.log.LogUtils;
 
 /**
  *
@@ -38,7 +36,7 @@ import net.sf.mbus4j.log.LogUtils;
  *
  * Problem 1. Schreiben als Masterstream, wenn nix ist ??? Ex ? Assert geht
  * nicht 2. Masterstream wenn letztes Byte gelesen, dann lesen oder timeout
- * triggern und nicht dfdas lesen des letzten Bytes verzögern, das bringt nix
+ * triggern und nicht das lesen des letzten Bytes verzögern, das bringt nix
  * ....
  *
  */

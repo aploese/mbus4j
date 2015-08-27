@@ -28,7 +28,6 @@ package net.sf.mbus4j;
  * #L%
  */
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -56,35 +55,28 @@ public class SlaveStreamTest {
     public SlaveStreamTest() {
     }
 
-    @Test(timeout = 10000)
+    @Test(timeout = 1000)
     public void respondToRequest() throws Exception {
         slaves.respondToRequest("0102", "0201");
         slaves.respondToRequest("0304", "0403");
         slaves.respondToRequest("0506", 1);
         slaves.respondToRequest("0708", "0807");
         slaves.replay();
-        assertFalse(slaves.isOK());
         slaves.os.write(0x01);
         slaves.os.write(0x02);
-        assertFalse(slaves.isOK());
         assertEquals(0x02, slaves.is.read());
         assertEquals(0x01, slaves.is.read());
-        assertFalse(slaves.isOK());
         slaves.os.write(0x03);
         slaves.os.write(0x04);
-        assertFalse(slaves.isOK());
         assertEquals(0x04, slaves.is.read());
         assertEquals(0x03, slaves.is.read());
-        assertFalse(slaves.isOK());
         slaves.os.write(0x05);
         slaves.os.write(0x06);
-        assertFalse(slaves.isOK());
         slaves.os.write(0x07);
         slaves.os.write(0x08);
-        assertFalse(slaves.isOK());
         assertEquals(0x08, slaves.is.read());
         assertEquals(0x07, slaves.is.read());
-        assertTrue(slaves.isOK());
+        assertTrue(slaves.checkNoDataLeft());
     }
 
     @Before

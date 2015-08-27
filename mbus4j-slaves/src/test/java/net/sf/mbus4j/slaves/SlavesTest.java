@@ -104,7 +104,7 @@ public class SlavesTest {
             master.wait();
         }
 
-        assertTrue(master.isOK());
+        assertTrue(master.checkNoDataLeft());
 
         //TODO  FCB ACB ??
         // BCD behandlung ???
@@ -213,7 +213,7 @@ public class SlavesTest {
             master.wait();
         }
 
-        assertTrue(master.isOK());
+        assertTrue(master.checkNoDataLeft());
         log.info("widcardSearch finished");
     }
 }

@@ -30,14 +30,12 @@ package net.sf.mbus4j.master;
 import java.util.logging.Logger;
 import net.sf.mbus4j.SlaveStreams;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.log.LogUtils;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -210,7 +208,7 @@ public class MasterTest {
         slaves.respondToRequest("680B0B6853FD52F9FFFFFFFFFFFFFF9416", 3);
         slaves.replay();
         master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
-        assertTrue(slaves.isOK());
+        assertTrue(slaves.checkNoDataLeft());
         log.info("widcardSearch finished");
         assertEquals(4, master.deviceCount());
         
@@ -332,7 +330,7 @@ public class MasterTest {
         slaves.respondToRequest("680B0B6853FD52F9FFFFFFFFFFFFFF9416", 3);
         slaves.replay();
         master.widcardSearch(bcdMaskedId, bcdMaskedMan, bcdMaskedVersion, bcdMaskedMedium);
-        assertTrue(slaves.isOK());
+        assertTrue(slaves.checkNoDataLeft());
         log.info("widcardSearch finished");
         assertEquals(4, master.deviceCount());
         
