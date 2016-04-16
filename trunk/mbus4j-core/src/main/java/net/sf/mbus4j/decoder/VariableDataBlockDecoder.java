@@ -198,7 +198,12 @@ public class VariableDataBlockDecoder {
         switch (b & 0xFF) {
             case 0x0F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_LAST_PACKET;
-                startCollectingValue(bytesLeft);
+                if (bytesLeft == 0) {
+                    createDataBlock();
+                    setState(DecodeState.RESULT_AVAIL);
+                } else {
+                    startCollectingValue(bytesLeft);
+                }
                 return;
             case 0x1F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_MAN_SPEC_DATA_PACKETS_FOLLOWS;

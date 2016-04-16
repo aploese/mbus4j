@@ -41,6 +41,7 @@ import java.util.List;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.IntegerDataBlock;
@@ -174,10 +175,10 @@ public class UserDataResponseTest implements DecoderListener {
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
         }
-        br.close();
         resultStr.close();
+        br.close();
 
-        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
+        assertEquals(String.format("Length mismatch at line %d Data:", line), dataLine, parsedLine);
     }
 
     @Test
@@ -245,6 +246,16 @@ public class UserDataResponseTest implements DecoderListener {
         testPackage("TCH", MBusMedium.HEAT, 38, 21519982, 1);
     }
 
+    @Test
+    public void testJAN_ELECTRICITY_9_57102137_0() throws Exception {
+        testPackage("JAN", MBusMedium.ELECTRICITY, 9, 57102137, 0);
+    }
+
+    @Test
+    public void testJAN_ELECTRICITY_9_26001712_0() throws Exception {
+        testPackage("JAN", MBusMedium.ELECTRICITY, 9, 26001712, 0);
+    }
+
     private void testJSON(Frame frame, String man, String deviceName) throws Exception {
         JSONObject json = frame.toJSON(JsonSerializeType.ALL);
         System.out.println(json.toString(1));
@@ -264,8 +275,8 @@ public class UserDataResponseTest implements DecoderListener {
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
         }
-        br.close();
         resultStr.close();
+        br.close();
 
         assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
     }
@@ -381,16 +392,24 @@ public class UserDataResponseTest implements DecoderListener {
         //final String dataStr = "0401040000681515680800727299780877040B04400000000C7872997808DE1639";
         //final String dataStr = "0501040000685555680800728237800977040B043D0000000C7882378009C2006C3C12C4000600000000CC001401000000D400AE4F16123912D5002ECD0A9D3BD400BE4F16123912D5003E6E12033BD400DB4F160F3212D5005BA2C4F041B916B0";
         //final String dataStr = "0601040000684D4D680800728337800977040B04240000000C78833780090406620000000C14471000000B2D0000000B3B0000000A5A62010A5E44010B61740100046D15132C130227330009FD0E1009FD0F210F0020A51671";
-        final String dataStr = "0701040000685555680800728437800977040B042F0000000C7884378009C2006C3C12C4000665000000CC001452190000D400AE4F1A0B3212D5002EB19A0E41D400BE4F1A0A3B12D5003EB6F37D3FD400DB4F1A0E3212D5005B4A000842041648";
-        //final String dataStr = "";
+        //final String dataStr = "0701040000685555680800728437800977040B042F0000000C7884378009C2006C3C12C4000665000000CC001452190000D400AE4F1A0B3212D5002EB19A0E41D400BE4F1A0A3B12D5003EB6F37D3FD400DB4F1A0E3212D5005B4A000842041648";
+        //final String dataStr = "68F7F768080172372110572E2809020200000006047E18000000008610047E18000000008620040000000000008640042800000000008650040000000000008660042800000000008680400492180000000084402400000000848040240000000084C040240000000084808040240000000084C0804024000000008480C04024000000000424FA4F000084808040FD590000000084C080402B000000008480C0402B0000000084C0C0402B000000008440FD48C8080000848040FD48ED03000084C040FD48EC0300008440FD5900000000848040FD590000000084C040FD590000000084402B000000008480402B0000000084C0402B000000000F2516";
+        //WRONG_CS final String dataStr =   "68f7f768083272121700262e2809020f0000000604ff80d701000086100444ec2a020000862004486b53000000864004f35924000000865004650e790000008660048b4babffffff86804004607dbf02000084402000000000848040240000000084c040240000000084808040240000000084c0804024000000008480c0402400000000042468c88b0284808040fd59a9e1010084c080402bfa1601008480c0402b95bcffff84c0c0402b6c2a01008440fd48b5080000848040fd48e908000084c040fd48ea0800008440e85988ca0200848040fd598362010084c040fd5917ff000084402b259a00008480402b144c000084c0402bbf3000000f4316";
+final String dataStr =   "68f7f768083272121700262e2809021100000006040c81d701000086100451ec2a020000862004486b53000000864004f35924000000865004680e79000000866004884babffffff868040046f7dbf02000084402400000000848040240000000084c040240000000084808040240000000084c0804024000000008480c040240000000004246fc88b0284808040fd59f5fe010084c080402b942701008480c0402bf6bcffff84c0c0402b713901008440fd48b2080000848040fd48ed08000084c040fd48e90800008440fd5927f80200848040fd592e68010084c040fd59610f010084402b86a400008480402b924d000084c0402b7b3500000f8316";
+//final String dataStr = "";
         //final String dataStr = "";
         final byte[] data = Decoder.ascii2Bytes(dataStr);
         for (byte b : data) {
             instance.addByte(b);
         }
-        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", frames.get(0).toString()));
         assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
         assertNotNull("DataValue not available", frames.get(0));
+        if (frames.get(0) instanceof UserDataResponse) {
+            UserDataResponse udr = (UserDataResponse)frames.get(0);
+        System.out.println(String.format("%s-%s-%d-%d-%d", udr.getManufacturer(), udr.getMedium().name(), udr.getVersion(), udr.getIdentNumber(), 0));
+        }
+        System.out.println(String.format("JSON>>> >>> >>>%s<<< <<< <<<JSON", frames.get(0).toJSON(JsonSerializeType.ALL).toString()));
+        System.out.println(String.format("PACKAGE>>> >>> >>>%s\n%s<<< <<< <<<PACKAGE", dataStr, frames.get(0).toString()));
     }
 
     @Override

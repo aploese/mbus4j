@@ -123,6 +123,7 @@ public class Decoder {
             if (expectedLengt == dataPos - 1) {
                 if (state != DecodeState.CHECKSUM) {
                     log.fine("expectedLengt reached: data discarted!");
+                    log.severe(parsingFrame.toString());
                     reset();
                     return;
                 }
