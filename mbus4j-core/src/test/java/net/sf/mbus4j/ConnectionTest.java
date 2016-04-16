@@ -38,7 +38,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -54,7 +53,6 @@ public class ConnectionTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    private MasterStreams master;
 
     public ConnectionTest() {
     }

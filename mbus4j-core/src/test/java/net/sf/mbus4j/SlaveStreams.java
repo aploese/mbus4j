@@ -28,7 +28,8 @@ package net.sf.mbus4j;
  * #L%
  */
 /**
- * This behaves like a slave
+ * This behaves like a slave for testin a master implementation.
+ * 
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
@@ -65,6 +66,12 @@ public class SlaveStreams extends MockConnection {
         }
     }
 
+    /**
+     * The request ist times to send, but no response from the slave.
+     * 
+     * @param request
+     * @param times 
+     */
     public void respondToRequest(String request, int times) {
         for (int i = 0; i < times; i++) {
             this.data.add(new Data(request, 0));
