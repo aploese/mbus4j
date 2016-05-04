@@ -167,17 +167,12 @@ public enum VifFC implements Vif {
     UNKNOWN_0X7E(),
     UNKNOWN_0X7F();
     
-    public static VifFC valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<>(0xFE);
-            for (VifFC val : values()) {
-                map.put((byte) val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
+    public final static VifFC valueOfTableIndex(byte ordinal) {
+        return map[ordinal];
     }
+    
     private final String label;
-    private static Map<Byte, VifFC> map;
+    private final static VifFC[] map = values();
 
     private VifFC() {
         this.label = String.format("VifFC Unknown 0x%02x", ordinal());

@@ -190,20 +190,14 @@ public enum VifFB implements Vif {
     CUMUL_COUNT_MAX_POWER_KILO_W_E_0(CUMUL_COUNT_MAX_POWER, KILO, WATT, 0),
     CUMUL_COUNT_MAX_POWER_KILO_W_E_1(CUMUL_COUNT_MAX_POWER, KILO, WATT, 1);
 
-    public static VifFB valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifFB>(0xFE);
-            for (VifFB val : values()) {
-                map.put((byte) val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
+    public final static VifFB valueOfTableIndex(byte ordinal) {
+        return map[ordinal];
     }
     private final String label;
     private final UnitOfMeasurement unit;
     private final SiPrefix siPrefix;
     private final Integer exponent;
-    private static Map<Byte, VifFB> map;
+    private final static VifFB[] map = values();
 
     private VifFB() {
         this.label = String.format("VifFB Reserved 0x%02x", ordinal());

@@ -27,8 +27,6 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -167,17 +165,11 @@ public enum VifeFC implements Vife {
     UNKNOWN_0X7E(),
     UNKNOWN_0X7F();
     
-    public static VifeFC valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<>(0xFE);
-            for (VifeFC val : values()) {
-                map.put((byte) val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
+    public final static VifeFC valueOfTableIndex(byte ordinal) {
+        return map[ordinal];
     }
     private final String label;
-    private static Map<Byte, VifeFC> map;
+    private final static VifeFC[] map = values();
 
     private VifeFC() {
         this.label = String.format("VifFC Unknown 0x%02x", ordinal());

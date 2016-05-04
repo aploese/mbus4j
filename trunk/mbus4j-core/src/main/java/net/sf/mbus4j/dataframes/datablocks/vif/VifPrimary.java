@@ -195,21 +195,15 @@ public enum VifPrimary implements Vif {
     EXTENSION_OF_VIF_CODES_FD(0x7D, "true VIF is given in the first VIFE FD extention"),
     READOUT_SELECTION(0x7E, "Readout selection of all storage numbers, all tariffs and all VIF");
 
-    public static VifPrimary valueOfTableIndex(int vifCode) {
-        if (map == null) {
-            map = new HashMap<Integer, VifPrimary>(0xFE);
-            for (VifPrimary val : values()) {
-                map.put(val.vifCode, val);
-            }
-        }
-        return map.get(vifCode);
+    public final static VifPrimary valueOfTableIndex(int vifCode) {
+        return map[vifCode];
     }
     private final String label;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final int vifCode;
     private final Integer exponent;
-    private static Map<Integer, VifPrimary> map;
+    private final static VifPrimary[] map = values();
 
     private VifPrimary(int vifCode) {
         this.vifCode = vifCode;

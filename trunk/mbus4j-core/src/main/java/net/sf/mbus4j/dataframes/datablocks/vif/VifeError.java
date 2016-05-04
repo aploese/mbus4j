@@ -71,16 +71,10 @@ public enum VifeError implements Vife {
     OTHER_ERROR_RESERVED_0X1F("Other Error Reserved 0x1F");
 
     private final String label;
-    private static Map<Byte, VifeError> map;
+    private final static VifeError[] map = values();
 
-    public static VifeError valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifeError>(values().length);
-            for (VifeError val : values()) {
-                map.put((byte) val.ordinal(), val);
-            }
-        }
-        return map.get(ordinal);
+    public final static VifeError valueOfTableIndex(byte ordinal) {
+        return map[ordinal];
     }
 
     private VifeError(String label) {
