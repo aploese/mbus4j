@@ -34,7 +34,11 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 public enum UnitOfMeasurement {
 
+    DIMENSIONLESS(""),
+    DEGREE("°"), 
+    HERTZ("Hz"), 
     WATT_HOUR("Wh"),
+    VA_HOUR("VAh"),
     VAR_HOUR("VARh"),
     JOULE("J"),
     LITRE("l"),
@@ -44,6 +48,8 @@ public enum UnitOfMeasurement {
     AMERICAN_GALLON_PER_MINUTE("american gallon / min"),
     AMERICAN_GALLON_PER_HOUR("american gallon / h"),
     WATT("W"),
+    VA("VA"),
+    VAR("VAR"),
     GRAMM("g"),
     TONNS("t"),
     JOULE_PER_HOUR("J/h"),
@@ -62,7 +68,6 @@ public enum UnitOfMeasurement {
     BAUD("Baud"),
     BITTIMES("bittimes"),
     TIME_AND_DATE("time and date"),
-    DIMENSIONLESS(""),
     LITRE_PER_HOUR("l/h"),
     CUBIC_METER_PER_HOUR("m³/h"),
     LITRE_PER_MINUTE("l/min"),

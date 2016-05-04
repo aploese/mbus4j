@@ -43,8 +43,12 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.JOULE_PER_HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONNS;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DEGREE;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VAR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VA;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VAR_HOUR;
+import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HERTZ;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +63,8 @@ public enum VifFB implements Vif {
 // DO NOT CHANGE ORDER!!!!
     ENERGY_KWH_E_2(ENERGY, KILO, WATT_HOUR, 2),
     ENERGY_MWH_E_0(ENERGY, MEGA, WATT_HOUR, 0),
-    REACTIVE_ENERGY_KVARH_E_2(ENERGY, KILO, VAR_HOUR, 2),
-    REACTIVE_ENERGY_MVARH_E_0(ENERGY, MEGA, VAR_HOUR, 0),
+    REACTIVE_ENERGY_KVARH_E_0(REACTIVE_ENERGY, KILO, VAR_HOUR, 0),
+    REACTIVE_ENERGY_KVARH_E_1(REACTIVE_ENERGY, KILO, VAR_HOUR, 1),
     RESERVED_0X04(),
     RESERVED_0X05(),
     RESERVED_0X06(),
@@ -77,7 +81,7 @@ public enum VifFB implements Vif {
     VOLUME_CBM_E_3(VOLUME, ONE, CUBIC_METER, 3),
     RESERVED_0X12(),
     RESERVED_0X13(),
-    RESERVED_0X14(),
+    REACTIVE_POWER_VAR_E_0(REACTIVE_POWER, ONE, VAR, 0),
     RESERVED_0X15(),
     RESERVED_0X16(),
     RESERVED_0X17(),
@@ -100,10 +104,10 @@ public enum VifFB implements Vif {
     POWER_KW_E_2(POWER, KILO, WATT, 2),
     POWER_MW_E_0(POWER, MEGA, WATT, 0),
     RESERVED_0X2A(),
-    RESERVED_0X2B(),
+    PHASE_U_I_E__1_DEGREE(PHASE_U_I, ONE, DEGREE, -1),
     RESERVED_0X2C(),
     RESERVED_0X2D(),
-    RESERVED_0X2E(),
+    FREQUENCY_HERTZ_E__1(FREQUENCY, ONE, HERTZ, -1),
     RESERVED_0X2F(),
     POWER_MEGA_JOULE_PER_HOUR_E_2(POWER, MEGA, JOULE_PER_HOUR, 2),
     POWER_GJ_PER_HOUR_E_0(POWER, GIGA, JOULE_PER_HOUR, 0),
@@ -137,10 +141,11 @@ public enum VifFB implements Vif {
     RESERVED_0X4D(),
     RESERVED_0X4E(),
     RESERVED_0X4F(),
+    RESERVED_0X50(),
     RESERVED_0X51(),
     RESERVED_0X52(),
     RESERVED_0X53(),
-    RESERVED_0X54(),
+    COMPLEX_POWER_VA_E__1(COMPLEX_POWER, ONE, VA, -1),
     RESERVED_0X55(),
     RESERVED_0X56(),
     RESERVED_0X57(),

@@ -34,6 +34,7 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
 public enum VifTypes {
 
     FB_EXTENTION("extention FB"),
+    FC_EXTENTION("extention FC"),
     FD_EXTENTION("extention FD"),
     ASCII("ascii"),
     PRIMARY("primary"),

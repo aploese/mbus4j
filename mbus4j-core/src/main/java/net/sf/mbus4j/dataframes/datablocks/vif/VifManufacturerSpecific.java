@@ -27,7 +27,6 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.util.Arrays;
 
 /**
  *
@@ -45,15 +44,12 @@ public class VifManufacturerSpecific implements Vif {
             throw new IllegalArgumentException("label is no man. spec. data !");
         }
 
-        String[] splitted = label.split("0x");
-        VifManufacturerSpecific result = new VifManufacturerSpecific((byte) Short.parseShort(splitted[1].substring(0, 2), 16));
+        VifManufacturerSpecific result = new VifManufacturerSpecific();
         return result;
     }
 
-    final byte vifByte;
 
-    public VifManufacturerSpecific(byte b) {
-        vifByte = b;
+    public VifManufacturerSpecific() {
     }
 
     @Override
@@ -63,7 +59,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public String getLabel() {
-        return String.format("0x%02X", vifByte);
+        return "0x7F";
     }
 
     /**
@@ -79,10 +75,6 @@ public class VifManufacturerSpecific implements Vif {
         return null;
     }
 
-    public byte getVifByte() {
-        return vifByte;
-    }
-
     @Override
     public String toString() {
         return getLabel();
@@ -90,11 +82,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof VifManufacturerSpecific)) {
-            return false;
-        }
-        VifManufacturerSpecific o = (VifManufacturerSpecific) other;
-        return vifByte == o.vifByte;
+        return (other instanceof VifManufacturerSpecific);
     }
 
     @Override

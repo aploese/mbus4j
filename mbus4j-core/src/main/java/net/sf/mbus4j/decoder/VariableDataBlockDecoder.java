@@ -51,6 +51,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.ObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifFC;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
@@ -96,8 +98,10 @@ public class VariableDataBlockDecoder {
         DIFE,
         VIF,
         VIF_FB,
+        VIF_FC,
         VIF_FD,
         VIFE,
+        VIFE_FC,
         ASCII_VIF_LENGTH,
         ASCII_VIF_COLLECT,
         SET_VARIABLE_LENGTH,
@@ -152,11 +156,17 @@ public class VariableDataBlockDecoder {
             case VIF_FB:
                 decodeVifExtention_FB(b);
                 return ds;
+            case VIF_FC:
+                decodeVifExtention_FC(b);
+                return ds;
             case VIF_FD:
                 decodeVifExtention_FD(b);
                 return ds;
             case VIFE:
-                decodeVIFE(b);
+                decodeVife(b);
+                return ds;
+            case VIFE_FC:
+                decodeVifeExtension_FC(b);
                 return ds;
             case COLLECTING_VALUE:
                 stack.push(b);
@@ -306,13 +316,11 @@ public class VariableDataBlockDecoder {
 
         if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.DIFE);
+        } else if (bytesLeft == 0) {
+            createDataBlock();
+            setState(DecodeState.RESULT_AVAIL);
         } else {
-            if (bytesLeft == 0) {
-                createDataBlock();
-                setState(DecodeState.RESULT_AVAIL);
-            } else {
-                setState(DecodeState.VIF);
-            }
+            setState(DecodeState.VIF);
         }
     }
 
@@ -489,41 +497,40 @@ public class VariableDataBlockDecoder {
      * nagative in the case extention bit is set
      */
     private void decodeVIF(final byte b) {
-        switch (b & ~Decoder.EXTENTION_BIT) {
-            case 0x7B:
-                // decode vife table 8.4.4 b
-                setState(DecodeState.VIF_FB);
-
-                return;
-
+        switch (b & 0xFF) {
             case 0x7C:
+                //Vif is ASCII coded (length in first/next byte)
                 stack.clear();
                 vif = new VifAscii();
                 setState(DecodeState.ASCII_VIF_LENGTH);
-
-                return;
-
-            case 0x7D:
-                // decode vife table 8.4.4 a
-                setState(DecodeState.VIF_FD);
-
                 return;
 
             case 0x7E:
                 vif = VifPrimary.READOUT_SELECTION;
-
                 break;
 
             case 0x7F:
-                vif = new VifManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT));
-
-                if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
-                    setState(DecodeState.VIFE);
-
-                    return;
-                }
-
+                vif = new VifManufacturerSpecific();
                 break;
+                
+            case 0xFB:
+                // decode vife table 8.4.4 b
+                setState(DecodeState.VIF_FB);
+                return;
+
+            case 0xFC:
+                setState(DecodeState.VIF_FC);
+                return;
+
+            case 0xFD:
+                // decode vife table 8.4.4 a
+                setState(DecodeState.VIF_FD);
+                return;
+
+            case 0xFF:
+                vif = new VifManufacturerSpecific();
+                setState(DecodeState.VIFE);
+                return;
 
             default:
                 vif = VifPrimary.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
@@ -533,11 +540,14 @@ public class VariableDataBlockDecoder {
         goFromVifOrVife(b);
     }
 
-    private void decodeVIFE(final byte b) {
+    private void decodeVife(final byte b) {
         // Extended VID chapter 8.4.5
         switch (frame.getControlCode()) {
             case RSP_UD:
-
+                if (0xFC == (b & 0xFF)) {
+                    setState(DecodeState.VIFE_FC);
+                    return;
+                }
                 Vife vife;
 
                 // TODO last VidPrimary is Manspec ???
@@ -576,9 +586,46 @@ public class VariableDataBlockDecoder {
         goFromVifOrVife(b);
     }
 
+    private void decodeVifeExtension_FC(final byte b) {
+        // Extended VID chapter 8.4.5
+        switch (frame.getControlCode()) {
+            case RSP_UD:
+                VifeFC vifeFC = VifeFC.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+                
+
+                if (vifes == null) {
+                    vifes = new Vife[1];
+                } else {
+                    vifes = Arrays.copyOf(vifes, vifes.length + 1);
+                }
+                vifes[vifes.length - 1] = vifeFC;
+
+                break;
+
+            case SND_UD:
+                objectAction = ObjectAction.valueOf(b);
+
+                break;
+
+            default:
+                setState(DecodeState.ERROR);
+                throw new NotSupportedException(String.format(
+                        "Dont know how to handele Control code %s ",
+                        frame.getControlCode()));
+        }
+
+        goFromVifOrVife(b);
+    }
+
     private void decodeVifExtention_FB(final byte b) {
         // Extended VID chapter 8.4.4 table b
         vif = VifFB.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
+        goFromVifOrVife(b);
+    }
+
+    private void decodeVifExtention_FC(final byte b) {
+        //new stuff first seen @ SINUS 
+        vif = VifFC.valueOfTableIndex((byte) (b & ~Decoder.EXTENTION_BIT));
         goFromVifOrVife(b);
     }
 
@@ -599,13 +646,11 @@ public class VariableDataBlockDecoder {
     private void goFromVifOrVife(final byte b) {
         if ((b & Decoder.EXTENTION_BIT) == Decoder.EXTENTION_BIT) {
             setState(DecodeState.VIFE);
+        } else if ((dfc == DataFieldCode.SELECTION_FOR_READOUT) || (dfc == DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST)) {
+            createDataBlock();
+            setState(DecodeState.RESULT_AVAIL);
         } else {
-            if ((dfc == DataFieldCode.SELECTION_FOR_READOUT) || (dfc == DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST)) {
-                createDataBlock();
-                setState(DecodeState.RESULT_AVAIL);
-            } else {
-                startCollectingValue();
-            }
+            startCollectingValue();
         }
     }
 
