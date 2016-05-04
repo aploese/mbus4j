@@ -59,7 +59,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public String getLabel() {
-        return "0x7F";
+        return "Manufacturer specific coding including VIFE's";
     }
 
     /**

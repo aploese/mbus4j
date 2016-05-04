@@ -29,15 +29,11 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -147,15 +143,10 @@ public enum VifePrimary implements Vife {
     FUTUR_VALUE("future value"),
     MAN_SPEC("next VIFE's and data of this block are manufacturer specific");
 
-    public static VifePrimary valueOfTableIndex(byte ordinal) {
-        if (map == null) {
-            map = new HashMap<Byte, VifePrimary>(values().length);
-            for (VifePrimary val : values()) {
-                map.put((byte) (val.ordinal() + 0x20), val);
-//                System.out.println(String.format("0x%02x %s", val.ordinal() + 0x20, val));
-            }
-        }
-        return map.get(ordinal);
+    public final static int CODE_OFFSET = 0x20;
+    
+    public final static VifePrimary valueOfTableIndex(byte ordinal) {
+            return map[ordinal - CODE_OFFSET];
     }
 
     public static boolean isTimestampVife(Collection<Vife> vifes) {
@@ -172,7 +163,7 @@ public enum VifePrimary implements Vife {
         return result == 1;
     }
     private final String label;
-    private static Map<Byte, VifePrimary> map;
+    private static VifePrimary[] map = values();
 
     private VifePrimary() {
         this.label = String.format("Reserved 0x%02x", ordinal() + 0x20);

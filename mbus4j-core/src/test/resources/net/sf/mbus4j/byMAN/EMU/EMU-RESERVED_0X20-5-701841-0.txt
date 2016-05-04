@@ -51,7 +51,7 @@ datablock[3]:
   subUnit = 2
 datablock[4]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Too many DIFE's
+  description = Power next VIFE's and data of this block are manufacturer specific 0x01
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -59,7 +59,7 @@ datablock[4]:
   subUnit = 0
 datablock[5]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Storage number not implemented
+  description = Power next VIFE's and data of this block are manufacturer specific 0x02
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -67,7 +67,7 @@ datablock[5]:
   subUnit = 0
 datablock[6]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Unit number not implemented
+  description = Power next VIFE's and data of this block are manufacturer specific 0x03
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -75,7 +75,7 @@ datablock[6]:
   subUnit = 0
 datablock[7]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Too many DIFE's
+  description = Power next VIFE's and data of this block are manufacturer specific 0x01
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -83,7 +83,7 @@ datablock[7]:
   subUnit = 2
 datablock[8]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Storage number not implemented
+  description = Power next VIFE's and data of this block are manufacturer specific 0x02
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -91,7 +91,7 @@ datablock[8]:
   subUnit = 2
 datablock[9]:
   dataType = 32 Bit Integer
-  description = Power next VIFE's and data of this block are manufacturer specific Unit number not implemented
+  description = Power next VIFE's and data of this block are manufacturer specific 0x03
   value = 0 [W]
   tariff = 0
   storageNumber = 0
@@ -107,7 +107,7 @@ datablock[10]:
   subUnit = 0
 datablock[11]:
   dataType = 16 Bit Integer
-  description = Voltage next VIFE's and data of this block are manufacturer specific Too many DIFE's
+  description = Voltage next VIFE's and data of this block are manufacturer specific 0x01
   value = 0 [V]
   tariff = 0
   storageNumber = 0
@@ -115,7 +115,7 @@ datablock[11]:
   subUnit = 0
 datablock[12]:
   dataType = 16 Bit Integer
-  description = Voltage next VIFE's and data of this block are manufacturer specific Storage number not implemented
+  description = Voltage next VIFE's and data of this block are manufacturer specific 0x02
   value = 0 [V]
   tariff = 0
   storageNumber = 0
@@ -123,7 +123,7 @@ datablock[12]:
   subUnit = 0
 datablock[13]:
   dataType = 16 Bit Integer
-  description = Voltage next VIFE's and data of this block are manufacturer specific Unit number not implemented
+  description = Voltage next VIFE's and data of this block are manufacturer specific 0x03
   value = 0 [V]
   tariff = 0
   storageNumber = 0
@@ -131,7 +131,7 @@ datablock[13]:
   subUnit = 0
 datablock[14]:
   dataType = 24 Bit Integer
-  description = Current next VIFE's and data of this block are manufacturer specific Too many DIFE's
+  description = Current next VIFE's and data of this block are manufacturer specific 0x01
   value = 0 [mA]
   tariff = 0
   storageNumber = 0
@@ -139,7 +139,7 @@ datablock[14]:
   subUnit = 0
 datablock[15]:
   dataType = 24 Bit Integer
-  description = Current next VIFE's and data of this block are manufacturer specific Storage number not implemented
+  description = Current next VIFE's and data of this block are manufacturer specific 0x02
   value = 0 [mA]
   tariff = 0
   storageNumber = 0
@@ -147,7 +147,7 @@ datablock[15]:
   subUnit = 0
 datablock[16]:
   dataType = 24 Bit Integer
-  description = Current next VIFE's and data of this block are manufacturer specific Unit number not implemented
+  description = Current next VIFE's and data of this block are manufacturer specific 0x03
   value = 0 [mA]
   tariff = 0
   storageNumber = 0
@@ -155,7 +155,7 @@ datablock[16]:
   subUnit = 0
 datablock[17]:
   dataType = 16 Bit Integer
-  description = 0x7F 0x52
+  description = Manufacturer specific coding including VIFE's 0x52
   value = 0
   tariff = 0
   storageNumber = 0
@@ -163,7 +163,7 @@ datablock[17]:
   subUnit = 0
 datablock[18]:
   dataType = 8 Bit Integer
-  description = 0x7F 0x61 0x7f 0x01
+  description = Manufacturer specific coding including VIFE's 0x61 0x7f 0x01
   value = 0
   tariff = 0
   storageNumber = 0
@@ -171,7 +171,7 @@ datablock[18]:
   subUnit = 0
 datablock[19]:
   dataType = 8 Bit Integer
-  description = 0x7F 0x61 0x7f 0x02
+  description = Manufacturer specific coding including VIFE's 0x61 0x7f 0x02
   value = 0
   tariff = 0
   storageNumber = 0
@@ -179,7 +179,7 @@ datablock[19]:
   subUnit = 0
 datablock[20]:
   dataType = 8 Bit Integer
-  description = 0x7F 0x61 0x7f 0x03
+  description = Manufacturer specific coding including VIFE's 0x61 0x7f 0x03
   value = 0
   tariff = 0
   storageNumber = 0

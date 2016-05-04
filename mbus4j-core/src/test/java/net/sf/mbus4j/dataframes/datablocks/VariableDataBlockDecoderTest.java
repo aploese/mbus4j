@@ -177,10 +177,15 @@ public class VariableDataBlockDecoderTest {
                 + "subUnit = 0\n");
     }
     
-    @Ignore
     @Test
     public void test_COS_PHI() {
-        doTest("01FFE10101", "");
+        doTest("01FFE10101", "dataType = 8 Bit Integer\n" +
+"description = Manufacturer specific coding including VIFE's 0x61 0x01\n" +
+"value = 1\n" +
+"tariff = 0\n" +
+"storageNumber = 0\n" +
+"functionField = Instantaneous value\n" +
+"subUnit = 0\n");
     }
     
     public void test_Template() {
