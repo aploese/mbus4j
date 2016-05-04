@@ -29,6 +29,7 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
@@ -36,6 +37,7 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -207,5 +209,26 @@ public enum VifePrimary implements Vife {
         }
         return valueOf(label);
     }
+    
+    public static Double getVifeCorrectionFactor(Vife[] vifes) {
+        for (Vife vife : vifes) {
+            if (vife instanceof VifePrimary) {
+                switch ((VifePrimary)vife) {
+                    case FACTOR_E__6: return 0.000001;
+                    case FACTOR_E__5: return 0.00001;
+                    case FACTOR_E__4: return 0.0001;
+                    case FACTOR_E__3: return 0.001;
+                    case FACTOR_E__2: return 0.01;
+                    case FACTOR_E__1: return 0.1;
+                    case FACTOR_E_0:return 1.0;
+                    case FACTOR_E_1:return 10.0;
+                    case FACTOR_E_3:return 1000.0;
+                    default: ;
+                }
+            }
+        }
+        return null;
+    }
+
 
 }

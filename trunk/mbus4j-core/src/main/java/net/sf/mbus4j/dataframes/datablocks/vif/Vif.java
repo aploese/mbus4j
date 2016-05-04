@@ -34,11 +34,17 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 public interface Vif {
 
+    final static String FREQUENCY = "Frequency";
+    final static String PHASE_U_I = "Phase U/I";
     final static String VOLUME = "Volume";
     final static String ENERGY = "Energy";
+    final static String REACTIVE_ENERGY = "Reactive Energy";
+    final static String COMPLEX_ENERGY = "Complex Energy";
     final static String MASS = "Mass";
     final static String VOLUME_FLOW = "Volume Flow";
     final static String POWER = "Power";
+    final static String REACTIVE_POWER = "Reactive Power";
+    final static String COMPLEX_POWER = "Complex Power";
     final static String FLOW_TEMPERATURE = "Flow Temperature";
     final static String RETURN_TEMPERATURE = "Return Temperature";
     final static String TEMPERATURE_DIFFERENCE = "Temperature Difference";

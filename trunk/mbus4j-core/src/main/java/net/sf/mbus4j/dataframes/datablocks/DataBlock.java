@@ -41,6 +41,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
@@ -222,7 +223,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
             case ASCII:
                 return new VifAscii(vifLabel);
             case MANUFACTURER_SPECIFIC:
-                return new VifManufacturerSpecific((byte) Integer.parseInt(vifLabel.substring(2), 16));
+                return new VifManufacturerSpecific();
             default: {
                 throw new IllegalArgumentException("Unknown vifType: " + vifTypeLabel);
             }
@@ -437,6 +438,13 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
                     }
                 }
+  
+                final Double cf = VifePrimary.getVifeCorrectionFactor(vifes);
+                if (cf != null) {
+                    sb.append(" * ");
+                    sb.append(cf);
+                }
+
                 sb.append(" [");
                 if (getSiPrefix() != null) {
                     sb.append(getSiPrefix());
@@ -612,4 +620,5 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         }
 
     }
+
 }

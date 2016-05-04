@@ -34,6 +34,7 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
 public enum VifeTypes {
 
     PRIMARY("primary"),
+    FC_EXTENSION("FC extension"),
     OBJECT_ACTION("object action"),
     ERROR("error"),
     MAN_SPEC("manufacturer specific");

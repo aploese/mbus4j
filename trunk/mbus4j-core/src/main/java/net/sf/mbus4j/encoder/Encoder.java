@@ -62,6 +62,7 @@ import net.sf.mbus4j.dataframes.datablocks.StringDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
