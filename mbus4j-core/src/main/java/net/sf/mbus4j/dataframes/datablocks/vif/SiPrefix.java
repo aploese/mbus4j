@@ -34,22 +34,26 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  */
 public enum SiPrefix {
 
-    PICO("p"),
-    NANO("n"),
-    MICRO("µ"),
-    MILLI("m"),
-    CENTI("c"),
-    DECI("d"),
-    ONE(""),
-    DECA("D"),
-    HECTO("h"),
-    KILO("k"),
-    MEGA("M"),
-    GIGA("G");
+    PICO("p", -15),
+    NANO("n", -12),
+    MICRO("µ", -6),
+    MILLI("m", -3),
+    CENTI("c", -2),
+    DECI("d", -1),
+    ONE("", 0),
+    DECA("D", 1),
+    HECTO("h",2),
+    KILO("k", 3),
+    MEGA("M", 6),
+    GIGA("G", 12);
     private final String label;
+    private final double factor;
+    private final int exponent;
 
-    private SiPrefix(String label) {
+    private SiPrefix(String label, int exponent) {
         this.label = label;
+        this.factor = Math.pow(10, exponent);
+        this.exponent = exponent;
     }
 
     @Override
@@ -75,4 +79,19 @@ public enum SiPrefix {
         }
         return valueOf(label);
     }
+
+    /**
+     * @return the factor
+     */
+    final public double getFactor() {
+        return factor;
+    }
+
+    /**
+     * @return the pow10
+     */
+    final public int getExponent() {
+        return exponent;
+    }
+
 }

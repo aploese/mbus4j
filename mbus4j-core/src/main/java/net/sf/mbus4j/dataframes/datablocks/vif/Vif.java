@@ -69,7 +69,14 @@ public interface Vif {
     final static String AVERAGING_DURATION = "Averaging Duration";
     final static String ACTUALLY_DURATION = "Actually Duration";
 
+    
     Integer getExponent();
+    
+    /**
+     * 
+     * @return the exponent as factor
+     */
+    double getFactor();
 
     /**
      * User friendly name

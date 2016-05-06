@@ -50,8 +50,6 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOU
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.VAR_HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HERTZ;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -197,6 +195,7 @@ public enum VifFB implements Vif {
     private final UnitOfMeasurement unit;
     private final SiPrefix siPrefix;
     private final Integer exponent;
+    private final double factor;
     private final static VifFB[] map = values();
 
     private VifFB() {
@@ -204,6 +203,7 @@ public enum VifFB implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
+        this.factor = Double.NaN;
     }
 
     private VifFB(String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
@@ -211,6 +211,7 @@ public enum VifFB implements Vif {
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
+        this.factor = Math.pow(10, exponent);
     }
 
     /**
@@ -219,6 +220,11 @@ public enum VifFB implements Vif {
     @Override
     public Integer getExponent() {
         return exponent;
+    }
+
+    @Override
+    public double getFactor() {
+        return factor;
     }
 
     @Override
