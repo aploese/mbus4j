@@ -41,7 +41,6 @@ import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifAscii;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFB;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
@@ -248,7 +247,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
             case OBJECT_ACTION:
                 return VifeObjectAction.fromLabel(vifeLabel);
             case MAN_SPEC:
-                return new VifeManufacturerSpecific((byte) Integer.parseInt(vifeLabel.substring(2), 16));
+                return new VifeManufacturerSpecific((byte) Integer.parseInt(vifeLabel, 16));
             default:
                 throw new IllegalArgumentException(vifeType.getLabel());
         }
@@ -340,7 +339,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         }
         if (vifes != null) {
             for (Vife vife : vifes) {
-                sb.append(" ").append(vife.getLabel());
+                sb.append(", ").append(vife.getLabel());
             }
         }
         return sb.toString();

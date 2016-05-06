@@ -21,7 +21,7 @@ datablock[0]:
   subUnit = 0
 datablock[1]:
   dataType = 16 Bit Integer
-  description = Time Point future value
+  description = Time Point, future value
   value = 31.12.2000 [Date]
   tariff = 0
   storageNumber = 1

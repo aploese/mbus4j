@@ -59,7 +59,7 @@ datablock[4]:
   subUnit = 0
 datablock[5]:
   dataType = 32 Bit Integer
-  description = Volume next VIFE's and data of this block are manufacturer specific
+  description = Volume, next VIFE's and data of this block are manufacturer specific
   value = 0 [l]
   tariff = 0
   storageNumber = 0

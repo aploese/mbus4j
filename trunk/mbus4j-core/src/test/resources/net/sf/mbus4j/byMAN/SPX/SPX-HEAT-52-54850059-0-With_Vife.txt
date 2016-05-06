@@ -13,7 +13,7 @@ medium = Heat
 lastPackage = false
 datablock[0]:
   dataType = 8 digit BCD
-  description = Energy Multiplicative correction factor 1000
+  description = Energy, Multiplicative correction factor 1000
   value = 00002378 * 100 * 1000.0 [Wh]
   tariff = 0
   storageNumber = 0

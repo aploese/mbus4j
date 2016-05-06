@@ -81,7 +81,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_REACTIVE_ENERGY_KVARH_E_0__Import() {
         doTest("8610FB82730100000000000", "dataType = 48 Bit Integer\n"
-                + "description = Reactive Energy Multiplicative correction factor 0.001\n"
+                + "description = Reactive Energy, Multiplicative correction factor 0.001\n"
                 + "value = 1 * 0.001 [kVARh]\n"
                 + "tariff = 1\n"
                 + "storageNumber = 0\n"
@@ -92,7 +92,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_REACTIVE_ENERGY_KVARH_E_0__Export() {
         doTest("8610FB82F33C0100000000000", "dataType = 48 Bit Integer\n"
-                + "description = Reactive Energy Multiplicative correction factor 0.001 Accumulation of abs value only if negative contributions\n"
+                + "description = Reactive Energy, Multiplicative correction factor 0.001, Accumulation of abs value only if negative contributions\n"
                 + "value = 1 * 0.001 [kVARh]\n"
                 + "tariff = 1\n"
                 + "storageNumber = 0\n"
@@ -113,7 +113,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_REACTIVE_POWER_VAR_E__0_PHASE_L1() {
         doTest("04FB94F5FC0100000000", "dataType = 32 Bit Integer\n"
-                + "description = Reactive Power Multiplicative correction factor 0.1 Phase L1\n"
+                + "description = Reactive Power, Multiplicative correction factor 0.1, Phase L1\n"
                 + "value = 0 * 0.1 [VAR]\n"
                 + "tariff = 0\n"
                 + "storageNumber = 0\n"
@@ -124,7 +124,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_PHASE_U_I_E__1_DEGREE__PHASE_L1() {
         doTest("02FBABFC010100", "dataType = 16 Bit Integer\n"
-                + "description = Phase U/I Phase L1\n"
+                + "description = Phase U/I, Phase L1\n"
                 + "value = 1 * 0.1 [°]\n"
                 + "tariff = 0\n"
                 + "storageNumber = 0\n"
@@ -135,7 +135,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_COMPLEX_POWER() {
         doTest("04FBD4F5FC0101000000", "dataType = 32 Bit Integer\n"
-                + "description = Complex Power Multiplicative correction factor 0.1 Phase L1\n"
+                + "description = Complex Power, Multiplicative correction factor 0.1, Phase L1\n"
                 + "value = 1 * 0.1 * 0.1 [VA]\n"
                 + "tariff = 0\n"
                 + "storageNumber = 0\n"
@@ -147,7 +147,7 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_VOLTAGE_PHASE_L3_L1() {
         doTest("02FDC8FC070100", "dataType = 16 Bit Integer\n"
-                + "description = Voltage Phase L3 - L1\n"
+                + "description = Voltage, Phase L3 - L1\n"
                 + "value = 1 * 100 [mV]\n"
                 + "tariff = 0\n"
                 + "storageNumber = 0\n"
@@ -169,25 +169,25 @@ public class VariableDataBlockDecoderTest {
     @Test
     public void test_CURRENT_PLASE_L1() {
         doTest("03FDD9FC01010000", "dataType = 24 Bit Integer\n"
-                + "description = Current Phase L1\n"
+                + "description = Current, Phase L1\n"
                 + "value = 1 [mA]\n"
                 + "tariff = 0\n"
                 + "storageNumber = 0\n"
                 + "functionField = Instantaneous value\n"
                 + "subUnit = 0\n");
     }
-    
+
     @Test
     public void test_COS_PHI() {
-        doTest("01FFE10101", "dataType = 8 Bit Integer\n" +
-"description = Manufacturer specific coding including VIFE's 0x61 0x01\n" +
-"value = 1\n" +
-"tariff = 0\n" +
-"storageNumber = 0\n" +
-"functionField = Instantaneous value\n" +
-"subUnit = 0\n");
+        doTest("01FFE10101", "dataType = 8 Bit Integer\n"
+                + "description = Manufacturer specific coding (including VIFE's), E1, 01\n"
+                + "value = 1\n"
+                + "tariff = 0\n"
+                + "storageNumber = 0\n"
+                + "functionField = Instantaneous value\n"
+                + "subUnit = 0\n");
     }
-    
+
     public void test_Template() {
         doTest("", "");
     }

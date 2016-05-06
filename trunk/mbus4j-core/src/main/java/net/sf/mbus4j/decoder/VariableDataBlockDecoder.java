@@ -548,7 +548,7 @@ public class VariableDataBlockDecoder {
         // Extended VID chapter 8.4.5
         switch (frame.getControlCode()) {
             case RSP_UD:
-                Vife vife = new VifeManufacturerSpecific((byte) (b & ~Decoder.EXTENTION_BIT));
+                Vife vife = new VifeManufacturerSpecific(b);
 
                 if (vifes == null) {
                     vifes = new Vife[1];
