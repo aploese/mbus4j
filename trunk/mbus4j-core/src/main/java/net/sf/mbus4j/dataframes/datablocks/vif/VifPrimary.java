@@ -203,6 +203,7 @@ public enum VifPrimary implements Vif {
     private final UnitOfMeasurement unit;
     private final int vifCode;
     private final Integer exponent;
+    private final double factor;
     private final static VifPrimary[] map = values();
 
     private VifPrimary(int vifCode) {
@@ -211,6 +212,7 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
+        this.factor = Double.NaN;
     }
 
     private VifPrimary(int vifCode, String label) {
@@ -219,6 +221,7 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
+        this.factor = Double.NaN;
     }
 
     private VifPrimary(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
@@ -227,6 +230,7 @@ public enum VifPrimary implements Vif {
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
+        this.factor = Math.pow(10, exponent);
     }
 
     private VifPrimary(int vifCode, String label, UnitOfMeasurement unit) {
@@ -235,18 +239,24 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = unit;
         this.exponent = null;
+        this.factor = Double.NaN;
     }
 
     /**
      * @return the exponent
      */
     @Override
-    public Integer getExponent() {
+    final public Integer getExponent() {
         return exponent;
     }
 
     @Override
-    public String getLabel() {
+    final public double getFactor() {
+        return factor;
+    }
+    
+    @Override
+    final public String getLabel() {
         return label;
     }
 
@@ -254,11 +264,11 @@ public enum VifPrimary implements Vif {
      * @return the siPrefix
      */
     @Override
-    public SiPrefix getSiPrefix() {
+    final public SiPrefix getSiPrefix() {
         return siPrefix;
     }
 
-    public byte getTableIndex() {
+    final public byte getTableIndex() {
         return (byte) ordinal();
     }
 
@@ -266,7 +276,7 @@ public enum VifPrimary implements Vif {
      * @return the unit
      */
     @Override
-    public UnitOfMeasurement getUnitOfMeasurement() {
+    final public UnitOfMeasurement getUnitOfMeasurement() {
         return unit;
     }
 

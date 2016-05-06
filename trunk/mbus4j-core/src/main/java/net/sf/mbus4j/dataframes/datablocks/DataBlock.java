@@ -46,6 +46,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifTypes;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
+import static net.sf.mbus4j.dataframes.datablocks.vif.Vife.CONST;
+import static net.sf.mbus4j.dataframes.datablocks.vif.Vife.FACTOR;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
@@ -346,7 +348,11 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     }
 
     public SiPrefix getSiPrefix() {
-        return vif != null ? vif.getSiPrefix() : null;
+        return vif == null ? null : vif.getSiPrefix();
+    }
+
+    public double getFactor() {
+        return vif == null ? Double.NaN : vif.getFactor();
     }
 
     public long getStorageNumber() {
@@ -394,7 +400,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     }
 
     /**
-     * @param deviceUnit the deviceUnit to set
+     * @param subUnit the subUnit to set
      */
     public void setSubUnit(short subUnit) {
         this.subUnit = subUnit;
@@ -439,7 +445,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
                 }
   
                 final Double cf = VifePrimary.getVifeCorrectionFactor(vifes);
-                if (cf != null) {
+                if (!Double.isNaN(cf)) {
                     sb.append(" * ");
                     sb.append(cf);
                 }
@@ -620,4 +626,12 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
     }
 
+    
+    public int getCorrectionExponent(SiPrefix siPrefix) {
+         return getSiPrefix().getExponent()- siPrefix.getExponent() + getExponent() + VifePrimary.getVifeCorrectionExponent(vifes);
+    }
+
+    public double getCorrectionConstant() {
+         return VifePrimary.getVifeCorrectionConstant(vifes);
+    }
 }

@@ -201,7 +201,7 @@ public enum VifePrimary implements Vife {
         return valueOf(label);
     }
     
-    public static Double getVifeCorrectionFactor(Vife[] vifes) {
+    public static double getVifeCorrectionFactor(Vife[] vifes) {
         for (Vife vife : vifes) {
             if (vife instanceof VifePrimary) {
                 switch ((VifePrimary)vife) {
@@ -218,8 +218,41 @@ public enum VifePrimary implements Vife {
                 }
             }
         }
-        return null;
+        return Double.NaN;
     }
 
+    public static int getVifeCorrectionExponent(Vife[] vifes) {
+        for (Vife vife : vifes) {
+            if (vife instanceof VifePrimary) {
+                switch ((VifePrimary)vife) {
+                    case FACTOR_E__6: return -6;
+                    case FACTOR_E__5: return -5;
+                    case FACTOR_E__4: return -4;
+                    case FACTOR_E__3: return -3;
+                    case FACTOR_E__2: return -2;
+                    case FACTOR_E__1: return -1;
+                    case FACTOR_E_0:return 0;
+                    case FACTOR_E_1:return 1;
+                    case FACTOR_E_3:return 3;
+                    default: ;
+                }
+            }
+        }
+        return 0;
+    }
 
+    public static double getVifeCorrectionConstant(Vife[] vifes) {
+        for (Vife vife : vifes) {
+            if (vife instanceof VifePrimary) {
+                switch ((VifePrimary)vife) {
+                    case CONST_E_0: return 1;
+                    case CONST_E__1: return 0.1;
+                    case CONST_E__2: return 0.01;
+                    case CONST_E__3: return 0.001;
+                    default: ;
+                }
+            }
+        }
+        return Double.NaN;
+    }
 }

@@ -27,8 +27,6 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -207,7 +205,12 @@ public enum VifFC implements Vif {
 
     @Override
     public Integer getExponent() {
-        return 0;
+        return null;
+    }
+
+    @Override
+    public double getFactor() {
+        return Double.NaN;
     }
 
     @Override

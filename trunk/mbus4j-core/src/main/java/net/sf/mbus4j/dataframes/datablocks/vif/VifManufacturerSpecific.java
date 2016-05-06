@@ -58,6 +58,11 @@ public class VifManufacturerSpecific implements Vif {
     }
 
     @Override
+    public double getFactor() {
+        return Double.NaN;
+    }
+
+    @Override
     public String getLabel() {
         return "Manufacturer specific coding (including VIFE's)";
     }
