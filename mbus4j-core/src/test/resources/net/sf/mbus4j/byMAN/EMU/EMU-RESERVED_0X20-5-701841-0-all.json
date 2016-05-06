@@ -114,7 +114,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x01"
+       "name": "01"
       }
      ]
     }
@@ -145,7 +145,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x02"
+       "name": "02"
       }
      ]
     }
@@ -176,7 +176,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x03"
+       "name": "03"
       }
      ]
     }
@@ -207,7 +207,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x01"
+       "name": "01"
       }
      ]
     }
@@ -238,7 +238,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x02"
+       "name": "02"
       }
      ]
     }
@@ -269,7 +269,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x03"
+       "name": "03"
       }
      ]
     }
@@ -319,7 +319,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x01"
+       "name": "01"
       }
      ]
     }
@@ -350,7 +350,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x02"
+       "name": "02"
       }
      ]
     }
@@ -381,7 +381,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x03"
+       "name": "03"
       }
      ]
     }
@@ -412,7 +412,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x01"
+       "name": "01"
       }
      ]
     }
@@ -443,7 +443,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x02"
+       "name": "02"
       }
      ]
     }
@@ -474,7 +474,7 @@
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x03"
+       "name": "03"
       }
      ]
     }
@@ -493,11 +493,11 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding including VIFE's"
+      "description": "Manufacturer specific coding (including VIFE's)"
      },
      "vifes": [     {
       "vifeType": "manufacturer specific",
-      "name": "0x52"
+      "name": "52"
      }]
     }
    },
@@ -515,20 +515,20 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding including VIFE's"
+      "description": "Manufacturer specific coding (including VIFE's)"
      },
      "vifes":      [
             {
        "vifeType": "manufacturer specific",
-       "name": "0x61"
+       "name": "E1"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x7f"
+       "name": "FF"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x01"
+       "name": "01"
       }
      ]
     }
@@ -547,20 +547,20 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding including VIFE's"
+      "description": "Manufacturer specific coding (including VIFE's)"
      },
      "vifes":      [
             {
        "vifeType": "manufacturer specific",
-       "name": "0x61"
+       "name": "E1"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x7f"
+       "name": "FF"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x02"
+       "name": "02"
       }
      ]
     }
@@ -579,20 +579,20 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding including VIFE's"
+      "description": "Manufacturer specific coding (including VIFE's)"
      },
      "vifes":      [
             {
        "vifeType": "manufacturer specific",
-       "name": "0x61"
+       "name": "E1"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x7f"
+       "name": "FF"
       },
             {
        "vifeType": "manufacturer specific",
-       "name": "0x03"
+       "name": "03"
       }
      ]
     }

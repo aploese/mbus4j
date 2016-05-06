@@ -39,6 +39,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
+import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 
 /**
  *
@@ -114,7 +119,7 @@ public class UserDataResponse
         if (json.containsKey("status")) {
             JSONArray statusArray = json.getJSONArray("status");
 
-            if (statusArray.size() == 0) {
+            if (statusArray.isEmpty()) {
                 setStatus(new StatusCode[0]);
             } else {
                 status = new StatusCode[statusArray.size()];
@@ -188,7 +193,7 @@ public class UserDataResponse
     private MBusMedium medium;
     private int identNumber;
     private String manufacturer;
-    private List<DataBlock> dataBlocks = new ArrayList<DataBlock>();
+    private List<DataBlock> dataBlocks = new ArrayList<>();
     private byte address;
 
     public UserDataResponse() {
@@ -226,7 +231,7 @@ public class UserDataResponse
     public UserDataResponse clone()
             throws CloneNotSupportedException {
         UserDataResponse result = (UserDataResponse) super.clone();
-        result.dataBlocks = new ArrayList<DataBlock>();
+        result.dataBlocks = new ArrayList<>();
         result.dataBlocks.addAll(dataBlocks);
 
         return result;
@@ -267,7 +272,7 @@ public class UserDataResponse
 
     @Override
     public DataBlock getLastDataBlock() {
-        return (dataBlocks.size() == 0) ? null : dataBlocks.get(dataBlocks.size() - 1);
+        return (dataBlocks.isEmpty()) ? null : dataBlocks.get(dataBlocks.size() - 1);
     }
 
     public String getManufacturer() {
@@ -346,7 +351,7 @@ public class UserDataResponse
     }
 
     /**
-     * @param dcf the dfc to set
+     * @param dfc the dfc to set
      */
     public void setDfc(boolean dfc) {
         this.dfc = dfc;
@@ -400,4 +405,35 @@ public class UserDataResponse
 
         return sb.toString();
     }
+
+    
+    public DataBlock[] getDataBlocks(int tarif, long storagenumber, short subUnit, Vif vif, FunctionField functionField, Vife[] vifes) {
+        DataBlock[] result = null;
+        for (DataBlock db : dataBlocks) {
+            if ((db.getTariff() == tarif) &&
+                    (db.getStorageNumber() == storagenumber) &&
+                    (db.getSubUnit()== subUnit) &&
+                    (Objects.equals(db.getVif(), vif)) &&
+                    (db.getFunctionField() == functionField) &&
+                    (Arrays.equals(db.getVifes(), vifes))) {
+                if (result == null) {
+                    result = new DataBlock[]{db};
+                } else {
+                    result = Arrays.copyOf(result, result.length +1);
+                    result[result.length -1] = db;
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean isDBUnique() {
+            for (DataBlock db : dataBlocks) {
+                if (getDataBlocks(db.getTariff(), db.getStorageNumber(), db.getSubUnit(), db.getVif(), db.getFunctionField(), db.getVifes()).length != 1) {
+                    return false;
+                }
+            }
+            return true;
+    }
+
 }

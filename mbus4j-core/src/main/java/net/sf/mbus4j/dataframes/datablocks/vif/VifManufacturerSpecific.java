@@ -59,7 +59,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public String getLabel() {
-        return "Manufacturer specific coding including VIFE's";
+        return "Manufacturer specific coding (including VIFE's)";
     }
 
     /**

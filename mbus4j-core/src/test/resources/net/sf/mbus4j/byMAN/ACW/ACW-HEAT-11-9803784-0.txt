@@ -45,7 +45,7 @@ datablock[3]:
   subUnit = 0
 datablock[4]:
   dataType = 32 Bit Integer
-  description = Power => Date(/time) end of last upper limit exceed
+  description = Power, Date(/time) end of last upper limit exceed
   unit = [kW]
   value = 18.02.2009 11:26:00
   tariff = 0
@@ -67,7 +67,7 @@ datablock[5]:
   subUnit = 0
 datablock[6]:
   dataType = 32 Bit Integer
-  description = Volume Flow => Date(/time) end of last upper limit exceed
+  description = Volume Flow, Date(/time) end of last upper limit exceed
   unit = [m³/h]
   value = 27.02.2009 10:26:00
   tariff = 0
@@ -89,7 +89,7 @@ datablock[7]:
   subUnit = 0
 datablock[8]:
   dataType = 32 Bit Integer
-  description = Flow Temperature => Date(/time) end of last upper limit exceed
+  description = Flow Temperature, Date(/time) end of last upper limit exceed
   unit = [°C]
   value = 18.02.2009 14:26:00
   tariff = 0

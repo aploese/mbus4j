@@ -41,7 +41,7 @@ public class VifeManufacturerSpecific implements Vife {
 
     @Override
     public String getLabel() {
-        return String.format("0x%02x", vifeValue);
+        return String.format("%02X", vifeValue);
     }
 
     @Override
