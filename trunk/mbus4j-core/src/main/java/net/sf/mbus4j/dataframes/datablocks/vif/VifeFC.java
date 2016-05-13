@@ -193,8 +193,8 @@ public enum VifeFC implements Vife {
         return label;
     }
 
-    public static VifeFC assemble(String label) {
-        for (VifeFC value : values()) {
+    public static VifeFC fromLabel(String label) {
+        for (VifeFC value : map) {
             if (value.getLabel().equals(label)) {
                 return value;
             }

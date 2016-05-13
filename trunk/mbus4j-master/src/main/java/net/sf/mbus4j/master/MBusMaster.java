@@ -107,6 +107,7 @@ public class MBusMaster
 //TODO impement        throw new UnsupportedOperationException("Not yet implemented");
     }
 
+    @Deprecated
     public static GenericDevice getDevice(Iterable<GenericDevice> deviceList, ValueRequestPointLocator locator) {
         for (GenericDevice dev : deviceList) {
             if ((dev.getAddress() == locator.getAddress())
@@ -121,6 +122,7 @@ public class MBusMaster
         return null;
     }
 
+    @Deprecated
     public static DataBlock getDataBlock(Frame frame, ValueRequestPointLocator locator) {
         if (frame instanceof UserDataResponse) {
             for (DataBlock db : (UserDataResponse) frame) {
@@ -141,7 +143,7 @@ public class MBusMaster
             throw new RuntimeException("Response is not a UserDataResponse but: " + frame);
         }
 
-        throw new RuntimeException("can't find datablock of locator");
+        throw new RuntimeException("can't find datablock of locator" + locator);
     }
 
     private DataBlock getTimeStampDB(GenericDevice dev, ValueRequestPointLocator locator) {
@@ -243,6 +245,7 @@ public class MBusMaster
 
     }
     private final static Logger log = LogUtils.getMasterLogger();
+    @Deprecated //DO not handle this here just plain send/receive
     private final List<GenericDevice> devices = new ArrayList<>();
     private final Encoder encoder = new Encoder();
     private Thread t;
@@ -262,6 +265,7 @@ public class MBusMaster
      * Manufacturer and Medium
      * @TODO refresh devicedata???
      */
+    @Deprecated
     public boolean addDevice(GenericDevice device) {
         for (GenericDevice dev : devices) {
             if (dev.getIdentNumber() == device.getIdentNumber()) {
@@ -296,10 +300,12 @@ public class MBusMaster
         return result;
     }
 
+    @Deprecated
     public int deviceIndexOf(GenericDevice d) {
         return devices.indexOf(d);
     }
 
+    @Deprecated
     public void clearDevices() {
         devices.clear();
     }
@@ -334,14 +340,17 @@ public class MBusMaster
         }
     }
 
+    @Deprecated
     public int deviceCount() {
         return devices.size();
     }
 
+    @Deprecated
     public GenericDevice getDevice(int i) {
         return devices.get(i);
     }
 
+    @Deprecated
     public GenericDevice[] getDevices() {
         return devices.toArray(new GenericDevice[deviceCount()]);
     }
@@ -369,6 +378,7 @@ public class MBusMaster
         return getIdleTime() * 10 + conn.getResponseTimeOutOffset();
     }
 
+    @Deprecated
     @Override
     public Iterator<GenericDevice> iterator() {
         return devices.iterator();
@@ -438,6 +448,7 @@ public class MBusMaster
         return null;
     }
 
+    @Deprecated
     public Map<GenericDevice, Frame> sendRequestUserData(MBusAddressing addressing)
             throws IOException, InterruptedException {
         Map<GenericDevice, MBusAddressing> devMap = new HashMap<>();
@@ -715,10 +726,10 @@ public class MBusMaster
 
     public void readValues(ValueRequest<?> requests)
             throws IOException, InterruptedException {
-        //Create devices if neccecary
+        //Create devices if necessary
         HashMap<GenericDevice, MBusAddressing> result = new HashMap<>();
 
-        for (ValueRequestPointLocator locator : requests) {
+        for (ValueRequestPointLocator<?> locator : requests) {
             GenericDevice myDevice = getDevice(devices, locator);
 
             if (myDevice == null) {
@@ -739,7 +750,7 @@ public class MBusMaster
         Map<GenericDevice, Frame> responses = sendRequestUserData(result);
 
         //pack response
-        for (ValueRequestPointLocator locator : requests) {
+        for (ValueRequestPointLocator<?> locator : requests) {
             GenericDevice dev = getDevice(result.keySet(), locator);
             DataBlock db = getDataBlock(responses.get(dev),
                     locator);

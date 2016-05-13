@@ -57,8 +57,6 @@ import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.TONN_PER
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.WATT_HOUR;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -201,13 +199,14 @@ public enum VifPrimary implements Vif {
     private final String label;
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
-    private final int vifCode;
     private final Integer exponent;
     private final double factor;
     private final static VifPrimary[] map = values();
 
     private VifPrimary(int vifCode) {
-        this.vifCode = vifCode;
+        if (this.ordinal() != vifCode) {
+            throw new IllegalArgumentException("ordinal and vifCode mismatch!");
+        }
         this.label = String.format("VifStd Reserved 0x%02x", vifCode);
         this.siPrefix = null;
         this.unit = null;
@@ -216,7 +215,9 @@ public enum VifPrimary implements Vif {
     }
 
     private VifPrimary(int vifCode, String label) {
-        this.vifCode = vifCode;
+        if (this.ordinal() != vifCode) {
+            throw new IllegalArgumentException("ordinal and vifCode mismatch!");
+        }
         this.label = label;
         this.siPrefix = null;
         this.unit = null;
@@ -225,7 +226,9 @@ public enum VifPrimary implements Vif {
     }
 
     private VifPrimary(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
-        this.vifCode = vifCode;
+        if (this.ordinal() != vifCode) {
+            throw new IllegalArgumentException("ordinal and vifCode mismatch!");
+        }
         this.label = label;
         this.siPrefix = siPrefix;
         this.unit = unit;
@@ -234,7 +237,9 @@ public enum VifPrimary implements Vif {
     }
 
     private VifPrimary(int vifCode, String label, UnitOfMeasurement unit) {
-        this.vifCode = vifCode;
+        if (this.ordinal() != vifCode) {
+            throw new IllegalArgumentException("ordinal and vifCode mismatch!");
+        }
         this.label = label;
         this.siPrefix = null;
         this.unit = unit;
@@ -281,7 +286,7 @@ public enum VifPrimary implements Vif {
     }
 
     public int getVifCode() {
-        return vifCode;
+        return ordinal();
     }
 
     @Override
@@ -291,7 +296,10 @@ public enum VifPrimary implements Vif {
 
     public static VifPrimary assemble(String label, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
         for (VifPrimary value : values()) {
-            if (value.getLabel().equals(label) && ((unitOfMeasurement == value.getUnitOfMeasurement()) || ((unitOfMeasurement != null) && unitOfMeasurement.equals(value.getUnitOfMeasurement()))) && ((siPrefix == value.getSiPrefix()) || ((siPrefix != null) && siPrefix.equals(value.getSiPrefix()))) && ((exponent == value.getExponent()) || ((exponent != null) && exponent.equals(value.getExponent())))) {
+            if (value.getLabel().equals(label) && 
+                    ((unitOfMeasurement == value.getUnitOfMeasurement()) || ((unitOfMeasurement != null) && unitOfMeasurement.equals(value.getUnitOfMeasurement()))) && 
+                    ((siPrefix == value.getSiPrefix()) || ((siPrefix != null) && siPrefix.equals(value.getSiPrefix()))) && 
+                    ((exponent == value.getExponent()) || ((exponent != null) && exponent.equals(value.getExponent())))) {
                 return value;
             }
         }

@@ -94,4 +94,10 @@ public class VifManufacturerSpecific implements Vif {
     public VifTypes getVifType() {
         return VifTypes.MANUFACTURER_SPECIFIC;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
 }
