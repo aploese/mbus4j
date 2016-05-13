@@ -27,7 +27,6 @@ package net.sf.mbus4j.master;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,11 +34,12 @@ import java.util.List;
 /**
  *
  * @author aploese
+ * @param <T>
  */
 public class ValueRequest<T>
         implements Iterable<ValueRequestPointLocator<T>> {
 
-    private List<ValueRequestPointLocator<T>> points = new ArrayList<ValueRequestPointLocator<T>>();
+    private final List<ValueRequestPointLocator<T>> points = new ArrayList<>();
 
     public boolean add(ValueRequestPointLocator<T> value) {
         return points.add(value);

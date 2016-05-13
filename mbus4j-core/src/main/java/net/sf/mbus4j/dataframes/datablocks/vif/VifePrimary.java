@@ -163,7 +163,7 @@ public enum VifePrimary implements Vife {
         return result == 1;
     }
     private final String label;
-    private static VifePrimary[] map = values();
+    private final static VifePrimary[] map = values();
 
     private VifePrimary() {
         this.label = String.format("Reserved 0x%02x", ordinal() + 0x20);
@@ -193,7 +193,7 @@ public enum VifePrimary implements Vife {
     }
 
     public static VifePrimary fromLabel(String label) {
-        for (VifePrimary value : values()) {
+        for (VifePrimary value : map) {
             if (value.getLabel().equals(label)) {
                 return value;
             }

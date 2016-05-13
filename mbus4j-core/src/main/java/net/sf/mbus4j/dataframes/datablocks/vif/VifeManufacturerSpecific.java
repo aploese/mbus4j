@@ -63,4 +63,20 @@ public class VifeManufacturerSpecific implements Vife {
         this.vifeValue = vifeValue;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof VifeManufacturerSpecific) {
+            return ((VifeManufacturerSpecific) other).vifeValue == vifeValue;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + this.vifeValue;
+        return hash;
+    }
+
 }

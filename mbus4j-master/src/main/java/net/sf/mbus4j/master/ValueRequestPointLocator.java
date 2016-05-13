@@ -41,6 +41,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  *
  * @author aploese
  */
+@Deprecated
 public class ValueRequestPointLocator<T> {
 
     private MBusAddressing addressing;
@@ -313,4 +314,9 @@ public class ValueRequestPointLocator<T> {
     public void setReference(T reference) {
         this.reference = reference;
     }
+    
+    public String toString() {
+        return "Reference:\n" + reference + "\n\nDataBlock:\n" +  db;
+    }
+    
 }

@@ -27,8 +27,6 @@ package net.sf.mbus4j.dataframes.datablocks.vif;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -101,7 +99,7 @@ public enum VifeError implements Vife {
     }
 
     public static VifeError fromLabel(String label) {
-        for (VifeError value : values()) {
+        for (VifeError value : map) {
             if (value.getLabel().equals(label)) {
                 return value;
             }

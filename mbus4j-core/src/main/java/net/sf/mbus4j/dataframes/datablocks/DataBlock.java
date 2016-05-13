@@ -29,6 +29,7 @@ package net.sf.mbus4j.dataframes.datablocks;
  */
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Objects;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -46,9 +47,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.VifManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifTypes;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
-import static net.sf.mbus4j.dataframes.datablocks.vif.Vife.CONST;
-import static net.sf.mbus4j.dataframes.datablocks.vif.Vife.FACTOR;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeError;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeManufacturerSpecific;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
@@ -210,10 +210,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
     }
 
-    public static Vif getVif(String vifTypeLabel, String vifLabel, String unitOfMeasurementLabel, String siPrefixLabel, Integer exponent) {
+    public static Vif getVif(String vifTypeLabel, String vifLabel, UnitOfMeasurement unitOfMeasurement, SiPrefix siPrefix, Integer exponent) {
         VifTypes vifType = VifTypes.fromLabel(vifTypeLabel);
-        SiPrefix siPrefix = SiPrefix.fromLabel(siPrefixLabel);
-        UnitOfMeasurement unitOfMeasurement = UnitOfMeasurement.fromLabel(unitOfMeasurementLabel);
         switch (vifType) {
             case PRIMARY:
                 return VifPrimary.assemble(vifLabel, unitOfMeasurement, siPrefix, exponent);
@@ -234,8 +232,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     public static Vif vifFromJSON(JSONObject jsonVif) {
         return getVif(jsonVif.getString("vifType"),
                 jsonVif.containsKey("description") ? jsonVif.getString("description") : null,
-                jsonVif.containsKey("unitOfMeasurement") ? jsonVif.getString("unitOfMeasurement") : null,
-                jsonVif.containsKey("siPrefix") ? jsonVif.getString("siPrefix") : null,
+                jsonVif.containsKey("unitOfMeasurement") ? UnitOfMeasurement.fromLabel(jsonVif.getString("unitOfMeasurement")) : null,
+                jsonVif.containsKey("siPrefix") ? SiPrefix.fromLabel(jsonVif.getString("siPrefix")) : null,
                 jsonVif.containsKey("exponent") ? jsonVif.getInt("exponent") : null);
     }
 
@@ -244,6 +242,8 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         switch (vifeType) {
             case PRIMARY:
                 return VifePrimary.fromLabel(vifeLabel);
+            case FC_EXTENSION:
+                return VifeFC.fromLabel(vifeLabel);
             case ERROR:
                 return VifeError.fromLabel(vifeLabel);
             case OBJECT_ACTION:
@@ -488,7 +488,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
             dib.accumulate("action", getAction().getLabel());
         }
         dib.accumulate("dataFieldCode", getDataFieldCode().getLabel());
-        if (dataFieldCode.VARIABLE_LENGTH.equals(getDataFieldCode())) {
+        if (DataFieldCode.VARIABLE_LENGTH.equals(getDataFieldCode())) {
             if (this instanceof StringDataBlock) {
                 dib.accumulate("variableLengthType", VariableLengthType.STRING.getLabel());
             } else {
@@ -634,4 +634,5 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
     public double getCorrectionConstant() {
          return VifePrimary.getVifeCorrectionConstant(vifes);
     }
+    
 }
