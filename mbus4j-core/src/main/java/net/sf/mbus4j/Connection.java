@@ -111,8 +111,11 @@ public abstract class Connection implements JSONSerializable, Serializable, Clos
         return bitPerSecond;
     }
 
+    public abstract String getName();
+    
+    
     /**
-     * @param baudrate the bitPerSecond to set
+     * @param bitPerSecond the bitPerSecond to set
      */
     public void setBitPerSecond(int bitPerSecond) {
         this.bitPerSecond = bitPerSecond;
@@ -176,6 +179,8 @@ public abstract class Connection implements JSONSerializable, Serializable, Clos
 
     /**
      * find fields in json and create approbirate connection instance
+     * @param json
+     * @return 
      */
     public static Connection createFromJSON(JSONObject json) {
         Connection result = null;

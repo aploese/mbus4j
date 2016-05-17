@@ -110,4 +110,9 @@ public class SlaveStreams extends MockConnection {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
 }
