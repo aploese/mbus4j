@@ -126,4 +126,9 @@ public class MasterStreams extends MockConnection {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String getName() {
+        return getClass().getName();
+    }
+
 }

@@ -30,6 +30,7 @@ package net.sf.mbus4j;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Objects;
 import java.util.Set;
 import net.sf.atmodem4j.spsw.Baudrate;
 import net.sf.atmodem4j.spsw.DataBits;
@@ -197,4 +198,42 @@ public class SerialPortConnection extends Connection {
     public String getJsonFieldName() {
         return SERIAL_CONNECTION;
     }
+    
+    @Override
+    public String getName() {
+        return portName;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + Objects.hashCode(this.portName);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SerialPortConnection other = (SerialPortConnection) obj;
+        if (!Objects.equals(this.portName, other.portName)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "SerialPortConnection{" + "portName=" + portName + '}';
+    }
+    
+    
+    
 }

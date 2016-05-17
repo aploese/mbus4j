@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Objects;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.json.JsonSerializeType;
 
@@ -139,4 +140,42 @@ public class TcpIpConnection extends Connection {
         return TCP_IP_CONNECTION;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + Objects.hashCode(this.host);
+        hash = 17 * hash + this.port;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TcpIpConnection other = (TcpIpConnection) obj;
+        if (this.port != other.port) {
+            return false;
+        }
+        if (!Objects.equals(this.host, other.host)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "TcpIpConnection{" + "host=" + host + ", port=" + port + '}';
+    }
+    
+    @Override
+    public String getName() {
+        return host + ":" + port;
+    }
 }
