@@ -665,12 +665,10 @@ public class MBusMaster
     }
 
     public UserDataResponse readResponse(byte address) throws IOException, InterruptedException {
-        Frame fi = sendInitSlave(address);
         Frame f = sendRequestUserData(address);
         if (f instanceof UserDataResponse) {
             return (UserDataResponse) f;
         } else {
-//TODO Ex??
             return null;
         }
     }

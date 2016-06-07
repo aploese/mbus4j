@@ -52,9 +52,9 @@ public class SerialPortConnection extends Connection {
 
     public static final int DEFAULT_RESPONSE_TIMEOUT_OFFSET = 50;
     public static final Set<FlowControl> FLOW_CONTROL = FlowControl.getFC_NONE();
-    public static DataBits DATA_BITS = DataBits.DB_8;
-    public static StopBits STOP_BITS = StopBits.SB_1;
-    public static Parity PARITY = Parity.EVEN;
+    public static final DataBits DATA_BITS = DataBits.DB_8;
+    public static final StopBits STOP_BITS = StopBits.SB_1;
+    public static final Parity PARITY = Parity.EVEN;
 
     private String portName;
     private SerialPortSocket sPort;
