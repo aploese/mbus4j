@@ -406,7 +406,16 @@ public class UserDataResponse
         return sb.toString();
     }
 
-    
+    /**
+     * Find matches except DataType
+     * @param tarif
+     * @param storagenumber
+     * @param subUnit
+     * @param vif
+     * @param functionField
+     * @param vifes
+     * @return 
+     */
     public DataBlock[] getDataBlocks(int tarif, long storagenumber, short subUnit, Vif vif, FunctionField functionField, Vife[] vifes) {
         DataBlock[] result = null;
         for (DataBlock db : dataBlocks) {
@@ -427,6 +436,7 @@ public class UserDataResponse
         return result;
     }
 
+    @Deprecated
     public boolean isDBUnique() {
             for (DataBlock db : dataBlocks) {
                 if (getDataBlocks(db.getTariff(), db.getStorageNumber(), db.getSubUnit(), db.getVif(), db.getFunctionField(), db.getVifes()).length != 1) {
