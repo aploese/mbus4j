@@ -75,7 +75,7 @@
     }}
    },
    "data":    {
-    "timestamp": "17.01.2009 23:04:00",
+    "timestamp": "2009-01-17T23:04:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -131,7 +131,7 @@
     }}
    },
    "data":    {
-    "timestamp": "17.01.2009 23:03:00",
+    "timestamp": "2009-01-17T23:03:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -187,7 +187,7 @@
     }}
    },
    "data":    {
-    "timestamp": "17.01.2009 23:03:00",
+    "timestamp": "2009-01-17T23:03:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -243,7 +243,7 @@
     }}
    },
    "data":    {
-    "timestamp": "17.01.2009 23:03:00",
+    "timestamp": "2009-01-17T23:03:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -299,7 +299,7 @@
     }}
    },
    "data":    {
-    "timestamp": "17.01.2009 23:03:00",
+    "timestamp": "2009-01-17T23:03:00",
     "summertime": false,
     "valid": true,
     "res1": false,

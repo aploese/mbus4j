@@ -71,7 +71,7 @@ datablock[7]:
   dataType = 32 Bit Integer
   description = Time Point
   unit = [time and date]
-  value = 15.12.2007 23:42:00
+  value = 2007-12-15T23:42:00
   tariff = 0
   storageNumber = 0
   functionField = Instantaneous value

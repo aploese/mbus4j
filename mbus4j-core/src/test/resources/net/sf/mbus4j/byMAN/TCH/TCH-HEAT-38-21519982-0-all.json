@@ -46,7 +46,7 @@
     }}
    },
    "data":    {
-    "timestamp": "29.09.2000 13:50:00",
+    "timestamp": "2000-09-29T13:50:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -88,7 +88,7 @@
      "unitOfMeasurement": "Date"
     }}
    },
-   "data": {"date": "29.05.2000"}
+   "data": {"date": "2000-05-29"}
   },
     {
    "drh":    {

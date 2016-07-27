@@ -23,7 +23,7 @@ datablock[1]:
   dataType = 32 Bit Integer
   description = Time Point
   unit = [time and date]
-  value = 29.09.2000 13:50:00
+  value = 2000-09-29T13:50:00
   tariff = 0
   storageNumber = 0
   functionField = Instantaneous value
@@ -44,7 +44,7 @@ datablock[2]:
 datablock[3]:
   dataType = 16 Bit Integer
   description = Time Point
-  value = 29.05.2000 [Date]
+  value = 2000-05-29 [Date]
   tariff = 0
   storageNumber = 1
   functionField = Instantaneous value

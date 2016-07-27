@@ -42,7 +42,7 @@
      "unitOfMeasurement": "Date"
     }}
    },
-   "data": {"date": "28.02.2009"}
+   "data": {"date": "2009-02-28"}
   },
     {
    "drh":    {
@@ -106,7 +106,7 @@
     }
    },
    "data":    {
-    "timestamp": "18.02.2009 11:26:00",
+    "timestamp": "2009-02-18T11:26:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -157,7 +157,7 @@
     }
    },
    "data":    {
-    "timestamp": "27.02.2009 10:26:00",
+    "timestamp": "2009-02-27T10:26:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -208,7 +208,7 @@
     }
    },
    "data":    {
-    "timestamp": "18.02.2009 14:26:00",
+    "timestamp": "2009-02-18T14:26:00",
     "summertime": false,
     "valid": true,
     "res1": false,

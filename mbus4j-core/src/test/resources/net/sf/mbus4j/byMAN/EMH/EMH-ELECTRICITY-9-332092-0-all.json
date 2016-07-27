@@ -27,7 +27,7 @@
     }}
    },
    "data":    {
-    "timestamp": "31.08.2005 02:58:00",
+    "timestamp": "2005-08-31T02:58:00",
     "summertime": false,
     "valid": true,
     "res1": false,
@@ -138,7 +138,7 @@
     }}
    },
    "data":    {
-    "timestamp": "07.08.2005 02:26:00",
+    "timestamp": "2005-08-07T02:26:00",
     "summertime": false,
     "valid": true,
     "res1": false,

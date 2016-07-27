@@ -29,6 +29,7 @@ package net.sf.mbus4j.dataframes.datablocks;
  */
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import net.sf.json.JSONObject;
 
@@ -42,6 +43,14 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  * @version $Id$
  */
 public class DateAndTimeDataBlock extends DataBlock {
+    // SimpleDateFormat is not thread-safe, so give one to each thread
+    private static final ThreadLocal<SimpleDateFormat> ISO_8601 = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        }
+    };
 
     private Date value;
     private boolean valid;
@@ -68,7 +77,7 @@ public class DateAndTimeDataBlock extends DataBlock {
 
     @Override
     public String getValueAsString() {
-        return DateFormat.getDateTimeInstance().format(value);
+        return ISO_8601.get().format(value);
     }
 
     /**
@@ -193,9 +202,8 @@ public class DateAndTimeDataBlock extends DataBlock {
 
     @Override
     protected void accumulateDatatoJSON(JSONObject json) {
-        DateFormat df = DateFormat.getDateTimeInstance();
         JSONObject jsonValue = new JSONObject();
-        jsonValue.accumulate("timestamp", df.format(value));
+        jsonValue.accumulate("timestamp", ISO_8601.get().format(value));
         jsonValue.accumulate("summertime", summerTime);
         jsonValue.accumulate("valid", valid);
         jsonValue.accumulate("res1", res1);
@@ -214,8 +222,7 @@ public class DateAndTimeDataBlock extends DataBlock {
             res1 = jsonValue.getBoolean("res1");
             res2 = jsonValue.getBoolean("res2");
             res3 = jsonValue.getBoolean("res3");
-            DateFormat df = DateFormat.getDateTimeInstance();
-            value = df.parse(jsonValue.getString("timestamp"));
+            value = ISO_8601.get().parse(jsonValue.getString("timestamp"));
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }

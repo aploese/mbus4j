@@ -22,7 +22,7 @@ datablock[0]:
 datablock[1]:
   dataType = 16 Bit Integer
   description = Time Point
-  value = 28.02.2009 [Date]
+  value = 2009-02-28 [Date]
   tariff = 0
   storageNumber = 1
   functionField = Instantaneous value
@@ -47,7 +47,7 @@ datablock[4]:
   dataType = 32 Bit Integer
   description = Power, Date(/time) end of last upper limit exceed
   unit = [kW]
-  value = 18.02.2009 11:26:00
+  value = 2009-02-18T11:26:00
   tariff = 0
   storageNumber = 1
   functionField = Maximum value
@@ -69,7 +69,7 @@ datablock[6]:
   dataType = 32 Bit Integer
   description = Volume Flow, Date(/time) end of last upper limit exceed
   unit = [m³/h]
-  value = 27.02.2009 10:26:00
+  value = 2009-02-27T10:26:00
   tariff = 0
   storageNumber = 1
   functionField = Maximum value
@@ -91,7 +91,7 @@ datablock[8]:
   dataType = 32 Bit Integer
   description = Flow Temperature, Date(/time) end of last upper limit exceed
   unit = [°C]
-  value = 18.02.2009 14:26:00
+  value = 2009-02-18T14:26:00
   tariff = 0
   storageNumber = 1
   functionField = Maximum value
