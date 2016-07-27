@@ -182,7 +182,7 @@ datablock[20]:
 datablock[21]:
   dataType = 16 Bit Integer
   description = Time Point
-  value = 01.01.2000 [Date]
+  value = 2000-01-01 [Date]
   tariff = 0
   storageNumber = 1
   functionField = Instantaneous value

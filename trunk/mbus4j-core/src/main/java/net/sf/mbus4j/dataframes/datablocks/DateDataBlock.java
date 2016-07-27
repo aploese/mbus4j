@@ -29,9 +29,8 @@ package net.sf.mbus4j.dataframes.datablocks;
  */
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
@@ -44,6 +43,14 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  * @version $Id$
  */
 public class DateDataBlock extends DataBlock {
+    // SimpleDateFormat is not thread-safe, so give one to each thread
+    private static final ThreadLocal<SimpleDateFormat> ISO_8601 = new ThreadLocal<SimpleDateFormat>(){
+        @Override
+        protected SimpleDateFormat initialValue()
+        {
+            return new SimpleDateFormat("yyyy-MM-dd");
+        }
+    };
 
     private Date value;
 
@@ -65,7 +72,7 @@ public class DateDataBlock extends DataBlock {
 
     @Override
     public String getValueAsString() {
-        return DateFormat.getDateInstance().format(value);
+        return ISO_8601.get().format(value);
     }
 
     /**
@@ -77,9 +84,8 @@ public class DateDataBlock extends DataBlock {
 
     @Override
     protected void accumulateDatatoJSON(JSONObject json) {
-        DateFormat df = DateFormat.getDateInstance();
         JSONObject jsonValue = new JSONObject();
-        jsonValue.accumulate("date", df.format(value));
+        jsonValue.accumulate("date", ISO_8601.get().format(value));
         json.accumulate("data", jsonValue);
     }
 
@@ -88,8 +94,7 @@ public class DateDataBlock extends DataBlock {
         super.fromJSON(json);
         try {
             JSONObject jsonValue = json.getJSONObject("data");
-            DateFormat df = DateFormat.getDateInstance();
-            value = df.parse(jsonValue.getString("date"));
+            value = ISO_8601.get().parse(jsonValue.getString("date"));
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }

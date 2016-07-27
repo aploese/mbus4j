@@ -43,7 +43,7 @@
     }}
    },
    "data":    {
-    "timestamp": "09.12.2000 00:13:00",
+    "timestamp": "2000-12-09T00:13:00",
     "summertime": false,
     "valid": false,
     "res1": false,
@@ -66,7 +66,7 @@
      "unitOfMeasurement": "Date"
     }}
    },
-   "data": {"date": "20.11.2000"}
+   "data": {"date": "2000-11-20"}
   },
     {
    "drh":    {
@@ -105,7 +105,7 @@
      }]
     }
    },
-   "data": {"date": "31.12.2000"}
+   "data": {"date": "2000-12-31"}
   },
     {
    "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
