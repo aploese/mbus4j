@@ -493,7 +493,9 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)"
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
      },
      "vifes": [     {
       "vifeType": "manufacturer specific",
@@ -515,7 +517,9 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)"
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
      },
      "vifes":      [
             {
@@ -547,7 +551,9 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)"
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
      },
      "vifes":      [
             {
@@ -579,7 +585,9 @@
     "vib":     {
      "vif":      {
       "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)"
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
      },
      "vifes":      [
             {

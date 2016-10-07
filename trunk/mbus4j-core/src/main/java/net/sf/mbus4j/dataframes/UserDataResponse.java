@@ -408,42 +408,66 @@ public class UserDataResponse
 
     /**
      * Find matches except DataType
+     *
      * @param tarif
      * @param storagenumber
      * @param subUnit
      * @param vif
      * @param functionField
      * @param vifes
-     * @return 
+     * @return
      */
     public DataBlock[] getDataBlocks(int tarif, long storagenumber, short subUnit, Vif vif, FunctionField functionField, Vife[] vifes) {
         DataBlock[] result = null;
         for (DataBlock db : dataBlocks) {
-            if ((db.getTariff() == tarif) &&
-                    (db.getStorageNumber() == storagenumber) &&
-                    (db.getSubUnit()== subUnit) &&
-                    (Objects.equals(db.getVif(), vif)) &&
-                    (db.getFunctionField() == functionField) &&
-                    (Arrays.equals(db.getVifes(), vifes))) {
+            if ((db.getTariff() == tarif)
+                    && (db.getStorageNumber() == storagenumber)
+                    && (db.getSubUnit() == subUnit)
+                    && (Objects.equals(db.getVif(), vif))
+                    && (db.getFunctionField() == functionField)
+                    && (Arrays.equals(db.getVifes(), vifes))) {
                 if (result == null) {
                     result = new DataBlock[]{db};
                 } else {
-                    result = Arrays.copyOf(result, result.length +1);
-                    result[result.length -1] = db;
+                    result = Arrays.copyOf(result, result.length + 1);
+                    result[result.length - 1] = db;
                 }
             }
         }
         return result;
     }
 
-    @Deprecated
-    public boolean isDBUnique() {
-            for (DataBlock db : dataBlocks) {
-                if (getDataBlocks(db.getTariff(), db.getStorageNumber(), db.getSubUnit(), db.getVif(), db.getFunctionField(), db.getVifes()).length != 1) {
-                    return false;
+    public DataBlock findDataBlock(final DataFieldCode difCode, final String paramDescr, final UnitOfMeasurement unitOfMeasurement, final FunctionField functionField, final long storageNumber, final short subUnit, final int tariff) {
+        DataBlock result = null;
+        for (DataBlock db : dataBlocks) {
+            if (Objects.equals(db.getDataFieldCode(), difCode)
+                    && Objects.equals(db.getParamDescr(), paramDescr)
+                    && Objects.equals(db.getUnitOfMeasurement(), unitOfMeasurement)
+                    && Objects.equals(db.getFunctionField(), functionField)
+                    && (db.getStorageNumber() == storageNumber)
+                    && (db.getSubUnit() == subUnit)
+                    && (db.getTariff() == tariff)) {
+                if (result == null) {
+                    result = db;
+                } else {
+                    throw new RuntimeException("Multiple db found: \n" + result + "\n\n" + db);
                 }
             }
-            return true;
+        }
+        if (result == null) {
+            throw new RuntimeException("No db found");
+        }
+        return result;
+    }
+
+    @Deprecated
+    public boolean isDBUnique() {
+        for (DataBlock db : dataBlocks) {
+            if (getDataBlocks(db.getTariff(), db.getStorageNumber(), db.getSubUnit(), db.getVif(), db.getFunctionField(), db.getVifes()).length != 1) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

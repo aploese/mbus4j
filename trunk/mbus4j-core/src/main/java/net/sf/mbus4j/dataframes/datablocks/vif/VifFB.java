@@ -223,11 +223,6 @@ public enum VifFB implements Vif {
     }
 
     @Override
-    public double getFactor() {
-        return factor;
-    }
-
-    @Override
     public String getLabel() {
         return label;
     }

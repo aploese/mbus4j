@@ -49,11 +49,6 @@ public class VifAscii implements Vif {
     }
 
     @Override
-    public double getFactor() {
-        return Double.NaN;
-    }
-
-    @Override
     public String getLabel() {
         return value;
     }

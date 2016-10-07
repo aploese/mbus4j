@@ -200,7 +200,6 @@ public enum VifPrimary implements Vif {
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final Integer exponent;
-    private final double factor;
     private final static VifPrimary[] map = values();
 
     private VifPrimary(int vifCode) {
@@ -211,7 +210,6 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
-        this.factor = Double.NaN;
     }
 
     private VifPrimary(int vifCode, String label) {
@@ -222,7 +220,6 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
-        this.factor = Double.NaN;
     }
 
     private VifPrimary(int vifCode, String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
@@ -233,7 +230,6 @@ public enum VifPrimary implements Vif {
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
-        this.factor = Math.pow(10, exponent);
     }
 
     private VifPrimary(int vifCode, String label, UnitOfMeasurement unit) {
@@ -244,7 +240,6 @@ public enum VifPrimary implements Vif {
         this.siPrefix = null;
         this.unit = unit;
         this.exponent = null;
-        this.factor = Double.NaN;
     }
 
     /**
@@ -255,11 +250,6 @@ public enum VifPrimary implements Vif {
         return exponent;
     }
 
-    @Override
-    final public double getFactor() {
-        return factor;
-    }
-    
     @Override
     final public String getLabel() {
         return label;

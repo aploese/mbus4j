@@ -186,7 +186,7 @@ public enum VifFD implements Vif {
 
     public static VifFD valueOfTableIndex(byte ordinal) {
         if (map == null) {
-            map = new HashMap<Byte, VifFD>(0xFE);
+            map = new HashMap<>(0xFE);
             for (VifFD val : values()) {
                 map.put((byte) val.ordinal(), val);
                 //             System.out.println(String.format("0x%02x %s\t%s\t%s", val.ordinal(), val, val.getUnitOfMeasurement(), val.getExponent()));
@@ -198,7 +198,6 @@ public enum VifFD implements Vif {
     private final SiPrefix siPrefix;
     private final UnitOfMeasurement unit;
     private final Integer exponent;
-    private final double factor;
     private static Map<Byte, VifFD> map;
 
     private VifFD() {
@@ -206,7 +205,6 @@ public enum VifFD implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
-        this.factor = Double.NaN;
     }
 
     private VifFD(String label) {
@@ -214,7 +212,6 @@ public enum VifFD implements Vif {
         this.siPrefix = null;
         this.unit = null;
         this.exponent = null;
-        this.factor = Double.NaN;
     }
 
     private VifFD(String label, SiPrefix siPrefix, UnitOfMeasurement unit, int exponent) {
@@ -222,7 +219,6 @@ public enum VifFD implements Vif {
         this.siPrefix = siPrefix;
         this.unit = unit;
         this.exponent = exponent;
-        this.factor = Math.pow(10, exponent);
     }
 
     private VifFD(String label, UnitOfMeasurement unit) {
@@ -230,7 +226,6 @@ public enum VifFD implements Vif {
         this.siPrefix = null;
         this.unit = unit;
         this.exponent = null;
-        this.factor = Double.NaN; 
     }
 
     /**
@@ -239,11 +234,6 @@ public enum VifFD implements Vif {
     @Override
     public Integer getExponent() {
         return exponent;
-    }
-
-    @Override
-    public double getFactor() {
-        return factor;
     }
 
     @Override

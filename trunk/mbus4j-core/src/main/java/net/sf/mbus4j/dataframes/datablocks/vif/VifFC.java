@@ -209,11 +209,6 @@ public enum VifFC implements Vif {
     }
 
     @Override
-    public double getFactor() {
-        return Double.NaN;
-    }
-
-    @Override
     public SiPrefix getSiPrefix() {
         return null;
     }
