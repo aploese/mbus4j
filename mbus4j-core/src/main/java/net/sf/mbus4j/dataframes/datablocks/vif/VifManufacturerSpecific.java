@@ -54,12 +54,7 @@ public class VifManufacturerSpecific implements Vif {
 
     @Override
     public Integer getExponent() {
-        return null;
-    }
-
-    @Override
-    public double getFactor() {
-        return Double.NaN;
+        return 0;
     }
 
     @Override
@@ -72,7 +67,7 @@ public class VifManufacturerSpecific implements Vif {
      */
     @Override
     public SiPrefix getSiPrefix() {
-        return null;
+        return SiPrefix.ONE;
     }
 
     @Override

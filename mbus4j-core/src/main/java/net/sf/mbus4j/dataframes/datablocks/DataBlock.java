@@ -29,7 +29,6 @@ package net.sf.mbus4j.dataframes.datablocks;
  */
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -351,10 +350,6 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
         return vif == null ? null : vif.getSiPrefix();
     }
 
-    public double getFactor() {
-        return vif == null ? Double.NaN : vif.getFactor();
-    }
-
     public long getStorageNumber() {
         return storageNumber;
     }
@@ -628,7 +623,7 @@ public abstract class DataBlock implements Serializable, JSONSerializable, Clone
 
     
     public int getCorrectionExponent(SiPrefix siPrefix) {
-         return getSiPrefix().getExponent()- siPrefix.getExponent() + getExponent() + VifePrimary.getVifeCorrectionExponent(vifes);
+            return  getSiPrefix().getExponent()- siPrefix.getExponent() + getExponent() + VifePrimary.getVifeCorrectionExponent(vifes);
     }
 
     public double getCorrectionConstant() {

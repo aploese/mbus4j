@@ -73,12 +73,6 @@ public interface Vif {
     Integer getExponent();
     
     /**
-     * 
-     * @return the exponent as factor
-     */
-    double getFactor();
-
-    /**
      * User friendly name
      *
      * @return
