@@ -4,7 +4,7 @@
     <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>mbus4j</name>
     <inceptionYear>2009</inceptionYear>
     <url>http://mbus4j.sf.net</url>
@@ -84,9 +84,9 @@
     </distributionManagement>
 
     <scm>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/mbus4j/code/tags/mbus4j-1.0.0</developerConnection>
-        <connection>scm:svn:http://svn.code.sf.net/p/mbus4j/code/tags/mbus4j-1.0.0</connection>
-        <url>http://sourceforge.net/p/mbus4j/code/HEAD/tree/tags/mbus4j-1.0.0</url>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/mbus4j/code/trunk</developerConnection>
+        <connection>scm:svn:http://svn.code.sf.net/p/mbus4j/code/trunk</connection>
+        <url>http://sourceforge.net/p/mbus4j/code/HEAD/tree/</url>
     </scm>
 
     <dependencyManagement>
