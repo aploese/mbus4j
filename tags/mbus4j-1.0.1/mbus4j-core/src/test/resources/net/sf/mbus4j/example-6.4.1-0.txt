@@ -1,0 +1,5 @@
+6803036853FEBD0E16
+control code = SND_UD
+isFcb = false
+address = 0xFE
+baudrate = 9600
