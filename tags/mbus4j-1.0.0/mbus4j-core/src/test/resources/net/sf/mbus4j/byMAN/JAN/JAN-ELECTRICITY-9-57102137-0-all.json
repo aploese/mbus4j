@@ -1,0 +1,515 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "JAN",
+ "medium": "Electricity",
+ "version": "0x09",
+ "identNumber": 57102137,
+ "address": "0x01",
+ "accessNumber": 2,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 6270
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 6270
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 2
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 40
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 2
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 40
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "48 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 1
+    }}
+   },
+   "data": 6290
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 3,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 4,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 5,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 6,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Operating Time",
+     "unitOfMeasurement": "s"
+    }}
+   },
+   "data": 20474
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 4,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Current",
+     "unitOfMeasurement": "A",
+     "siPrefix": "m",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 5,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 6,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 7,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Voltage",
+     "unitOfMeasurement": "V",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 2248
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Voltage",
+     "unitOfMeasurement": "V",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 1005
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 3,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Voltage",
+     "unitOfMeasurement": "V",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 1004
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Current",
+     "unitOfMeasurement": "A",
+     "siPrefix": "m",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Current",
+     "unitOfMeasurement": "A",
+     "siPrefix": "m",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 3,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Current",
+     "unitOfMeasurement": "A",
+     "siPrefix": "m",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 3,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 0
+  },
+  {"drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}}}
+ ]
+}
