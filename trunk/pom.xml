@@ -8,7 +8,10 @@
     <name>mbus4j</name>
     <inceptionYear>2009</inceptionYear>
     <url>http://mbus4j.sf.net</url>
-    
+     <description>
+        libs and commandline tools for handling the m-bus protocol
+    </description>
+
     <modules>
         <module>mbus4j-core</module>
         <module>mbus4j-master</module>
