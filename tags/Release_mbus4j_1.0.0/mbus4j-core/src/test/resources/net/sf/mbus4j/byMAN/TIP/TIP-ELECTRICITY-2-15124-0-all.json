@@ -1,0 +1,673 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "TIP",
+ "medium": "Electricity",
+ "version": "0x02",
+ "identNumber": 15124,
+ "address": "0x36",
+ "accessNumber": 195,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 1
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 645621
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 2
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Energy",
+     "unitOfMeasurement": "Wh",
+     "siPrefix": "",
+     "exponent": 2
+    }}
+   },
+   "data": 3
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L1"
+     }]
+    }
+   },
+   "data": -660
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L2"
+     }]
+    }
+   },
+   "data": -110
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L3"
+     }]
+    }
+   },
+   "data": -190
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": -980
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L1"
+     }]
+    }
+   },
+   "data": 2020
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L2"
+     }]
+    }
+   },
+   "data": 1850
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L3"
+     }]
+    }
+   },
+   "data": 1970
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 1,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 5850
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L1"
+     }]
+    }
+   },
+   "data": 2130
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L2"
+     }]
+    }
+   },
+   "data": 1860
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Power",
+      "unitOfMeasurement": "W",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L3"
+     }]
+    }
+   },
+   "data": 1980
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 2,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Power",
+     "unitOfMeasurement": "W",
+     "siPrefix": "m",
+     "exponent": 2
+    }}
+   },
+   "data": 5930
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L1"
+     }]
+    }
+   },
+   "data": 2290
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L2"
+     }]
+    }
+   },
+   "data": 2300
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Voltage",
+      "unitOfMeasurement": "V",
+      "siPrefix": "m",
+      "exponent": 2
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L3"
+     }]
+    }
+   },
+   "data": 2296
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FB",
+     "description": "Frequency",
+     "unitOfMeasurement": "Hz",
+     "siPrefix": "",
+     "exponent": -1
+    }}
+   },
+   "data": 500
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "manufacturer specific",
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "manufacturer specific",
+      "name": "13"
+     }]
+    }
+   },
+   "data": 1
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L1"
+     }]
+    }
+   },
+   "data": 932
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L2"
+     }]
+    }
+   },
+   "data": 809
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "extention FD",
+      "description": "Current",
+      "unitOfMeasurement": "A",
+      "siPrefix": "m",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "FC extension",
+      "name": "Phase L3"
+     }]
+    }
+   },
+   "data": 862
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "24 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "extention FD",
+     "description": "Current",
+     "unitOfMeasurement": "A",
+     "siPrefix": "m",
+     "exponent": 0
+    }}
+   },
+   "data": 2603
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "manufacturer specific",
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "manufacturer specific",
+       "name": "F1"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "FC"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "01"
+      }
+     ]
+    }
+   },
+   "data": -31
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "manufacturer specific",
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "manufacturer specific",
+       "name": "F1"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "FC"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "02"
+      }
+     ]
+    }
+   },
+   "data": -6
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "manufacturer specific",
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes":      [
+            {
+       "vifeType": "manufacturer specific",
+       "name": "F1"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "FC"
+      },
+            {
+       "vifeType": "manufacturer specific",
+       "name": "03"
+      }
+     ]
+    }
+   },
+   "data": -9
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "manufacturer specific",
+      "description": "Manufacturer specific coding (including VIFE's)",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "manufacturer specific",
+      "name": "61"
+     }]
+    }
+   },
+   "data": -16
+  }
+ ]
+}

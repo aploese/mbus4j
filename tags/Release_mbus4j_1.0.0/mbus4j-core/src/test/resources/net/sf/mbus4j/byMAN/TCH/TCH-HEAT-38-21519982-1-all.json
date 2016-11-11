@@ -1,0 +1,61 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "TCH",
+ "medium": "Heat",
+ "version": "0x26",
+ "identNumber": 21519982,
+ "address": "0x4e",
+ "accessNumber": 134,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status": ["No application error"],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "4 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Temperature Difference",
+     "unitOfMeasurement": "K",
+     "siPrefix": "",
+     "exponent": -1
+    }}
+   },
+   "data": 10
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Time Point",
+      "unitOfMeasurement": "Date"
+     },
+     "vifes": [     {
+      "vifeType": "primary",
+      "name": "future value"
+     }]
+    }
+   },
+   "data": {"date": "2000-12-31"}
+  },
+    {
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
+   "data": "0x[000107000000009E0000001C30707F7F7F7F7B7A7C7C8D98A0AA00006E08000C05087F0800862C6449C95769696DADF6602D4849FC5760698FBFF6101A2700004C0001074D07100024023402FD2A0000FF3A0000009C1300708864000000FB000000000000000000000000000000000000000000000000000000000000000005000000000000002A000000000005000000001D05829951216850260486001F0C320D1D0990079E03710009000003001200000000079F9F1F15A321A2000000000000000000000000000000000000AEFB0800B8E44CF968000000000000BE0200]"
+  }
+ ]
+}

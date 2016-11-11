@@ -1,0 +1,6 @@
+6804046853FE5010B116
+control code = SND_UD
+isFcb = false
+address = 0xFE
+telegramType = User data
+subTelegram = 0
