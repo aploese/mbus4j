@@ -1,0 +1,160 @@
+{
+ "controlCode": "RSP_UD",
+ "manufacturer": "SLB",
+ "medium": "Cold Water",
+ "version": "0x03",
+ "identNumber": 1309125,
+ "address": "0x0e",
+ "accessNumber": 140,
+ "acd": false,
+ "dfc": false,
+ "signature": "0x0000",
+ "status":  [
+  "No application error",
+  "Permanent error",
+  "Temporary error",
+  "Specific to manufacturer 0x20"
+ ],
+ "dataBlocks":  [
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "8 digit BCD",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Fabrication No"
+    }}
+   },
+   "data": 1309125
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "variable length",
+     "variableLengthType": "String",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "ascii",
+     "description": "cust. ID"
+    }}
+   },
+   "data": "TEST CYBLE"
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Time Point",
+     "unitOfMeasurement": "time and date"
+    }}
+   },
+   "data":    {
+    "timestamp": "2001-08-28T14:27:00",
+    "summertime": false,
+    "valid": true,
+    "res1": false,
+    "res2": false,
+    "res3": false
+   }
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "16 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "ascii",
+     "description": "bat. time"
+    }}
+   },
+   "data": 4447
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 12345678
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 0,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib":     {
+     "vif":      {
+      "vifType": "primary",
+      "description": "Volume",
+      "unitOfMeasurement": "l",
+      "siPrefix": "",
+      "exponent": 0
+     },
+     "vifes": [     {
+      "vifeType": "primary",
+      "name": "next VIFE's and data of this block are manufacturer specific"
+     }]
+    }
+   },
+   "data": 0
+  },
+    {
+   "drh":    {
+    "dib":     {
+     "dataFieldCode": "32 Bit Integer",
+     "functionField": "Instantaneous value",
+     "storageNumber": 1,
+     "subUnit": 0,
+     "tariff": 0
+    },
+    "vib": {"vif":     {
+     "vifType": "primary",
+     "description": "Volume",
+     "unitOfMeasurement": "l",
+     "siPrefix": "",
+     "exponent": 0
+    }}
+   },
+   "data": 12345678
+  },
+    {
+   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
+   "data": "0x[1C011F]"
+  }
+ ]
+}

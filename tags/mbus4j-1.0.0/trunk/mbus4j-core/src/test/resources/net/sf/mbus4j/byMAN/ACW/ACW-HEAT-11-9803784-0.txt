@@ -1,0 +1,111 @@
+685555680800728437800977040B04310000000C7884378009C2006C3C12C4000665000000CC001452190000D400AE4F1A0B3212D5002EB19A0E41D400BE4F1A0A3B12D5003EB6F37D3FD400DB4F1A0E3212D5005B4A0008420616
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x00
+ident number = 09803784
+manufacturer = ACW
+version = 0x0B
+accessnumber = 49
+status = [No application error]
+signature = 0x0000
+medium = Heat
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 09803784
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 16 Bit Integer
+  description = Time Point
+  value = 2009-02-28 [Date]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 101 [kWh]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 00001952 * 10 [l]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 32 Bit Integer
+  description = Power, Date(/time) end of last upper limit exceed
+  unit = [kW]
+  value = 2009-02-18T11:26:00
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[5]:
+  dataType = 32 Bit Real
+  description = Power
+  value = 8.912766 [kW]
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+datablock[6]:
+  dataType = 32 Bit Integer
+  description = Volume Flow, Date(/time) end of last upper limit exceed
+  unit = [m³/h]
+  value = 2009-02-27T10:26:00
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[7]:
+  dataType = 32 Bit Real
+  description = Volume Flow
+  value = 0.992 [m³/h]
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = Flow Temperature, Date(/time) end of last upper limit exceed
+  unit = [°C]
+  value = 2009-02-18T14:26:00
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[9]:
+  dataType = 32 Bit Real
+  description = Flow Temperature
+  value = 34.000282 [°C]
+  tariff = 0
+  storageNumber = 1
+  functionField = Maximum value
+  subUnit = 0

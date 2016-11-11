@@ -1,0 +1,69 @@
+6839396808377208580100305102026F000000841005F586000084100519C3FFFF842005000000008420050000000002FB2EF50102FF13010001FF6163D916
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x37
+ident number = 00015808
+manufacturer = TIP
+version = 0x02
+accessnumber = 111
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 34549 * 100 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = -15591 * 100 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 0 * 100 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 0 * 100 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 16 Bit Integer
+  description = Frequency
+  value = 501 * 0.1 [Hz]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 13
+  value = 1
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 8 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 61
+  value = 99
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0

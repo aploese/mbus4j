@@ -1,0 +1,70 @@
+68474768080F7225543699824D0316B03800000C78255436990D7C084449202E747375630A36373031303741543939046D160F3C080413B601000004937F1F0000004413B50100000F1C0CFF16
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x0F
+ident number = 99365425
+manufacturer = SLB
+version = 0x03
+accessnumber = 176
+status = [No application error, Permanent error, Temporary error, Specific to manufacturer 0x20]
+signature = 0x0000
+medium = Cold Water
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 99365425
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = variable length
+  description = cust. ID
+  value = 99TA701076
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 2001-08-28T15:22:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[3]:
+  dataType = 32 Bit Integer
+  description = Volume
+  value = 438 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 32 Bit Integer
+  description = Volume, next VIFE's and data of this block are manufacturer specific
+  value = 31 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 32 Bit Integer
+  description = Volume
+  value = 437 [l]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = Special Function Manufacturer specific data
+  value = 1C0C

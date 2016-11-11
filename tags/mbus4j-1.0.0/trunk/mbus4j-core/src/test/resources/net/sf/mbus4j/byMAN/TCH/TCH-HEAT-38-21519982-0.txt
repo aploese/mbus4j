@@ -1,0 +1,94 @@
+683F3F68084E728299512168502604850000000C0500000000046D320D1D094C0500000000426C1D050B3A0000000A5A34020A5E24020C2A000000000C13640000001F0916
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x4E
+ident number = 21519982
+manufacturer = TCH
+version = 0x26
+accessnumber = 133
+status = [No application error]
+signature = 0x0000
+medium = Heat
+lastPackage = false
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00000000 * 100 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = Time Point
+  unit = [time and date]
+  value = 2000-09-29T13:50:00
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+  valid = true
+  summertime = false
+  res1 = false
+  res2 = false
+  res3 = false
+datablock[2]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00000000 * 100 [Wh]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 16 Bit Integer
+  description = Time Point
+  value = 2000-05-29 [Date]
+  tariff = 0
+  storageNumber = 1
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 6 digit BCD
+  description = Volume Flow
+  value = 000000 * 100 [ml/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 4 digit BCD
+  description = Flow Temperature
+  value = 0234 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 4 digit BCD
+  description = Return Temperature
+  value = 0224 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 8 digit BCD
+  description = Power
+  value = 00000000 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 00000064 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = Special Function Manufacturer specific data more records follow in next telegram
+  value = 
