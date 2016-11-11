@@ -1,0 +1,232 @@
+68f7f768083272121700262e2809021000000006040581d70100008610044aec2a020000862004486b53000000864004f35924000000865004660e790000008660048a4babffffff86804004677dbf02000084402400000000848040240000000084c040240000000084808040240000000084c0804024000000008480c040240000000004246bc88b0284808040fd59100b020084c080402b2e2e01008480c0402b84bfffff84c0c0402b224001008440fd48b0080000848040fd48ed08000084c040fd48e90800008440fd59f3090300848040fd59526c010084c040fd59d617010084402bbea800008480402b544e000084c0402b1b3700000f9d16
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x32
+ident number = 26001712
+manufacturer = JAN
+version = 0x09
+accessnumber = 16
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 30900485 * 10 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 36367434 * 10 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 5466952 * 10 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 2382323 * 10 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[4]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 7933542 * 10 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[5]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 281474971159434 * 10 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[6]:
+  dataType = 48 Bit Integer
+  description = Energy
+  value = 46103911 * 10 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[7]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[9]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 3
+datablock[10]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 4
+datablock[11]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 5
+datablock[12]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 0 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 6
+datablock[13]:
+  dataType = 32 Bit Integer
+  description = Operating Time
+  value = 42715243 [s]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[14]:
+  dataType = 32 Bit Integer
+  description = Current
+  value = 133904 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 4
+datablock[15]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 77358 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 5
+datablock[16]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = -16508 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 6
+datablock[17]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 81954 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 7
+datablock[18]:
+  dataType = 32 Bit Integer
+  description = Voltage
+  value = 2224 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[19]:
+  dataType = 32 Bit Integer
+  description = Voltage
+  value = 2285 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[20]:
+  dataType = 32 Bit Integer
+  description = Voltage
+  value = 2281 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 3
+datablock[21]:
+  dataType = 32 Bit Integer
+  description = Current
+  value = 199155 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[22]:
+  dataType = 32 Bit Integer
+  description = Current
+  value = 93266 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[23]:
+  dataType = 32 Bit Integer
+  description = Current
+  value = 71638 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 3
+datablock[24]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 43198 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[25]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 20052 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[26]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 14107 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 3
+datablock[27]:
+  dataType = Special Function Manufacturer specific data
+  value = 
