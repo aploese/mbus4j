@@ -1,0 +1,229 @@
+68D6D6680836722451010030510202C3000000841005F5D909008420050300000004AAFC016CFDFFFF04AAFC0292FFFFFF04AAFC0342FFFFFF042A2CFCFFFF8440AAFC01E40700008440AAFC023A0700008440AAFC03B207000084402ADA160000848040AAFC0152080000848040AAFC0244070000848040AAFC03BC0700008480402A2A17000002FDC8FC01F20802FDC8FC02FC0802FDC8FC03F80802FB2EF40102FF13010003FDD9FC01A4030003FDD9FC0229030003FDD9FC035E030003FD592B0A0001FFF1FC01E101FFF1FC02FA01FFF1FC03F701FF61F0B216
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x36
+ident number = 00015124
+manufacturer = TIP
+version = 0x02
+accessnumber = 195
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 645621 * 100 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 32 Bit Integer
+  description = Energy
+  value = 3 * 100 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L1
+  value = -660 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L2
+  value = -110 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L3
+  value = -190 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = -980 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L1
+  value = 2020 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[7]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L2
+  value = 1850 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L3
+  value = 1970 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[9]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 5850 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1
+datablock[10]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L1
+  value = 2130 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[11]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L2
+  value = 1860 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[12]:
+  dataType = 32 Bit Integer
+  description = Power, Phase L3
+  value = 1980 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[13]:
+  dataType = 32 Bit Integer
+  description = Power
+  value = 5930 * 100 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[14]:
+  dataType = 16 Bit Integer
+  description = Voltage, Phase L1
+  value = 2290 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[15]:
+  dataType = 16 Bit Integer
+  description = Voltage, Phase L2
+  value = 2300 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[16]:
+  dataType = 16 Bit Integer
+  description = Voltage, Phase L3
+  value = 2296 * 100 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[17]:
+  dataType = 16 Bit Integer
+  description = Frequency
+  value = 500 * 0.1 [Hz]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[18]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 13
+  value = 1
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[19]:
+  dataType = 24 Bit Integer
+  description = Current, Phase L1
+  value = 932 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[20]:
+  dataType = 24 Bit Integer
+  description = Current, Phase L2
+  value = 809 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[21]:
+  dataType = 24 Bit Integer
+  description = Current, Phase L3
+  value = 862 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[22]:
+  dataType = 24 Bit Integer
+  description = Current
+  value = 2603 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[23]:
+  dataType = 8 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), F1, FC, 01
+  value = -31
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[24]:
+  dataType = 8 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), F1, FC, 02
+  value = -6
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[25]:
+  dataType = 8 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), F1, FC, 03
+  value = -9
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[26]:
+  dataType = 8 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 61
+  value = -16
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0

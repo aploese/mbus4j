@@ -1,0 +1,88 @@
+6843436808007259008554184E3404A60000000C857D782300000C15102437000C3D040000000C2D590000000A5A27040A5E15030B607212010C78590085540CFD10590085541F2316
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x00
+ident number = 54850059
+manufacturer = SPX
+version = 0x34
+accessnumber = 166
+status = [No application error]
+signature = 0x0000
+medium = Heat
+lastPackage = false
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Energy, Multiplicative correction factor 1000
+  value = 00002378 * 100 * 1000.0 [Wh]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 8 digit BCD
+  description = Volume
+  value = 00372410 * 100 [l]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 8 digit BCD
+  description = Volume Flow
+  value = 00000004 * 100 [l/h]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 8 digit BCD
+  description = Power
+  value = 00000059 * 100 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 4 digit BCD
+  description = Flow Temperature
+  value = 0427 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 4 digit BCD
+  description = Return Temperature
+  value = 0315 * 0.1 [°C]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 6 digit BCD
+  description = Temperature Difference
+  value = 011272 * 0.001 [K]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 8 digit BCD
+  description = Fabrication No
+  value = 54850059
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 8 digit BCD
+  description = Other location
+  value = 54850059
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = Special Function Manufacturer specific data more records follow in next telegram
+  value = 
