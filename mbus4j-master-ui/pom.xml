@@ -4,13 +4,13 @@
     <parent>
         <groupId>net.sf.mbus4j</groupId>
         <artifactId>mbus4j</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
     </parent>
 
     <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j-master-ui</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>mbus4j-master-ui</name>
 
     <dependencies>
@@ -30,12 +30,12 @@
         <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-core</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-master</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>net.sf.atmodem4j</groupId>
