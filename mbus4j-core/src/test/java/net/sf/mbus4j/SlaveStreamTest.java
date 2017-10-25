@@ -29,6 +29,10 @@ package net.sf.mbus4j;
  */
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
+import java.io.InterruptedIOException;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,39 +54,91 @@ public class SlaveStreamTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    private SlaveStreams slaves;
+    private MockSerialPortSocket slaves;
 
     public SlaveStreamTest() {
     }
 
-    @Test(timeout = 1000)
+    @Test(expected=IOException.class)
+    public void respondToRequest_1() throws IOException {
+   		slaves.getOutputStream().write(0x01);
+    }
+
+    @Test(expected=InterruptedIOException.class)
+    public void respondToRequest_2() throws IOException {
+        slaves.getInputStream().read();
+    }
+
+    @Test
+    public void respondToReques_3() throws Exception {
+        slaves.addRequest("0102", "0201");
+        slaves.addRequest("0304", "0403");
+
+        slaves.getOutputStream().write(0x01);
+        slaves.getOutputStream().write(0x02);
+        assertEquals(0x02, slaves.getInputStream().read());
+        assertEquals(0x01, slaves.getInputStream().read());
+        try {
+        	slaves.getInputStream().read();
+        	fail();
+        } catch (InterruptedIOException  e) {
+        	assertTrue(true);
+		}
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void respondToReques_4() throws Exception {
+        slaves.addRequest("01", 1);
+        slaves.allRequestsHandled();
+    }
+
+    @Test
+    public void respondToReques_5() throws Exception {
+        slaves.addRequest("0102", "0201");
+        assertEquals(0, slaves.getInputStream().available());
+
+        slaves.getOutputStream().write(0x01);
+        assertEquals(0, slaves.getInputStream().available());
+        slaves.getOutputStream().write(0x02);
+        assertEquals(2, slaves.getInputStream().available());
+        assertEquals(0x02, slaves.getInputStream().read());
+        assertEquals(1, slaves.getInputStream().available());
+        assertEquals(0x01, slaves.getInputStream().read());
+        assertEquals(0, slaves.getInputStream().available());
+    }
+
+    @Test
     public void respondToRequest() throws Exception {
-        slaves.respondToRequest("0102", "0201");
-        slaves.respondToRequest("0304", "0403");
-        slaves.respondToRequest("0506", 1);
-        slaves.respondToRequest("0708", "0807");
-        slaves.replay();
-        slaves.os.write(0x01);
-        slaves.os.write(0x02);
-        assertEquals(0x02, slaves.is.read());
-        assertEquals(0x01, slaves.is.read());
-        slaves.os.write(0x03);
-        slaves.os.write(0x04);
-        assertEquals(0x04, slaves.is.read());
-        assertEquals(0x03, slaves.is.read());
-        slaves.os.write(0x05);
-        slaves.os.write(0x06);
-        slaves.os.write(0x07);
-        slaves.os.write(0x08);
-        assertEquals(0x08, slaves.is.read());
-        assertEquals(0x07, slaves.is.read());
-        assertTrue(slaves.checkNoDataLeft());
+        slaves.addRequest("0102", "0201");
+        slaves.addRequest("0304", "0403");
+        slaves.addRequest("0506", 1);
+        slaves.addRequest("0708", "0807");
+
+        slaves.getOutputStream().write(0x01);
+        slaves.getOutputStream().write(0x02);
+        assertEquals(0x02, slaves.getInputStream().read());
+        assertEquals(0x01, slaves.getInputStream().read());
+        
+        slaves.getOutputStream().write(0x03);
+        slaves.getOutputStream().write(0x04);
+        assertEquals(0x04, slaves.getInputStream().read());
+        assertEquals(0x03, slaves.getInputStream().read());
+        
+        slaves.getOutputStream().write(0x05);
+        slaves.getOutputStream().write(0x06);
+        
+        slaves.getOutputStream().write(0x07);
+        slaves.getOutputStream().write(0x08);
+        assertEquals(0x08, slaves.getInputStream().read());
+        assertEquals(0x07, slaves.getInputStream().read());
+        
+        assertTrue(slaves.allRequestsHandled());
     }
 
     @Before
     public void setUp() throws Exception {
-        slaves = new SlaveStreams();
-        slaves.open();
+        slaves = new MockSerialPortSocket();
+        slaves.openRaw();
     }
 
     @After

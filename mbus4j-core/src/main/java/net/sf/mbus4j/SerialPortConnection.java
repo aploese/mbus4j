@@ -32,13 +32,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
 import java.util.Set;
-import net.sf.atmodem4j.spsw.Baudrate;
-import net.sf.atmodem4j.spsw.DataBits;
-import net.sf.atmodem4j.spsw.FlowControl;
-import net.sf.atmodem4j.spsw.logging.LoggingSerialPortSocket;
-import net.sf.atmodem4j.spsw.Parity;
-import net.sf.atmodem4j.spsw.SerialPortSocket;
-import net.sf.atmodem4j.spsw.StopBits;
+import de.ibapl.spsw.api.Baudrate;
+import de.ibapl.spsw.api.DataBits;
+import de.ibapl.spsw.api.FlowControl;
+import de.ibapl.spsw.logging.LoggingSerialPortSocket;
+import de.ibapl.spsw.logging.TimeStampLogging;
+import de.ibapl.spsw.api.Parity;
+import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.api.SerialPortSocketFactory;
+import de.ibapl.spsw.api.StopBits;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.json.JsonSerializeType;
 
@@ -46,74 +50,25 @@ import net.sf.mbus4j.json.JsonSerializeType;
  *
  * @author aploese
  */
+@Deprecated
 public class SerialPortConnection extends Connection {
 
     static final String SERIAL_CONNECTION = "serialConnection";
 
     public static final int DEFAULT_RESPONSE_TIMEOUT_OFFSET = 50;
-    public static final Set<FlowControl> FLOW_CONTROL = FlowControl.getFC_NONE();
-    public static final DataBits DATA_BITS = DataBits.DB_8;
-    public static final StopBits STOP_BITS = StopBits.SB_1;
-    public static final Parity PARITY = Parity.EVEN;
-
+ 
     private String portName;
-    private SerialPortSocket sPort;
-
+ 
     public SerialPortConnection() {
         super(DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
     }
 
-    public SerialPortConnection(String portName) {
-        super(DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
-        this.portName = portName;
-    }
-
-    public SerialPortConnection(String portName, int bitPerSecond, int responseTimeoutOffset) {
+    public SerialPortConnection(SerialPortSocketFactory serialPortSocketFactory, String portName, int bitPerSecond, int responseTimeoutOffset) {
         super(bitPerSecond, responseTimeoutOffset);
         this.portName = portName;
     }
 
-    @Override
-    public void open() throws IOException {
-        try {
-            setConnState(State.OPENING);
-            sPort = SerialPortSocket.FACTORY.createSerialPortSocket(portName);
-            if (getLoggingStream() != null) {
-                sPort = new LoggingSerialPortSocket(sPort, getLoggingStream());
-            }
-            sPort.openRaw(Baudrate.fromValue(getBitPerSecond()), DATA_BITS, STOP_BITS, PARITY, FlowControl.getFC_NONE());
-            is = sPort.getInputStream();
-            os = sPort.getOutputStream();
-
-            setConnState(State.OPEN);
-        } catch (UnsatisfiedLinkError | NoClassDefFoundError ex) {
-            throw new IOException(ex);
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        setConnState(State.CLOSING);
-        try {
-            sPort.close();
-        } finally {
-            setConnState(State.CLOSED);
-        }
-    }
-
-    @Override
-    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
-        JSONObject result = super.toJSON(jsonSerializeType);
-        result.accumulate("serialPort", portName);
-        return result;
-    }
-
-    @Override
-    public void fromJSON(JSONObject json) {
-        super.fromJSON(json);
-        portName = json.getString("serialPort");
-    }
-    private static final long serialVersionUID = -1;
+     private static final long serialVersionUID = -1;
     private static final int SERIAL_VERSION = 2;
 
     // Serialization for saveDataSource
@@ -166,39 +121,6 @@ public class SerialPortConnection extends Connection {
         this.portName = portName;
     }
 
-    /**
-     * @return the dataBits
-     */
-    public DataBits getDataBits() {
-        return DATA_BITS;
-    }
-
-    /**
-     * @return the flowControl
-     */
-    public Set<FlowControl> getFlowControl() {
-        return FLOW_CONTROL;
-    }
-
-    /**
-     * @return the stopBits
-     */
-    public StopBits getStopBits() {
-        return STOP_BITS;
-    }
-
-    /**
-     * @return the parity
-     */
-    public Parity getParity() {
-        return PARITY;
-    }
-
-    @Override
-    public String getJsonFieldName() {
-        return SERIAL_CONNECTION;
-    }
-    
     @Override
     public String getName() {
         return portName;

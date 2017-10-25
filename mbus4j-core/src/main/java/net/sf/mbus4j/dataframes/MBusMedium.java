@@ -294,21 +294,21 @@ public enum MBusMedium {
     RESERVED_0XFE(0xFE),
     RESERVED_0XFF(0xFF);
 
-    final public int id;
+    final public byte id;
     final public String label;
     static private Set<MBusMedium> REGULAR_VALUES;
 
     MBusMedium(int id, String label) {
-        this.id = id;
+        this.id = (byte)id;
         this.label = label;
     }
 
     MBusMedium(int id) {
-        this.id = id;
+        this.id = (byte)id;
         this.label = String.format("Reserved 0x%02x", id);
     }
 
-    public int getId() {
+    public byte getId() {
         return id;
     }
 

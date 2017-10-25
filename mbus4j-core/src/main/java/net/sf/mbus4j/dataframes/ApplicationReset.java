@@ -41,7 +41,7 @@ import java.util.Iterator;
  * @version $Id$
  */
 public class ApplicationReset
-        implements LongFrame {
+        implements LongFrame, RequestFrame<SingleCharFrame> {
 
     public static final String SEND_USER_DATA_SUBTYPE = "application reset";
 

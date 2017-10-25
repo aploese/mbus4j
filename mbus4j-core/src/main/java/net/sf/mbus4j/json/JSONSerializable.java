@@ -33,6 +33,7 @@ import net.sf.json.JSONObject;
  *
  * @author aploese
  */
+@Deprecated
 public interface JSONSerializable {
 
     JSONObject toJSON(JsonSerializeType jsonSerializeType);

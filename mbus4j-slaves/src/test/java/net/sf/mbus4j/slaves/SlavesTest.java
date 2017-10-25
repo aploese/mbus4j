@@ -68,7 +68,7 @@ public class SlavesTest {
     @Before
     public void setUp() throws Exception {
         master = new MasterStreams(115200 / 4, 50);
-        slaves = new Slaves();
+        slaves = new Slaves(null);
         slaves.setConnection(master);
         slaves.open();
     }

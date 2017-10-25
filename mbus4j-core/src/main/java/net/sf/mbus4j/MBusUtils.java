@@ -144,8 +144,8 @@ public class MBusUtils {
 
     public static byte bcd2Byte(byte b) {
         byte result = 0;
-        for (int i = 0; i < 16; i++) {
-            result += (long) ((b % 16) * Math.pow(10, i));
+        for (int i = 0; i < 2; i++) {
+            result += (byte) ((b % 16) * Math.pow(10, i));
             b >>= 4;
         }
         return result;

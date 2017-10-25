@@ -1,0 +1,61 @@
+6838386808037211001100434c2402010000008c1004000000008c11040000000002fdc9ff01ed0002fddbff01000002acff0100008240acff0100004116
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x03
+ident number = 00110011
+manufacturer = SBC
+version = 0x24
+accessnumber = 1
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00000000 * 10 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 8 digit BCD
+  description = Energy
+  value = 00000000 * 10 [Wh]
+  tariff = 1
+  storageNumber = 2
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 16 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 01
+  value = 237 [V]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 16 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 01
+  value = 0 * 100 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 16 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 01
+  value = 0 * 10 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 16 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 01
+  value = 0 * 10 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 1

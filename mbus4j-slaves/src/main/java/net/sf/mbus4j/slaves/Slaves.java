@@ -27,6 +27,8 @@ package net.sf.mbus4j.slaves;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+import de.ibapl.spsw.api.SerialPortSocketFactory;
+import de.ibapl.spsw.provider.SerialPortSocketFactoryImpl;
 import java.io.UnsupportedEncodingException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -74,7 +76,7 @@ import net.sf.mbus4j.log.LogUtils;
  */
 public class Slaves implements JSONSerializable {
 
-    public static Slaves readJsonStream(InputStream is)
+    public static Slaves readJsonStream(InputStream is, SerialPortSocketFactory serialPortSocketFactory)
             throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         StringBuilder sb = new StringBuilder();
@@ -84,7 +86,7 @@ public class Slaves implements JSONSerializable {
             sb.append(line);
         }
 
-        Slaves result = new Slaves();
+        Slaves result = new Slaves(serialPortSocketFactory);
         result.fromJSON(JSONObject.fromObject(sb.toString()));
 
         return result;
@@ -109,7 +111,7 @@ public class Slaves implements JSONSerializable {
 
     @Override
     public void fromJSON(JSONObject json) {
-        conn = Connection.createFromJSON(json);
+        conn = Connection.createFromJSON(json, serialPortSocketFactory);
 
         JSONArray jsonSlaves = json.getJSONArray("devices");
 
@@ -307,7 +309,7 @@ public class Slaves implements JSONSerializable {
 
     public static void main(String[] args)
             throws Exception {
-        Slaves app = new Slaves();
+        Slaves app = new Slaves(SerialPortSocketFactoryImpl.singleton());
         int timeout = 0;
         ScriptEngineManager scriptManager = new ScriptEngineManager();
         ScriptEngine js = scriptManager.getEngineByExtension("js");
@@ -319,7 +321,7 @@ public class Slaves implements JSONSerializable {
         Reader in = new InputStreamReader(is);
         Boolean result = (Boolean) js.eval(in, bindings);
 
-        SerialPortConnection sc = new SerialPortConnection(args[0]);
+        SerialPortConnection sc = new SerialPortConnection(SerialPortSocketFactoryImpl.singleton(), args[0]);
         app.setConnection(sc);
         app.open();
         try {
@@ -349,9 +351,11 @@ public class Slaves implements JSONSerializable {
     private Encoder encoder = new Encoder();
     private Thread t;
     private StreamListener streamListener = new StreamListener();
-
-    public Slaves() {
+    private final SerialPortSocketFactory serialPortSocketFactory;
+    
+    public Slaves(SerialPortSocketFactory serialPortSocketFactory) {
         super();
+        this.serialPortSocketFactory = serialPortSocketFactory;
     }
 
     public boolean addSlave(Slave slave) {

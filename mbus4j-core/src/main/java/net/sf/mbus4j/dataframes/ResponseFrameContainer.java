@@ -37,6 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  *
  * @author aploese
  */
+@Deprecated
 public class ResponseFrameContainer
         implements JSONSerializable {
 

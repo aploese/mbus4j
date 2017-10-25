@@ -16,7 +16,6 @@
         <module>mbus4j-core</module>
         <module>mbus4j-master</module>
         <module>mbus4j-master-ui</module>
-        <module>mbus4j-slaves</module>
     </modules>
     
     <properties>
@@ -96,14 +95,14 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.sf.atmodem4j</groupId>
-                <artifactId>spsw-java</artifactId>
-                <version>0.0.7</version>
+                <groupId>de.ibapl.spsw</groupId>
+                <artifactId>de.ibapl.spsw.api</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>net.sf.atmodem4j</groupId>
-                <artifactId>spsw-nativelibs-bundle</artifactId>
-                <version>0.0.7</version>
+                <groupId>de.ibapl.spsw</groupId>
+                <artifactId>de.ibapl.spsw.provider</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
             
             <dependency>
@@ -196,7 +195,7 @@
                     <executions>
                         <execution>
                             <id>sign-artifacts</id>
-                            <phase>verify</phase>
+                            <phase>deploy</phase>
                             <goals>
                                 <goal>sign</goal>
                             </goals>
@@ -239,6 +238,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

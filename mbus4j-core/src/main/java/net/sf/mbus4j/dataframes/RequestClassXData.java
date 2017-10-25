@@ -36,12 +36,12 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class RequestClassXData implements ShortFrame {
+public class RequestClassXData implements ShortFrame, RequestFrame<UserDataResponse> {
 
     private byte address;
     private boolean fcb;
     private boolean fcv;
-    private ControlCode controlCode;
+    private final ControlCode controlCode;
 
     public RequestClassXData(boolean fcb, boolean fcv, ControlCode controlCode) {
         this.fcb = fcb;
@@ -49,13 +49,15 @@ public class RequestClassXData implements ShortFrame {
         this.controlCode = controlCode;
     }
 
-    public RequestClassXData(ControlCode controlCode) {
-        this(false, true, controlCode);
+    public RequestClassXData(boolean fcb, boolean fcv, ControlCode controlCode, byte address) {
+        this.fcb = fcb;
+        this.fcv = fcv;
+        this.controlCode = controlCode;
+        this.address = address;
     }
 
-    public RequestClassXData(ControlCode controlCode, byte address) {
+    public RequestClassXData(ControlCode controlCode) {
         this(false, true, controlCode);
-        this.address = address;
     }
 
     @Override
@@ -120,5 +122,9 @@ public class RequestClassXData implements ShortFrame {
         setFcb(JSONFactory.getBoolean(json, "fcb", false));
         setFcv(JSONFactory.getBoolean(json, "fcv", false));
         setAddress(JSONFactory.decodeHexByte(json, "address", (byte) 0));
+    }
+
+    public void toggleFcb() {
+        fcb = !fcb;
     }
 }

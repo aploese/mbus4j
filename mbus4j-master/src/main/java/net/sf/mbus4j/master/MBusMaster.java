@@ -1,5 +1,9 @@
 package net.sf.mbus4j.master;
 
+import de.ibapl.spsw.api.Baudrate;
+import de.ibapl.spsw.api.DataBits;
+import de.ibapl.spsw.api.FlowControl;
+import de.ibapl.spsw.api.Parity;
 /*
  * #%L
  * mbus4j-master
@@ -27,55 +31,39 @@ package net.sf.mbus4j.master;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import java.io.BufferedReader;
+import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.api.StopBits;
+
 import java.io.Closeable;
-import java.io.FileOutputStream;
 import net.sf.mbus4j.dataframes.Frame;
-import net.sf.mbus4j.dataframes.MBusResponseFramesContainer;
 import net.sf.mbus4j.dataframes.RequestClassXData;
 import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
-import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.decoder.DecodeException;
 import net.sf.mbus4j.decoder.Decoder;
-import net.sf.mbus4j.devices.DeviceFactory;
-import net.sf.mbus4j.devices.GenericDevice;
 import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.encoder.Encoder;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.InterruptedIOException;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.Set;
 import java.util.Deque;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.mbus4j.Connection;
-import net.sf.mbus4j.MBusAddressing;
 import net.sf.mbus4j.MBusUtils;
+import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.GarbageCharFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.RequestFrame;
+import net.sf.mbus4j.dataframes.ResponseFrame;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
-import net.sf.mbus4j.decoder.DecoderListener;
-import net.sf.mbus4j.json.JSONSerializable;
-import net.sf.mbus4j.json.JsonSerializeType;
 import net.sf.mbus4j.log.LogUtils;
 
 /**
@@ -84,13 +72,42 @@ import net.sf.mbus4j.log.LogUtils;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  *
- * TODO: Handle multi Resoṕonses ClassXData (connect or chaon them together)
  */
-public class MBusMaster
-        implements Iterable<GenericDevice>,
-        Sender,
-        JSONSerializable,
-        Closeable {
+public class MBusMaster implements Sender, Closeable {
+    public static final Baudrate DEFAULT_BAUDRATE = Baudrate.B2400;
+    public static final Set<FlowControl> FLOW_CONTROL = FlowControl.getFC_NONE();
+    public static final DataBits DATA_BITS = DataBits.DB_8;
+    public static final StopBits STOP_BITS = StopBits.SB_1;
+    public static final Parity PARITY = Parity.EVEN;
+
+
+    private void readGarbage() throws IOException {
+        final int avail = serialPortSocket.getInputStream().available();
+        if (avail > 0) {
+        	serialPortSocket.getInputStream().read(new byte[avail]);
+        }
+    }
+
+    public void requestUserData(ValuesRequest<?> request) throws IOException {
+        for (DeviceRequest<?> dr : request) {
+            requestUserData(dr);
+        }
+    }
+
+    private void requestUserData(DeviceRequest<?> dr) throws IOException {
+        UserDataResponse udr;
+        switch (dr.addressing) {
+            case PRIMARY:
+               udr = sendRequestUserData(DEFAULT_FCB, DEFAULT_FCV, dr.deviceId.address);
+               break;
+            case SECONDARY:
+                udr = sendRequestUserData(DEFAULT_FCB, DEFAULT_FCV, dr.deviceId);
+                break;
+                default:
+                	throw new RuntimeException("Unknown addressing: " + dr.addressing);
+        }
+        dr.fullResponse = udr;
+    }
 
     private class MaskedQueueEntry {
 
@@ -103,256 +120,40 @@ public class MBusMaster
         }
     }
 
-    public void cancel() {
-//TODO impement        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    @Deprecated
-    public static GenericDevice getDevice(Iterable<GenericDevice> deviceList, ValueRequestPointLocator locator) {
-        for (GenericDevice dev : deviceList) {
-            if ((dev.getAddress() == locator.getAddress())
-                    && (dev.getIdentNumber() == locator.getIdentnumber())
-                    && dev.getManufacturer().equals(locator.getManufacturer())
-                    && dev.getMedium().equals(locator.getMedium())
-                    && (dev.getVersion() == locator.getVersion())) {
-                return dev;
-            }
-        }
-
-        return null;
-    }
-
-    @Deprecated
-    public static DataBlock getDataBlock(Frame frame, ValueRequestPointLocator locator) {
-        if (frame instanceof UserDataResponse) {
-            for (DataBlock db : (UserDataResponse) frame) {
-                if (db.getDataFieldCode().equals(locator.getDifCode())
-                        && db.getVif().equals(locator.getVif())
-                        && db.getFunctionField().equals(locator.getFunctionField())
-                        && (db.getStorageNumber() == locator.getStorageNumber())
-                        && (db.getSubUnit() == locator.getDeviceUnit())
-                        && (db.getTariff() == locator.getTariff())
-                        && Arrays.equals(db.getVifes(),
-                                locator.getVifes())) {
-                    return db;
-                }
-            }
-        } else if (frame == null) {
-            return null;
-        } else {
-            throw new RuntimeException("Response is not a UserDataResponse but: " + frame);
-        }
-
-        throw new RuntimeException("can't find datablock of locator" + locator);
-    }
-
-    private DataBlock getTimeStampDB(GenericDevice dev, ValueRequestPointLocator locator) {
-        // TODO implement
-        return null;
-    }
-
-    public Connection getConnection() {
-        return conn;
-    }
-
-    public void writeJsonStream(FileOutputStream os) throws UnsupportedEncodingException, IOException {
-        try (OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8")) {
-            JSONObject json = toJSON(JsonSerializeType.SLAVE_CONFIG);
-            String text = json.toString(1);
-            osw.write(text, 0, text.length());
-            osw.flush();
-        }
-    }
-
-    /**
-     * @return the lastByteSended
-     */
-    public long getLastByteSended() {
-        return lastByteSended;
-    }
-
-    private class StreamListener implements Runnable, DecoderListener {
-
-        private final Decoder parser = new Decoder(this);
-
-        @Override
-        public void run() {
-            log.fine("Thread MBus StreamListener Started");
-            parser.reset();  // Just to make sure to have a clean parser
-            try {
-                try {
-                    while (!isClosed()) {
-                        try {
-                            final int theData = conn.getInputStream().read();
-                            if (theData == -1) {
-                                if (log.isLoggable(Level.FINEST)) {
-                                    log.finest("Thread interrupted or eof on waiting occured");
-                                }
-                            } else {
-                                try {
-                                    //TODO LOGGING 
-                                    parser.addByte((byte) theData);
-                                } catch (Exception e) {
-                                    log.log(Level.SEVERE, "Error during createPackage()", e);
-                                    parser.reset();
-                                }
-                            }
-                        } catch (NullPointerException npe) {
-                            if (!isClosed()) {
-                                throw new RuntimeException(npe);
-                            }
-                        }
-                    }
-                    log.info("Thread MBus StreamListener Will stop");
-                } catch (IOException e) {
-                    if (isClosed()) {
-                        log.log(Level.FINE, "Port Closed", e);
-                    } else {
-                        log.log(Level.SEVERE, "run()", e);
-                    }
-                } catch (RuntimeException e) {
-                    if (isClosed()) {
-                        log.log(Level.FINE, "Port Closed", e);
-                    } else {
-                        log.log(Level.INFO, "finished waiting for packages", e);
-                    }
-                }
-            } catch (Throwable t) {
-                log.log(Level.SEVERE, "END", t);
-            } finally {
-                log.fine("Thread MBus StreamListener Stopped");
-                parser.reset();
-            }
-        }
-
-        private boolean isClosed() {
-            return conn == null ? true : conn.getConnState().equals(Connection.State.CLOSED) || conn.getConnState().equals(Connection.State.CLOSING);
-        }
-
-        @Override
-        public void success(Frame frame) {
-            log.log(Level.FINER, "New frame parsed {0}", frame);
-
-            synchronized (frameQueue) {
-                frameQueue.add(frame);
-                frameQueue.notifyAll();
-            }
-        }
-
-        void resetDecoder() {
-            parser.reset();
-        }
-
-    }
     private final static Logger log = LogUtils.getMasterLogger();
-    @Deprecated //DO not handle this here just plain send/receive
-    private final List<GenericDevice> devices = new ArrayList<>();
     private final Encoder encoder = new Encoder();
-    private Thread t;
-    private final StreamListener streamListener = new StreamListener();
-    private final Queue<Frame> frameQueue = new ConcurrentLinkedQueue<>();
-    private Connection conn;
-    private long lastByteSended;
+    private final Decoder parser = new Decoder();
+    private SerialPortSocket serialPortSocket;
+    private int responseTimeOutOffset;
 
     public MBusMaster() {
         super();
     }
 
-    /**
-     *
-     * @param device
-     * @return true if the device is not Already in the List Identnumber,
-     * Manufacturer and Medium
-     * @TODO refresh devicedata???
-     */
-    @Deprecated
-    public boolean addDevice(GenericDevice device) {
-        for (GenericDevice dev : devices) {
-            if (dev.getIdentNumber() == device.getIdentNumber()) {
-                if (dev.getManufacturer().equals(device.getManufacturer()) && dev.getMedium().equals(device.getMedium())) {
-                    return false;
-                }
-            }
-        }
-        return devices.add(device);
-    }
+    public boolean DEFAULT_FCB = true;
+    public boolean DEFAULT_FCV = true;
 
-    public GenericDevice searchDeviceByAddress(byte address)
-            throws InterruptedException, IOException {
-        Frame f = sendRequestUserData(address);
-//        Frame f = sendInitSlave(address);
-        GenericDevice result = null;
-        if (f instanceof UserDataResponse) {
-            UserDataResponse udr = (UserDataResponse) f;
-            //TODO detect dev and create
-            result = DeviceFactory.createDevice(udr, new RequestClassXData(Frame.ControlCode.REQ_UD2, (byte) address));
-            addDevice(result);
+    public boolean searchDeviceByAddress(byte address, Consumer<DeviceId> deviceIdConsumer) throws IOException {
+        RequestClassXData req = new RequestClassXData(DEFAULT_FCB, DEFAULT_FCV, Frame.ControlCode.REQ_UD2, address);
+        UserDataResponse udr = send(req, getSendReTries());
+        if (udr != null) { 
+        	deviceIdConsumer.accept(udr.getDeviceId());
             log.info(String.format("found device: address = 0x%02X, id = %08d, man = %s, medium = %s, version = 0x%02X",
                     udr.getAddress(),
                     udr.getIdentNumber(),
                     udr.getManufacturer(),
                     udr.getMedium(),
                     udr.getVersion()));
-            //TODO check wenn dev braucht mehr ( falsces udr)
-        } else {
-            log.info(String.format("no device at address = 0x%02X", address));
+            return true;
         }
-        return result;
-    }
-
-    @Deprecated
-    public int deviceIndexOf(GenericDevice d) {
-        return devices.indexOf(d);
-    }
-
-    @Deprecated
-    public void clearDevices() {
-        devices.clear();
-    }
-
-    private void clearFrameQueue() {
-        synchronized (frameQueue) {
-            frameQueue.clear();
-        }
+        log.info(String.format("no device at address = 0x%02X", address));
+        return false;
     }
 
     @Override
     public void close() throws IOException {
-        if (conn != null) {
-            log.fine("TRY CLOSING");
-            conn.close();
+            serialPortSocket.close();
             log.fine("CLOSED");
-            /* TODO thread.interrrupt does not work in native posix blocking read ...
-             try {
-             Thread.sleep(10);
-             } catch (InterruptedException ex) {
-             throw new IOException(ex);
-             }
-             log.fine("Do INterrupt");
-             t.interrupt();
-             try {
-             Thread.sleep(10);
-             } catch (InterruptedException ex) {
-             throw new IOException(ex);
-             }
-             */
-            t = null;
-        }
-    }
-
-    @Deprecated
-    public int deviceCount() {
-        return devices.size();
-    }
-
-    @Deprecated
-    public GenericDevice getDevice(int i) {
-        return devices.get(i);
-    }
-
-    @Deprecated
-    public GenericDevice[] getDevices() {
-        return devices.toArray(new GenericDevice[deviceCount()]);
     }
 
     /**
@@ -360,8 +161,8 @@ public class MBusMaster
      *
      * @return
      */
-    public long getIdleTime() {
-        return 33000 / conn.getBitPerSecond();
+    public long getIdleTime() throws  IOException {
+        return 33000 / serialPortSocket.getBaudrate().value;
     }
 
     /**
@@ -370,26 +171,16 @@ public class MBusMaster
      *
      * @return
      */
-    public long getResponseTimeout() {
-        return ((((512 * 11) + 330) * 1000) / conn.getBitPerSecond()) + conn.getResponseTimeOutOffset();
+    public long getResponseTimeout() throws IOException {
+        return ((((512 * 11) + 330) * 1000) / serialPortSocket.getBaudrate().value) + responseTimeOutOffset;
     }
 
-    public long getShortResponseTimeout() {
-        return getIdleTime() * 10 + conn.getResponseTimeOutOffset();
+    public long getShortResponseTimeout() throws IOException {
+        return getIdleTime() * 10 + responseTimeOutOffset;
     }
 
-    @Deprecated
-    @Override
-    public Iterator<GenericDevice> iterator() {
-        return devices.iterator();
-    }
-
-    private Frame removeFrame() {
-        return frameQueue.remove();
-    }
-
-    public Collection<GenericDevice> searchDevicesBySecondaryAddressing() throws IOException, InterruptedException {
-        return widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF);
+    public void searchDevicesBySecondaryAddressing(Consumer<DeviceId> deviceIdConsumer) throws IOException {
+        widcardSearch(0xFFFFFFFF, (short) 0xFFFF, (byte) 0xFF, (byte) 0xFF, deviceIdConsumer);
     }
 
     /**
@@ -398,109 +189,70 @@ public class MBusMaster
      *
      * @return
      * @throws java.io.IOException
-     * @throws java.lang.InterruptedException
      */
-    public GenericDevice[] searchDevicesByPrimaryAddress()
-            throws IOException, InterruptedException {
-        return searchDevicesByPrimaryAddress((byte) 0, MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS);
+    public void searchDevicesByPrimaryAddress(Consumer<DeviceId> deviceIdConsumer)
+            throws IOException {
+        searchDevicesByPrimaryAddress((byte) 0, MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS, deviceIdConsumer);
     }
 
-    public GenericDevice[] searchDevicesByPrimaryAddress(byte first, byte last)
-            throws IOException, InterruptedException {
-        List<GenericDevice> result = new ArrayList<>();
+    public void searchDevicesByPrimaryAddress(byte first, byte last, Consumer<DeviceId> deviceIdConsumer)
+            throws IOException {
         final short fAddr = (short) (first & 0xFF);
         final short lAddr = (short) (last & 0xFF);
         for (short i = fAddr; i <= lAddr; i++) {
-            GenericDevice c = searchDeviceByAddress((byte) i);
-            if (c != null) {
-                result.add(c);
-            }
+            searchDeviceByAddress((byte) i, deviceIdConsumer);
         }
-        return result.toArray(new GenericDevice[result.size()]);
     }
 
     @Override
-    public Frame send(Frame frame, int maxTries, long timeout)
-            throws IOException, InterruptedException {
+    public <T extends ResponseFrame> T send(RequestFrame<T> request, int maxTries) throws IOException {
         for (int tries = 0; tries < maxTries; tries++) {
-            clearFrameQueue();
+            try {
+        	readGarbage();
 
-            final byte[] b = encoder.encode(frame);
+            serialPortSocket.getOutputStream().write(encoder.encode(request));
+            serialPortSocket.getOutputStream().flush();
 
-            //Reset the decoder from old leftovers...
-            streamListener.resetDecoder();
+            return (T)parser.parse(serialPortSocket.getInputStream());
 
-            conn.getOutputStrteam().write(b);
-            conn.getOutputStrteam().flush();
-            lastByteSended = System.currentTimeMillis();
-
-            Frame result = pollFrameOrWaitUntil(lastByteSended + timeout);
-
-            if (result != null) {
-                return result;
-            } else {
-                Thread.sleep(getIdleTime());
-            }
+        } catch (InterruptedIOException | DecodeException e) {
         }
+        }    
         if (log.isLoggable(Level.FINE)) {
-            log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, frame});
+            log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[]{maxTries, request});
         }
         return null;
     }
 
-    @Deprecated
-    public Map<GenericDevice, Frame> sendRequestUserData(MBusAddressing addressing)
-            throws IOException, InterruptedException {
-        Map<GenericDevice, MBusAddressing> devMap = new HashMap<>();
-        for (GenericDevice d : devices) {
-            devMap.put(d, addressing);
-        }
-        return sendRequestUserData(devMap);
-    }
-
-    public Frame sendInitSlave(byte address) throws IOException, InterruptedException {
+    public SingleCharFrame sendInitSlave(byte address) throws IOException {
         SendInitSlave req = new SendInitSlave(address);
-        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
+        return send(req, getSendReTries());
     }
 
-    public Frame sendSetNewAddress(byte address, byte newAddress) throws InterruptedException, IOException {
+    public SingleCharFrame sendSetNewAddress(byte address, byte newAddress) throws IOException {
         SendUserData req = new SendUserData();
         req.setAddress(address);
         req.addDataBlock(new ByteDataBlock(DataFieldCode._8_BIT_INTEGER, VifPrimary.BUS_ADDRESS, newAddress));
-        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
+        return send(req, getSendReTries());
     }
 
-    public Frame sendRequestUserData(byte address)
-            throws IOException, InterruptedException {
-        RequestClassXData req = new RequestClassXData(Frame.ControlCode.REQ_UD2, address);
-        req.setFcb(true);
-        return send(req, DEFAULT_SEND_TRIES, getResponseTimeout());
-    }
-
-    public Map<GenericDevice, Frame> sendRequestUserData(Map<GenericDevice, MBusAddressing> devices)
-            throws IOException, InterruptedException {
-        Map<GenericDevice, Frame> result = new HashMap<>();
-
-        byte address;
-        for (GenericDevice dev : devices.keySet()) {
-            MBusAddressing addressing = devices.get(dev);
-            if (MBusAddressing.SECONDARY.equals(addressing)) {
-                selectDevice(dev);
-                address = MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS;
-            } else {
-                address = dev.getAddress();
-            }
-            result.put(dev, sendRequestUserData(address));
-            if (MBusAddressing.SECONDARY.equals(addressing)) {
-                //TODO deselect??
-            }
+    public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, byte address) throws IOException {
+        RequestClassXData req = new RequestClassXData(fcb, fcv, Frame.ControlCode.REQ_UD2, address);
+        UserDataResponse result = send(req, getSendReTries());
+        if (result.isLastPackage()) {
+            return result;
         }
-
+        UserDataResponse udr; 
+        req.setFcv(true);
+        do {
+          req.toggleFcb();  
+          udr = send(req, getSendReTries());
+          result.addAllDataBlocks(udr.getDataBlocks());
+        } while  (!udr.isLastPackage());
         return result;
     }
 
-    public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion,
-            byte maskedMedium) throws IOException, InterruptedException {
+    public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium) throws IOException {
         final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
         selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
         selectionOfSlaves.setMaskedMan(maskedMan);
@@ -509,81 +261,44 @@ public class MBusMaster
         return sendSlaveSelect(selectionOfSlaves);
     }
 
-    private int sendSlaveSelect(SelectionOfSlaves selectionOfSlaves) throws IOException, InterruptedException {
+    private int sendSlaveSelect(SelectionOfSlaves selectionOfSlaves) throws IOException {
 
         if (log.isLoggable(Level.FINE)) {
             log.fine(String.format("Will select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", selectionOfSlaves.getBcdMaskedId(), selectionOfSlaves.getMaskedMan(), selectionOfSlaves.getMaskedVersion(), selectionOfSlaves.getMaskedMedium()));
         }
 
-        int result;
-        Frame resultFrame = send(selectionOfSlaves, Sender.DEFAULT_SEND_TRIES, getShortResponseTimeout());
+        int result = 0;
+        ResponseFrame resultFrame = send(selectionOfSlaves, getSendReTries());
         if (resultFrame == null) {
-            return 0;
+            return result;
         }
         if (resultFrame instanceof SingleCharFrame) {
             log.log(Level.FINE, "Slave selected {0}", selectionOfSlaves.getBcdMaskedId());
-            result = 1;
+            result++;
         } else if (resultFrame instanceof GarbageCharFrame) {
             log.log(Level.FINE, "Multiple Slaves selected {0}", selectionOfSlaves.getBcdMaskedId());
-            result = 2;
+            result += 1;
         } else {
             log.severe(String.format("unexpected Frame received \n \"%s\" \n tried to select Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", resultFrame.toString(), selectionOfSlaves.getBcdMaskedId(), selectionOfSlaves.getMaskedMan(), selectionOfSlaves.getMaskedVersion(), selectionOfSlaves.getMaskedMedium()));
-            return 0;
+            return result;
         }
-        log.fine("Wait for more Answers of slave select");
-        result += waitForSingleCharsOrGarbage(getShortResponseTimeout());
+        try {
+        	resultFrame = (ResponseFrame)parser.parse(serialPortSocket.getInputStream());
+        	result++;
+        } catch (InterruptedIOException e) {
+        	//caught timeout ...
+        }
         return result;
     }
 
-    public void setConnection(Connection conn) {
-        this.conn = conn;
+     public MBusMaster open() throws IOException {
+        serialPortSocket.openRaw(DEFAULT_BAUDRATE, DATA_BITS, STOP_BITS, PARITY, FLOW_CONTROL);
+        serialPortSocket.setReadTimeouts(200, 1000 + responseTimeOutOffset);
+    	 return this;
     }
 
-    public Closeable open() throws IOException {
-        conn.open();
-        t = new Thread(streamListener);
-        t.setDaemon(true);
-        t.start();
-        return this;
-    }
-
-    private Frame pollFrameOrWaitUntil(long endTime) throws InterruptedException {
-        synchronized (frameQueue) {
-            while (endTime - System.currentTimeMillis() > 0) {
-                if (frameQueue.peek() == null) {
-                    log.log(Level.FINE, "Wait max for {0} ms", endTime - System.currentTimeMillis());
-                    frameQueue.wait(endTime - System.currentTimeMillis());
-                } else {
-                    return frameQueue.poll();
-                }
-            }
-            return frameQueue.poll();
-        }
-    }
-
-    private int waitForSingleCharsOrGarbage(long timeout)
-            throws InterruptedException {
-        int result = 0;
-
-        while ((System.currentTimeMillis() - lastByteSended) <= timeout) {
-            Frame frame = pollFrameOrWaitUntil(lastByteSended + timeout);
-
-            if (frame instanceof SingleCharFrame) {
-                result++;
-            } else if (frame instanceof GarbageCharFrame) {
-                result++;
-            } else {
-                return result;
-            }
-        }
-
-        return result;
-    }
-
-    public Collection<GenericDevice> widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium)
-            throws IOException, InterruptedException {
-
-        final Collection<GenericDevice> result = new LinkedList<>();
+    public void widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium, Consumer<DeviceId> deviceIdConsumer)
+            throws IOException {
 
         final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
         selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
@@ -595,85 +310,73 @@ public class MBusMaster
             case 0:
                 // No devices found
                 log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
-                return result;
+                return;
             case 1: {
-                GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-                if (dev != null) {
-                    // one device found
-                    result.add(dev);
-                    return result;
+                if (searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
+                    return;
                 }
-                //one anser, but maybe more then one is there on the bus, so falltrough
             }
-            default:
-                Deque<MaskedQueueEntry> stack = new LinkedList<>();
+        }
+        Deque<MaskedQueueEntry> stack = new LinkedList<>();
 
-                SelectionOfSlaves.WildcardNibbles currentNibble = SelectionOfSlaves.WildcardNibbles.ID_0;
-                byte currentNibbleValue = 0;
-                boolean finished = false;
-                while (!finished) {
+        SelectionOfSlaves.WildcardNibbles currentNibble = SelectionOfSlaves.WildcardNibbles.ID_0;
+        byte currentNibbleValue = 0;
+        boolean finished = false;
+        while (!finished) {
+            selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
+            switch (sendSlaveSelect(selectionOfSlaves)) {
+                case 0:
+                    log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
+                    currentNibbleValue++;
+                    break;
+                case 1:
+                    if (searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
+                        // We found exactly one device so no further searching is needed at this nibble.
+                        currentNibbleValue++;
+                        break;
+                    }
+                //Collision?!, search further on
+                default:
+                    stack.add(new MaskedQueueEntry(currentNibble, selectionOfSlaves.getWildcardNibble(currentNibble)));
+                    currentNibbleValue = 0;
+                    while (!selectionOfSlaves.isWildcardNibble(currentNibble) && !currentNibble.isLast()) {
+                        currentNibble = currentNibble.next();
+                    }
                     selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
-                    switch (sendSlaveSelect(selectionOfSlaves)) {
-                        case 0:
-                            log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
-                            currentNibbleValue++;
-                            break;
-                        case 1:
-                            GenericDevice dev = searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-                            if (dev != null) {
-                                // We foud exactly one device so no further seraching is needed at this nibble.
-                                result.add(dev);
-                                currentNibbleValue++;
-                                break;
-                            }
-                        //Collision?!, search further on
-                        default:
-                            stack.add(new MaskedQueueEntry(currentNibble, selectionOfSlaves.getWildcardNibble(currentNibble)));
-                            currentNibbleValue = 0;
-                            while (!selectionOfSlaves.isWildcardNibble(currentNibble) && !currentNibble.isLast()) {
-                                currentNibble = currentNibble.next();
-                            }
-                            selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
 
-                    }
-                    while (currentNibbleValue == 10) {
-                        if (stack.isEmpty()) {
-                            return result;
-                        } else {
-                            selectionOfSlaves.maskWildcardNibble(currentNibble);
-                            final MaskedQueueEntry nV = stack.pollLast();
-                            currentNibbleValue = (byte)(nV.value + 1);
-                            currentNibble = nV.nibble;
-                        }
-                    }
+            }
+            while (currentNibbleValue == 10) {
+                if (stack.isEmpty()) {
+                    return;
+                } else {
+                    selectionOfSlaves.maskWildcardNibble(currentNibble);
+                    final MaskedQueueEntry nV = stack.pollLast();
+                    currentNibbleValue = (byte) (nV.value + 1);
+                    currentNibble = nV.nibble;
                 }
-
+            }
         }
-        return result;
+
     }
 
-    public UserDataResponse readResponseBySecondary(int bcdId, String man, Byte version, MBusMedium medium) throws IOException, InterruptedException {
-        final short bcdMan = (man == null || man.length() == 0) ? (short) 0xFFFF : MBusUtils.man2Short(man);
-        byte bcdVersion = (version == null) ? (byte) 0xFF : version;
-        byte bcdMedium = (medium == null) ? (byte) 0xFF : (byte) medium.getId();
-
-        if (selectDevice(bcdId, bcdMan, bcdVersion, bcdMedium)) {
-            return readResponse(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+    public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DeviceId deviceId) throws IOException {
+        if (selectDevice(MBusUtils.int2Bcd(deviceId.identNumber), MBusUtils.man2Short(deviceId.manufacturer), deviceId.version, MBusUtils.byte2Bcd(deviceId.medium.id))) {
+            return sendRequestUserData(fcb, fcv, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
         } else {
-            return null;
+            throw new RuntimeException("Can't select device");
         }
     }
 
-    public UserDataResponse readResponse(byte address) throws IOException, InterruptedException {
-        Frame f = sendRequestUserData(address);
-        if (f instanceof UserDataResponse) {
-            return (UserDataResponse) f;
-        } else {
-            return null;
-        }
+    public boolean selectDevice(Integer id, String man , Byte version, MBusMedium medium) throws IOException {
+    	final int bcdMaskedId = id != null ? MBusUtils.int2Bcd(id) : 0xFFFFFFFF;
+    	final  short maskedMan = man != null ? MBusUtils.short2Bcd(MBusUtils.man2Short(man)) : (short)0xFFFF;
+    	final byte maskedVersion = version != null ? MBusUtils.byte2Bcd(version) : (byte)0xFF;
+    	final byte maskedMedium = medium != null ? MBusUtils.byte2Bcd(medium.id) : (byte)0xFF;
+    	return selectDevice(bcdMaskedId, maskedMan, maskedVersion, maskedMedium);
+    			
     }
 
-    public boolean selectDevice(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium) throws IOException, InterruptedException {
+    public boolean selectDevice(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium) throws IOException {
         int answers = sendSlaveSelect(bcdMaskedId, maskedMan, maskedVersion, maskedMedium);
         if (answers > 1) {
             log.warning(String.format("Can't select select (too many) Slave: id=0x%08X, man=0x%04X, ver=0x%02X, medium=0x%02X", bcdMaskedId, maskedMan, maskedVersion, maskedMedium));
@@ -683,124 +386,33 @@ public class MBusMaster
         return answers == 1;
     }
 
-    public boolean selectDevice(int id, String manufacturer, byte version, MBusMedium medium) throws IOException, InterruptedException {
-        return selectDevice(MBusUtils.int2Bcd(id),
-                MBusUtils.man2Short(manufacturer),
-                version,
-                (byte) medium.getId());
+    public boolean selectDevice(DeviceId deviceId) throws IOException {
+        return selectDevice(MBusUtils.int2Bcd(deviceId.identNumber),
+                MBusUtils.man2Short(deviceId.manufacturer),
+                deviceId.version,
+                (byte) deviceId.medium.getId());
     }
 
-    public boolean setPrimaryAddressOfDevice(byte newAddress, MBusResponseFramesContainer dev) throws IOException, InterruptedException {
-        if (selectDevice(dev)) {
-            final Frame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
+     public boolean setPrimaryAddressOfDevice(DeviceId deviceId, byte newAddress) throws IOException {
+        if (selectDevice(deviceId)) {
+            final SingleCharFrame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
             sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-            if (f instanceof SingleCharFrame) {
-                dev.setAddress(newAddress);
-                return true;
-            } else {
-                return false;
-            }
+            return true;
         } else {
             return false;
         }
     }
 
-    public boolean setPrimaryAddressOfDevice(byte newAddress, int id, String manufacturer, byte version, MBusMedium medium) throws IOException, InterruptedException {
-        if (selectDevice(id, manufacturer, version, medium)) {
-            final Frame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
-            sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
-            return f instanceof SingleCharFrame;
-        } else {
-            return false;
-        }
-    }
+	public void setSerialPort(SerialPortSocket serialPortSocket) {
+		this.serialPortSocket = serialPortSocket;
+	}
 
-    public boolean selectDevice(MBusResponseFramesContainer dev) throws IOException, InterruptedException {
-        return selectDevice(MBusUtils.int2Bcd(dev.getIdentNumber()),
-                MBusUtils.man2Short(dev.getManufacturer()),
-                dev.getVersion(),
-                (byte) dev.getMedium().getId());
-    }
-
-    public void readValues(ValueRequest<?> requests)
-            throws IOException, InterruptedException {
-        //Create devices if necessary
-        HashMap<GenericDevice, MBusAddressing> result = new HashMap<>();
-
-        for (ValueRequestPointLocator<?> locator : requests) {
-            GenericDevice myDevice = getDevice(devices, locator);
-
-            if (myDevice == null) {
-                myDevice
-                        = DeviceFactory.createDevice(locator.getAddress(),
-                                locator.getManufacturer(),
-                                locator.getMedium(),
-                                locator.getVersion(),
-                                locator.getIdentnumber());
-                addDevice(myDevice);
-            }
-
-            result.put(myDevice, locator.getAddressing());
-        }
-
-        //get data from devices
-        //TODO honor frames 
-        Map<GenericDevice, Frame> responses = sendRequestUserData(result);
-
-        //pack response
-        for (ValueRequestPointLocator<?> locator : requests) {
-            GenericDevice dev = getDevice(result.keySet(), locator);
-            DataBlock db = getDataBlock(responses.get(dev),
-                    locator);
-            locator.setDb(db);
-            db = getTimeStampDB(dev, locator);
-            locator.setTimestampDb(db);
-        }
-    }
-
-    public static MBusMaster readJsonStream(InputStream is)
-            throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        String line;
-
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-
-        MBusMaster result = new MBusMaster();
-        result.fromJSON(JSONObject.fromObject(sb.toString()));
-
-        return result;
-    }
-
-    @Override
-    public void fromJSON(JSONObject json) {
-        conn = Connection.createFromJSON(json);
-
-        JSONArray jsonDevices = json.getJSONArray("devices");
-
-        for (int i = 0; i < jsonDevices.size(); i++) {
-            GenericDevice device = new GenericDevice();
-            device.fromJSON(jsonDevices.getJSONObject(i));
-            addDevice(device);
-        }
-    }
-
-    @Override
-    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
-        JSONObject result = new JSONObject();
-
-        result.accumulate(conn.getJsonFieldName(), conn.toJSON(jsonSerializeType));
-
-        JSONArray jsonDevices = new JSONArray();
-
-        for (GenericDevice device : devices) {
-            jsonDevices.add(device.toJSON(jsonSerializeType));
-        }
-
-        result.accumulate("devices", jsonDevices);
-
-        return result;
-    }
+	public int getSendReTries() {
+		return DEFAULT_SEND_TRIES;
+	}
+	
+	public void setResponseTimeoutOffset(int responseTimeOutOffset) {
+		this.responseTimeOutOffset = responseTimeOutOffset;
+	}
+ 
 }

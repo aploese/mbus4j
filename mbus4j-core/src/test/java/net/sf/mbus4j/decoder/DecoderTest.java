@@ -27,6 +27,10 @@ package net.sf.mbus4j.decoder;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+import java.io.ByteArrayInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.mbus4j.dataframes.Frame;
@@ -41,95 +45,91 @@ import static org.junit.Assert.*;
  *
  * @author aploese
  */
-public class DecoderTest implements DecoderListener {
+public class DecoderTest {
 
-    private Decoder instance;
-    private List<Frame> frames;
-    
-    public DecoderTest() {
-    }
+	private Decoder instance;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
+	public DecoderTest() {
+	}
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+	}
 
-    @Before
-    public void setUp() {
-        frames = new ArrayList<>();
-        instance = new Decoder(this);
-    }
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+	}
 
-    @After
-    public void tearDown() {
-        instance = null;
-    }
+	@Before
+	public void setUp() {
+		instance = new Decoder();
+	}
 
-    @Test
-    public void testErrorRecovery() {
-        String[] raw = new String[]{
-            "68c4c46808007213961113475f0307fd000000041390000000046d1f00cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009a16",
-            "68c4",
-            "68c4c46808007213961113475f0307000000041390000000046d2000cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009d16",
-            "68c4c46808007213961113475f030700000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009f16",
-            "68c4c46808007213961113475f030701000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c",
-            "68c4c46808007213961113475f030702000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f010000a116",
-            "68c4c46808007213961113475f030703000000041390000000046d2200cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313"};
+	@After
+	public void tearDown() {
+		instance = null;
+	}
 
-        for (byte b : Decoder.ascii2Bytes(raw[0])) {
-            instance.addByte(b);
-        }
-        assertEquals(1, frames.size());
-        frames.clear();
-        
-        //Just waqy too short
-        for (byte b : Decoder.ascii2Bytes(raw[1])) {
-            instance.addByte(b);
-        }
-        assertTrue(frames.isEmpty());
-        
-        // Here oner byte is missing
-        for (byte b : Decoder.ascii2Bytes(raw[2])) {
-                instance.addByte(b);
-        }
-        assertTrue(frames.isEmpty());
+	@Test
+	public void testErrorRecovery() throws IOException {
+		String[] raw = new String[] {
+				"68c4c46808007213961113475f0307fd000000041390000000046d1f00cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009a16",
+				"68c4",
+				"68c4c46808007213961113475f0307000000041390000000046d2000cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009d16",
+				"68c4c46808007213961113475f030700000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f0100009f16",
+				"68c4c46808007213961113475f030701000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c",
+				"68c4c46808007213961113475f030702000000041390000000046d2100cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313fae0f505c2036cdf11c403135c00000082046cdc12840413be000000c2046c0000c404130000000082056c000084051300000000c2056c0000c405130000000082066c000084061300000000c2066c0000c40613000000000f010000a116",
+				"68c4c46808007213961113475f030703000000041390000000046d2200cd13426c000044130000000042ec7ede180c789351050082016cbf1884011300000000c2016cbe19c401130000000082026cbf1a84021300000000c2026cbe1bc40213fae0f50582036cbf1c840313" };
 
-        //recover from byteloss in last frame
-        for (byte b : Decoder.ascii2Bytes(raw[3])) {
-            try {
-                instance.addByte(b);
+		Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[0])));
 
-            } catch (Exception e) {
-                instance.reset();
-            }
-        }
-        assertEquals(1, frames.size());
-        frames.clear();
+		assertEquals(Decoder.DecodeState.SUCCESS, instance.getState());
+		assertNotNull(f);
 
-        //RECOVER
-        for (byte b : Decoder.ascii2Bytes(raw[4])) {
-            instance.addByte(b);
-        }
-        assertTrue(frames.isEmpty());
+		// Just way too short
+		try {
+			instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[1])));
+			fail();
+		} catch (EOFException e) {
+			assertTrue(true);
+		}
 
-        for (byte b : Decoder.ascii2Bytes(raw[5])) {
-            instance.addByte(b);
-        }
-        assertTrue(frames.isEmpty());
+		// Here oner byte is missing
+		try {
+			instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[2])));
+			fail();
+		} catch (DecodeException e) {
+			assertTrue(true);
+		}
 
-        for (byte b : Decoder.ascii2Bytes(raw[6])) {
-            instance.addByte(b);
-        }
-        assertTrue(frames.isEmpty());
+		// recover from byteloss in last frame
+		f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[3])));
+		assertNotNull(f);
 
-    }
+		// RECOVER
+		try {
+			instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[4])));
+			fail();
+		} catch (EOFException e) {
+			assertTrue(true);
+		}
 
-    @Override
-    public void success(Frame parsingFrame) {
-        frames.add(parsingFrame);
-    }
+		final InputStream is = new ByteArrayInputStream(Decoder.ascii2Bytes(raw[5]));
+		f = instance.parse(is);
+		
+		try {
+			instance.parse(is);
+			fail();
+		} catch (EOFException e) {
+			assertTrue(true);
+		}
+		
+		try {
+			instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(raw[6])));
+			fail();
+		} catch (EOFException e) {
+			assertTrue(true);
+		}
+	}
 
 }

@@ -1,4 +1,4 @@
-package net.sf.mbus4j.devices;
+package net.sf.mbus4j.master;
 
 /*
  * #%L
@@ -27,33 +27,42 @@ package net.sf.mbus4j.devices;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import net.sf.mbus4j.dataframes.Frame;
+import net.sf.mbus4j.MBusAddressing;
+import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.MBusMedium;
-import net.sf.mbus4j.dataframes.UserDataResponse;
 
 /**
- *
- * @author arnep@users.sourceforge.net
- * @version $Id$
+ * Request that bundles requests to different devices
+ * @author aploese
+ * @param <T>
  */
-public class DeviceFactory {
+public class ValuesRequest<T>
+        implements Iterable<DeviceRequest<T>> {
 
-    public static GenericDevice createDevice(UserDataResponse udResp, Frame requestFrame) {
-        return createGenericDevice(udResp, requestFrame);
+    private final LinkedList<DeviceRequest<T>> devices= new LinkedList<>();
+
+    public void add(byte version, int identNumber, String manufacturer, MBusMedium medium, byte address, MBusAddressing addressing, DataBlockLocator<T> value) {
+        for (DeviceRequest<T> r : devices) {
+        	if (r.deviceId.equalsCheckAddress(version, identNumber, manufacturer, medium, address)) {
+        		if (r.addressing != addressing) {
+        			throw new IllegalArgumentException("Adressing mismatch");
+        		}
+        		r.dataBlockLocators.add(value);
+        		return;
+        	}
+        }
+        DeviceId deviceId = new DeviceId(version, medium, identNumber, manufacturer, address);
+        devices.add(new DeviceRequest<>(deviceId, addressing, value));
     }
 
-    public static GenericDevice createGenericDevice(UserDataResponse udResp, Frame requestFrame) {
-        return new GenericDevice(udResp, requestFrame);
+    @Override
+    public Iterator<DeviceRequest<T>> iterator() {
+        return devices.iterator();
     }
-
-    public static GenericDevice createDevice(byte address, String manufacturer, MBusMedium medium, byte version,
-            int identNumber) {
-        return createGenericDevice(address, manufacturer, medium, version, identNumber);
-    }
-
-    private static GenericDevice createGenericDevice(byte address, String manufacturer, MBusMedium medium,
-            byte version, int identNumber) {
-        return new GenericDevice(address, manufacturer, medium, version, identNumber);
-    }
+    
+    
+    
 }

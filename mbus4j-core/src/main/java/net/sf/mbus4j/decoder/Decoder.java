@@ -27,8 +27,13 @@ package net.sf.mbus4j.decoder;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -37,6 +42,7 @@ import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestClassXData;
+import net.sf.mbus4j.dataframes.ResponseFrame;
 import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
@@ -74,7 +80,9 @@ public class Decoder {
         SIGNATURE,
         VARIABLE_DATA_BLOCK,
         CHECKSUM,
-        END_SIGN;
+        END_SIGN, 
+        SUCCESS,
+        ERROR;
     }
 
     private final static Logger log = LogUtils.getDecoderLogger();
@@ -109,23 +117,30 @@ public class Decoder {
     private byte start;
     private final VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
     private DecodeState state = DecodeState.EXPECT_START;
-    private final DecoderListener listener;
 
-    public Decoder(DecoderListener listener) {
-        this.listener = listener;
+    public Decoder() {
     }
 
-    public void addByte(final byte b) {
+    public Frame parse(InputStream is) throws IOException {
+        reset();
+        do {
+        int  data = is.read();
+            if (data == -1) {
+                throw new EOFException("Closed");
+            }
+            addByte((byte)data);
+        } while (state != DecodeState.SUCCESS && state != DecodeState.ERROR);
+        return parsingFrame;
+    } 
+    
+    private void addByte(final byte b) {
         checksum += b;
         dataPos++;
 
         if (start != 0) {
             if (expectedLengt == dataPos - 1) {
                 if (state != DecodeState.CHECKSUM) {
-                    log.fine("expectedLengt reached: data discarted!");
-                    log.severe(parsingFrame.toString());
-                    reset();
-                    return;
+                    throw  new DecodeException("expectedLengt reached: data discarted!",  parsingFrame);
                 }
             }
         }
@@ -149,15 +164,10 @@ public class Decoder {
                         return;
                     case 0xE5:
                         parsingFrame = SingleCharFrame.SINGLE_CHAR_FRAME;
-                        listener.success(parsingFrame);
-                        reset();
+                        state = DecodeState.SUCCESS;
                         return;
                     default:
-                        if (log.isLoggable(Level.FINEST)) {
-                            log.finest(String.format("Garbage: %02x", b));
-                        }
-                        // Drop the garbage
-                        return;
+                    throw  new DecodeException("Garbage collected",  parsingFrame);
                 }
 
             case LONG_LENGTH_1:
@@ -181,9 +191,7 @@ public class Decoder {
                         dataPos = -3;
                         return;
                     } else {
-                        log.fine("got to second lengt byte, but nowhere to go!");
-                        reset();
-                        return;
+                        throw new DecodeException("got to second lengt byte, but nowhere to go!", parsingFrame);
                     }
                 } else {
                     setState(DecodeState.START_LONG_PACK);
@@ -196,9 +204,7 @@ public class Decoder {
                     setState(DecodeState.C_FIELD);
                     return;
                 } else {
-                    log.fine("second start byte of long/control frame mismatch: data discarted!");
-                    reset();
-                    return;
+                    throw new DecodeException("second start byte of long/control frame mismatch: data discarted!", parsingFrame);
                 }
 
             case C_FIELD:
@@ -226,9 +232,7 @@ public class Decoder {
                                 return;
                             default:
                                 // are we collecting garbage? - maybe try to recover.
-                                log.fine("short frame c field reached: data discarted!");
-                                reset();
-                                return;
+                                throw  new DecodeException("short frame c field reached: data discarted!", parsingFrame);
                         }
 
                     case 0x68:
@@ -254,15 +258,11 @@ public class Decoder {
                                 return;
                             default:
                                 // are we collecting garbage? - maybe try to recover.
-                                log.fine("control/long frame c field reached: data discarted!");
-                                reset();
-                                return;
+                                throw new DecodeException("control/long frame c field reached: data discarted!", parsingFrame);
                         }
 
                     default:
-                        log.log(Level.SEVERE, String.format("C Field dont know where to go: %02x", b));
-                        reset();
-                        throw new NotSupportedException("Should never ever happen!: C Field dont know where to go!");
+                        throw new DecodeException(String.format("C Field dont know where to go: %02x", b), parsingFrame);
                 }
 
             case A_FIELD:
@@ -270,10 +270,7 @@ public class Decoder {
                 try {
                     ((PrimaryAddress) parsingFrame).setAddress(b);
                 } catch (ClassCastException e) {
-                    // are we collecting garbage? - maybe try to recover.
-                    log.fine("a field: data discarted!");
-                    reset();
-                    return;
+                    throw new DecodeException("No set Address Ex:" + parsingFrame.getClass(), parsingFrame);
                 }
 
                 switch (start) {
@@ -284,9 +281,7 @@ public class Decoder {
                         setState(DecodeState.CI_FIELD);
                         return;
                     default:
-                        log.log(Level.SEVERE, String.format("A Field dont know where to go start: %02x", start));
-                        reset();
-                        throw new NotSupportedException("Should never ever happen!: A Field dont know where to go!");
+                        throw new DecodeException(String.format("A Field dont know where to go start: %02x", start), parsingFrame);
                 }
 
             case CI_FIELD:
@@ -298,9 +293,7 @@ public class Decoder {
                     decodeCiUserDataResponse(b & 0xFF);
                     return;
                 } else {
-                    log.log(Level.SEVERE, "CI Field dont know where to go: {0}", parsingFrame.getClass());
-                    reset();
-                    throw new NotSupportedException("Should never ever happen!: CI Field dont know where to go!");
+                    throw new DecodeException("CI Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
                 }
 
             case GENERAL_APPLICATION_ERRORCODE:
@@ -310,9 +303,7 @@ public class Decoder {
                     setState(DecodeState.CHECKSUM);
                     return;
                 } catch (ClassCastException e) {
-                    log.log(Level.SEVERE, "GENERAL_APPLICATION_ERRORCODE Field dont know where to go: {0}", parsingFrame.getClass());
-                    reset();
-                    throw new NotSupportedException("General Application Error Expected");
+                    throw new DecodeException("GENERAL_APPLICATION_ERRORCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
                 }
 
             case APPLICATION_RESET_SUBCODE:
@@ -322,9 +313,7 @@ public class Decoder {
                     setState(DecodeState.CHECKSUM);
                     return;
                 } catch (ClassCastException e) {
-                    log.log(Level.SEVERE, "APPLICATION_RESET_SUBCODE Field dont know where to go: {0}", parsingFrame.getClass());
-                    reset();
-                    throw new NotSupportedException("Application Reset Expected");
+                    throw new DecodeException("APPLICATION_RESET_SUBCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
                 }
 
             case IDENT_NUMBER:
@@ -364,7 +353,8 @@ public class Decoder {
                 if (parsingFrame instanceof SelectionOfSlaves) {
                     ((SelectionOfSlaves) parsingFrame).setMaskedVersion((byte) (b & 0xFF));
                 } else {
-                    ((UserDataResponse) parsingFrame).setVersion((byte) (b & 0x00FF));
+                	//TODO BCD???
+                    ((UserDataResponse) parsingFrame).setVersion(((byte)b));
                 }
 
                 setState(DecodeState.MEDIUM);
@@ -390,7 +380,7 @@ public class Decoder {
                 return;
 
             case STATUS:
-                ((UserDataResponse) parsingFrame).setStatus(new UserDataResponse.StatusCode[0]);
+                ((UserDataResponse) parsingFrame).clearStatus();
 
                 switch (b & 0x03) {
                     case 0x00:
@@ -478,11 +468,7 @@ public class Decoder {
                             return;
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    //try to sync again (for the event that one byte got missing on the serial line due to parity check .... THis happend when the decoder hangs on old input and this is the start of a new frame
-                    log.fine("collect variable data block: data discarted!");
-                    reset();
-                    addByte(b);
-                    return;
+                    throw  new DecodeException("collect variable data block: data discarted!", parsingFrame);
                 }
 
             case CHECKSUM:
@@ -493,36 +479,19 @@ public class Decoder {
 
                     break;
                 } else {
-                    log.fine("checksum mismatch: data discarted!");
-                    reset();
+                    throw  new DecodeException("checksum mismatch: data discarted!", parsingFrame);
                 }
 
             case END_SIGN:
                 if (b == 0x16) {
-                    listener.success(parsingFrame);
+                    state = DecodeState.SUCCESS;                    
                 } else {
-                             log.fine("end sign not found: data discarted!");
+                    throw  new DecodeException("end sign not found: data discarted!", parsingFrame);
                 }
-                reset();
                 break;
             default:
-                log.log(Level.SEVERE, "Unknown state: {0}", state);
-                reset();
-                throw new NotSupportedException("Should never ever happen!: Unknown State!");
+                throw new DecodeException("Should never ever happen!: Unknown State!" + state, parsingFrame);
         }
-    }
-
-    private int bcd2Int(byte[] data) {
-        int result = 0;
-
-        for (int i = data.length - 1; i >= 0; i--) {
-            result *= 10;
-            result += ((data[i] >> 4) & 0x0F);
-            result *= 10;
-            result += (data[i] & 0x0F);
-        }
-
-        return result;
     }
 
     private void decodeCiSendUserData(int b) {
@@ -669,7 +638,7 @@ public class Decoder {
         }
     }
 
-    public void reset() {
+    private void reset() {
         start = 0;
         expectedLengt = 0;
         vdbd.reset();

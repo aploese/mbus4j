@@ -1,0 +1,133 @@
+6894946808017291852405016a01020000000086108300304f1e03000086208300000000000000869040830000000000000086a040830000000000000002fdc9ff8100ea0002fdc9ff8200000002fdc9ff8300000003fdd9ff810000000003fdd9ff820000000003fdd9ff830000000004abff81000000000004abff82000000000004abff83000000000004ab000000000002ff92003c00ad16
+control code = RSP_UD
+isAcd = false
+isDfc = false
+address = 0x01
+ident number = 05248591
+manufacturer = ZPA
+version = 0x01
+accessnumber = 0
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = true
+datablock[0]:
+  dataType = 48 Bit Integer
+  description = Energy, No error
+  value = 52318000 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 48 Bit Integer
+  description = Energy, No error
+  value = 0 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 48 Bit Integer
+  description = Energy, No error
+  value = 0 [Wh]
+  tariff = 1
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[3]:
+  dataType = 48 Bit Integer
+  description = Energy, No error
+  value = 0 [Wh]
+  tariff = 2
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[4]:
+  dataType = 16 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 81, 00
+  value = 234 [V]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 16 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 82, 00
+  value = 0 [V]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 16 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 83, 00
+  value = 0 [V]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 24 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 81, 00
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 24 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 82, 00
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = 24 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 83, 00
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[10]:
+  dataType = 32 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 81, 00
+  value = 0 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[11]:
+  dataType = 32 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 82, 00
+  value = 0 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[12]:
+  dataType = 32 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 83, 00
+  value = 0 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[13]:
+  dataType = 32 Bit Integer
+  description = Power, No error
+  value = 0 [W]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[14]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 92, 00
+  value = 60
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0

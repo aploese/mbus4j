@@ -75,7 +75,7 @@ public class SlavesPersitenceTest {
     @Test
     public void testWrite()
             throws Exception {
-        Slaves slaves = Slaves.readJsonStream(SlavesPersitenceTest.class.getResourceAsStream("slaves.json"));
+        Slaves slaves = Slaves.readJsonStream(SlavesPersitenceTest.class.getResourceAsStream("slaves.json"), null);
 
         JSONObject json = slaves.toJSON(JsonSerializeType.SLAVE_CONFIG);
 
@@ -98,7 +98,7 @@ public class SlavesPersitenceTest {
         br.close();
         resultStr.close();
 
-        Slaves dehydrated = new Slaves();
+        Slaves dehydrated = new Slaves(null);
         dehydrated.fromJSON(json);
         assertEquals(slaves.toJSON(JsonSerializeType.SLAVE_CONFIG).toString(1),
                 dehydrated.toJSON(JsonSerializeType.SLAVE_CONFIG).toString(1));

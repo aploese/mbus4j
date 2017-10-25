@@ -33,6 +33,7 @@ import net.sf.mbus4j.json.JSONSerializable;
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
+ * @param <T>
  */
 public interface Frame
         extends JSONSerializable {

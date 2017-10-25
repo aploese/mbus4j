@@ -27,6 +27,10 @@ package net.sf.mbus4j;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.logging.LoggingSerialPortSocket;
+import de.ibapl.spsw.logging.TimeStampLogging;
+import de.ibapl.spsw.ser2net.Ser2NetProvider;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -39,11 +43,10 @@ import net.sf.mbus4j.json.JsonSerializeType;
  *
  * @author aploese
  */
+@Deprecated
 public class TcpIpConnection extends Connection {
 
     public static final int DEFAULT_RESPONSE_TIMEOUT_OFFSET = 600;
-    static final String TCP_IP_CONNECTION = "tcpIpConnection";
-    private transient Socket socket;
     private String host;
     private int port;
 
@@ -61,38 +64,6 @@ public class TcpIpConnection extends Connection {
         super(bitPerSecond, responseTimeoutOffset);
         this.host = host;
         this.port = port;
-    }
-
-    @Override
-    public void open() throws IOException {
-        setConnState(State.OPENING);
-        socket = new Socket(host, port);
-        // load here to sppeddup furher access!!!
-        is = socket.getInputStream();
-        os = socket.getOutputStream();
-        setConnState(State.OPEN);
-    }
-
-    @Override
-    public void close() throws IOException {
-        setConnState(State.CLOSING);
-        socket.close();
-        setConnState(State.CLOSED);
-    }
-
-    @Override
-    public JSONObject toJSON(JsonSerializeType jsonSerializeType) {
-        JSONObject result = super.toJSON(jsonSerializeType);
-        result.accumulate("host", host);
-        result.accumulate("port", port);
-        return result;
-    }
-
-    @Override
-    public void fromJSON(JSONObject json) {
-        super.fromJSON(json);
-        host = json.getString("host");
-        port = json.getInt("port");
     }
 
     public String getHost() {
@@ -133,11 +104,6 @@ public class TcpIpConnection extends Connection {
     private void readObjectVer1(ObjectInputStream in) throws IOException {
         host = in.readUTF();
         port = in.readInt();
-    }
-
-    @Override
-    public String getJsonFieldName() {
-        return TCP_IP_CONNECTION;
     }
 
     @Override

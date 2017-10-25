@@ -43,7 +43,7 @@ import net.sf.mbus4j.MBusUtils;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SelectionOfSlaves implements LongFrame {
+public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFrame> {
 
     public enum WildcardNibbles {
 

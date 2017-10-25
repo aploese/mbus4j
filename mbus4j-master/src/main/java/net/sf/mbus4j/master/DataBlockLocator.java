@@ -28,8 +28,6 @@ package net.sf.mbus4j.master;
  * #L%
  */
 
-import net.sf.mbus4j.MBusAddressing;
-import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
@@ -41,16 +39,8 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  *
  * @author aploese
  */
-@Deprecated
-public class ValueRequestPointLocator<T> {
+public class DataBlockLocator<T> {
 
-    private MBusAddressing addressing;
-    private byte address;
-    private String manufacturer;
-    private int identnumber;
-    private MBusMedium medium;
-    private byte version;
-    private String responseFrameName;
     private DataFieldCode difCode;
     private FunctionField functionField;
     private int deviceUnit;
@@ -60,105 +50,20 @@ public class ValueRequestPointLocator<T> {
     private Vife[] vifes = DataBlock.EMPTY_VIFE;
     private DataBlock db;
     private DataBlock timestampDb;
-    private UserDataResponse fullResponse;
     private T reference;
 
     /**
-     * @return the addressing
+     * @return the reference
      */
-    public MBusAddressing getAddressing() {
-        return addressing;
+    public T getReference() {
+        return reference;
     }
 
     /**
-     * @param addressing the addressing to set
+     * @param reference the reference to set
      */
-    public void setAddressing(MBusAddressing addressing) {
-        this.addressing = addressing;
-    }
-
-    /**
-     * @return the address
-     */
-    public byte getAddress() {
-        return address;
-    }
-
-    /**
-     * @param address the address to set
-     */
-    public void setAddress(byte address) {
-        this.address = address;
-    }
-
-    /**
-     * @return the manufacturer
-     */
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    /**
-     * @param manufacturer the manufacturer to set
-     */
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    /**
-     * @return the identnumber
-     */
-    public int getIdentnumber() {
-        return identnumber;
-    }
-
-    /**
-     * @param identnumber the identnumber to set
-     */
-    public void setIdentnumber(int identnumber) {
-        this.identnumber = identnumber;
-    }
-
-    /**
-     * @return the medium
-     */
-    public MBusMedium getMedium() {
-        return medium;
-    }
-
-    /**
-     * @param medium the medium to set
-     */
-    public void setMedium(MBusMedium medium) {
-        this.medium = medium;
-    }
-
-    /**
-     * @return the version
-     */
-    public byte getVersion() {
-        return version;
-    }
-
-    /**
-     * @param version the version to set
-     */
-    public void setVersion(byte version) {
-        this.version = version;
-    }
-
-    /**
-     * @return the responseFrameName
-     */
-    public String getResponseFrameName() {
-        return responseFrameName;
-    }
-
-    /**
-     * @param responseFrameName the responseFrameName to set
-     */
-    public void setResponseFrameName(String responseFrameName) {
-        this.responseFrameName = responseFrameName;
+    public void setReference(T reference) {
+        this.reference = reference;
     }
 
     /**
@@ -287,36 +192,4 @@ public class ValueRequestPointLocator<T> {
         this.timestampDb = timestampDb;
     }
 
-    /**
-     * @return the fullResponse
-     */
-    public UserDataResponse getFullResponse() {
-        return fullResponse;
-    }
-
-    /**
-     * @param fullResponse the fullResponse to set
-     */
-    public void setFullResponse(UserDataResponse fullResponse) {
-        this.fullResponse = fullResponse;
-    }
-
-    /**
-     * @return the reference
-     */
-    public T getReference() {
-        return reference;
-    }
-
-    /**
-     * @param reference the reference to set
-     */
-    public void setReference(T reference) {
-        this.reference = reference;
-    }
-    
-    public String toString() {
-        return "Reference:\n" + reference + "\n\nDataBlock:\n" +  db;
-    }
-    
 }

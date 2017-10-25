@@ -1,5 +1,7 @@
 package net.sf.mbus4j.decoder;
 
+import net.sf.mbus4j.dataframes.Frame;
+
 /*
  * #%L
  * mbus4j-core
@@ -39,8 +41,11 @@ public class DecodeException
      *
      */
     private static final long serialVersionUID = -215432140014998592L;
+    
+    private final Frame frame;
 
-    DecodeException(String message) {
+    DecodeException(String message, Frame frame) {
         super(message);
+        this.frame = frame;
     }
 }

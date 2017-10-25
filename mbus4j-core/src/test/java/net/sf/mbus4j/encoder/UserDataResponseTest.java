@@ -32,6 +32,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,7 +42,6 @@ import net.sf.mbus4j.dataframes.Frame;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.decoder.Decoder;
-import net.sf.mbus4j.decoder.DecoderListener;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -54,7 +54,7 @@ import org.junit.Test;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class UserDataResponseTest implements DecoderListener {
+public class UserDataResponseTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -65,15 +65,13 @@ public class UserDataResponseTest implements DecoderListener {
     }
     private Decoder parser;
     private Encoder instance;
-    private List<Frame> frames;
-
+  
     public UserDataResponseTest() {
     }
 
     @Before
     public void setUp() {
-        frames = new ArrayList<>();
-        parser = new Decoder(this);
+        parser = new Decoder();
         instance = new Encoder();
     }
 
@@ -129,12 +127,11 @@ public class UserDataResponseTest implements DecoderListener {
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
         final byte[] data = Decoder.ascii2Bytes(br.readLine());
-        for (byte b : data) {
-            parser.addByte(b);
-        }
-        assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, parser.getState());
-        assertEquals("DataValue not available", 1, frames.size());
-        byte[] result = instance.encode(frames.get(0));
+        Frame f =  parser.parse(new ByteArrayInputStream(data));
+        
+        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, parser.getState());
+        assertNotNull("DataValue not available", f);
+        byte[] result = instance.encode(f);
         assertArrayEquals(data, result);
     }
 
@@ -201,11 +198,6 @@ public class UserDataResponseTest implements DecoderListener {
     @Test
     public void testTCH_HEAT_38_21519982_1() throws Exception {
         testPackage("TCH", MBusMedium.HEAT, 38, 21519982, 1);
-    }
-
-    @Override
-    public void success(Frame parsingFrame) {
-        frames.add(parsingFrame);
     }
 
 }

@@ -1,0 +1,208 @@
+68eded6818017284010100870504020000000003fdc6ff011f8e0303fdc6ff0200000003fdc6ff0300000003fdc6ff05468c0303fdc6ff0600000003fdc6ff07bb8c0303fdc6ff00750d0204fdd9ff010000000004fdd9ff020000000004fdd9ff030000000004fdd9ff040000000004fdd9ff000000000002ff84ff01000002ff84ff02000002ff84ff03000002ff84ff00000006a8ff0100000000000006a8ff0200000000000006a8ff0300000000000006a8ff00000000000000868040ff90ff01000000000000868040ff90ff02000000000000868040ff90ff03000000000000868040ff90ff000000000000001ffd16
+control code = RSP_UD
+isAcd = false
+isDfc = true
+address = 0x01
+ident number = 00010184
+manufacturer = ALG
+version = 0x04
+accessnumber = 0
+status = [No application error]
+signature = 0x0000
+medium = Electricity
+lastPackage = false
+datablock[0]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 01
+  value = 232991 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[1]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 02
+  value = 0 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[2]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 03
+  value = 0 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[3]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 05
+  value = 232518 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[4]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 06
+  value = 0 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[5]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 07
+  value = 232635 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[6]:
+  dataType = 24 Bit Integer
+  description = Voltage, next VIFE's and data of this block are manufacturer specific, 00
+  value = 134517 [mV]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[7]:
+  dataType = 32 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 01
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[8]:
+  dataType = 32 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 02
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[9]:
+  dataType = 32 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 03
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[10]:
+  dataType = 32 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 04
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[11]:
+  dataType = 32 Bit Integer
+  description = Current, next VIFE's and data of this block are manufacturer specific, 00
+  value = 0 [mA]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[12]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 84, FF, 01
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[13]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 84, FF, 02
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[14]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 84, FF, 03
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[15]:
+  dataType = 16 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 84, FF, 00
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[16]:
+  dataType = 48 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 01
+  value = 0 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[17]:
+  dataType = 48 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 02
+  value = 0 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[18]:
+  dataType = 48 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 03
+  value = 0 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[19]:
+  dataType = 48 Bit Integer
+  description = Power, next VIFE's and data of this block are manufacturer specific, 00
+  value = 0 [mW]
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 0
+datablock[20]:
+  dataType = 48 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 90, FF, 01
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[21]:
+  dataType = 48 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 90, FF, 02
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[22]:
+  dataType = 48 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 90, FF, 03
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[23]:
+  dataType = 48 Bit Integer
+  description = Manufacturer specific coding (including VIFE's), 90, FF, 00
+  value = 0
+  tariff = 0
+  storageNumber = 0
+  functionField = Instantaneous value
+  subUnit = 2
+datablock[24]:
+  dataType = Special Function Manufacturer specific data more records follow in next telegram
+  value = 

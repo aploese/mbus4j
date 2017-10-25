@@ -38,7 +38,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class GeneralApplicationError implements LongFrame, PrimaryAddress {
+public class GeneralApplicationError implements LongFrame, PrimaryAddress, ResponseFrame {
 
     public static String RSP_UD_SUBTYPE = "general application error";
 

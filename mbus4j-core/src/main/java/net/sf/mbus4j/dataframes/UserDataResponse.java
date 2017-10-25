@@ -35,11 +35,14 @@ import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.json.JSONFactory;
 import net.sf.mbus4j.json.JsonSerializeType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
@@ -52,6 +55,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
  */
 public class UserDataResponse
         implements LongFrame,
+        ResponseFrame,
         PrimaryAddress,
         Cloneable {
 
@@ -120,17 +124,23 @@ public class UserDataResponse
             JSONArray statusArray = json.getJSONArray("status");
 
             if (statusArray.isEmpty()) {
-                setStatus(new StatusCode[0]);
+                clearStatus();
             } else {
-                status = new StatusCode[statusArray.size()];
-
-                for (int i = 0; i < status.length; i++) {
-                    status[i] = StatusCode.fromLabel(statusArray.getString(i));
+                for (int i = 0; i < statusArray.size(); i++) {
+                    status.add(StatusCode.fromLabel(statusArray.getString(i)));
                 }
             }
         }
 
         JSONFactory.readDataBlocks(this, json);
+    }
+
+    public void clearStatus() {
+        status.clear();
+    }
+
+    public Collection<DataBlock> getDataBlocks() {
+        return dataBlocks;
     }
 
     public static enum StatusCode { // Taken from Chapter 6.6 Fig 27
@@ -146,7 +156,7 @@ public class UserDataResponse
         MAN_SPEC_0X40(0x40, "Specific to manufacturer 0x40"),
         MAN_SPEC_0X80(0x80, "Specific to manufacturer 0x80");
 
-        public static byte toId(StatusCode[] values) {
+        public static byte toId(Set<StatusCode> values) {
             byte result = 0;
 
             for (StatusCode sc : values) {
@@ -188,12 +198,12 @@ public class UserDataResponse
     private boolean dfc;
     private byte version;
     private short accessNumber;
-    private StatusCode[] status;
+    private EnumSet<StatusCode> status = EnumSet.noneOf(StatusCode.class);
     private short signature;
     private MBusMedium medium;
     private int identNumber;
     private String manufacturer;
-    private List<DataBlock> dataBlocks = new ArrayList<>();
+    private List<DataBlock> dataBlocks = new LinkedList<>();
     private byte address;
 
     public UserDataResponse() {
@@ -210,17 +220,12 @@ public class UserDataResponse
         return dataBlocks.add(dataBlock);
     }
 
-    public boolean addAllDataBlocks(List<DataBlock> list) {
+    public boolean addAllDataBlocks(Collection<DataBlock> list) {
         return dataBlocks.addAll(list);
     }
 
     public void addStatus(StatusCode status) {
-        if (this.status == null) {
-            this.status = new StatusCode[]{status};
-        } else {
-            this.status = Arrays.copyOf(this.status, this.status.length + 1);
-            this.status[this.status.length - 1] = status;
-        }
+        this.status.add(status);
     }
 
     public void clearDataBlocks() {
@@ -231,7 +236,7 @@ public class UserDataResponse
     public UserDataResponse clone()
             throws CloneNotSupportedException {
         UserDataResponse result = (UserDataResponse) super.clone();
-        result.dataBlocks = new ArrayList<>();
+        result.dataBlocks = new LinkedList<>();
         result.dataBlocks.addAll(dataBlocks);
 
         return result;
@@ -287,7 +292,7 @@ public class UserDataResponse
         return signature;
     }
 
-    public StatusCode[] getStatus() {
+    public Set<StatusCode> getStatus() {
         return status;
     }
 
@@ -373,8 +378,14 @@ public class UserDataResponse
         this.signature = signature;
     }
 
-    public void setStatus(StatusCode[] status) {
-        this.status = status;
+    public void setStatus(StatusCode status) {
+        this.status.clear();
+        this.status.add(status);
+    }
+
+    public void setStatus(Set<StatusCode> status) {
+        this.status.clear();
+        this.status.addAll(status);
     }
 
     public void setVersion(byte version) {
@@ -392,8 +403,7 @@ public class UserDataResponse
         sb.append("manufacturer = ").append(manufacturer).append('\n');
         sb.append(String.format("version = 0x%02X\n", version));
         sb.append("accessnumber = ").append(accessNumber).append('\n');
-        sb.append(String.format("status = %s\n",
-                Arrays.toString(status)));
+        sb.append(String.format("status = %s\n", status));
         sb.append(String.format("signature = 0x%04X\n", signature));
         sb.append("medium = ").append(medium.toString()).append('\n');
         sb.append("lastPackage = ").append(isLastPackage()).append('\n');
@@ -470,4 +480,8 @@ public class UserDataResponse
         return true;
     }
 
+    public DeviceId getDeviceId() {
+        return new DeviceId(version, medium, identNumber, manufacturer, address);
+    }
+    
 }

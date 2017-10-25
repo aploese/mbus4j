@@ -28,7 +28,8 @@ package net.sf.mbus4j.devices;
  * #L%
  */
 import java.io.IOException;
-import net.sf.mbus4j.dataframes.Frame;
+import net.sf.mbus4j.dataframes.RequestFrame;
+import net.sf.mbus4j.dataframes.ResponseFrame;
 
 /**
  *
@@ -36,7 +37,7 @@ import net.sf.mbus4j.dataframes.Frame;
  */
 public interface Sender {
 
-    Frame send(Frame frame, int maxTries, long timeout) throws IOException, InterruptedException;
+    <T extends ResponseFrame> T send(RequestFrame<T> frame, int maxTries) throws IOException;
 
     public final static int DEFAULT_SEND_TRIES = 3;
 

@@ -30,6 +30,10 @@
             <version>1.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>de.ibapl.spsw</groupId>
+            <artifactId>de.ibapl.spsw.provider</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.sf.mbus4j</groupId>
             <artifactId>mbus4j-core</artifactId>
             <version>1.0.1-SNAPSHOT</version>

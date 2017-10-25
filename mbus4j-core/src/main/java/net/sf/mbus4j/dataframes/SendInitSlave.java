@@ -36,7 +36,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SendInitSlave implements ShortFrame {
+public class SendInitSlave implements ShortFrame, RequestFrame<SingleCharFrame> {
 
     private byte address;
 

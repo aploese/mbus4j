@@ -44,7 +44,7 @@ import java.util.List;
  * @version $Id$
  */
 public class SendUserData
-        implements LongFrame {
+        implements LongFrame, RequestFrame<SingleCharFrame> {
 
     public static final String SEND_USER_DATA_SUBTYPE = "send user data";
     private final List<DataBlock> dataBlocks = new ArrayList<>();

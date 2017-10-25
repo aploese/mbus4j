@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -60,10 +61,8 @@ import org.junit.Test;
  * @version $Id: MBusDocumentationExamplesTest.java 18 2010-03-20 16:15:49Z
  * arnep $
  */
-public class MBusDocumentationExamplesTest implements DecoderListener {
+public class MBusDocumentationExamplesTest {
 
-    List<Frame> frames;
-    
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
@@ -79,16 +78,14 @@ public class MBusDocumentationExamplesTest implements DecoderListener {
         InputStream is = MBusDocumentationExamplesTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
-        final byte[] data = Decoder.ascii2Bytes(br.readLine());
-        for (byte b : data) {
-            instance.addByte(b);
-        }
-        assertEquals("ParserState", Decoder.DecodeState.EXPECT_START, instance.getState());
-        assertEquals("DataValue not available", 1, frames.size());
-        assertEquals(clazz, frames.get(0).getClass());
-        testJSON(frames.get(0), chapter, exampleIndex);
+        Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(br.readLine())));
+
+        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, instance.getState());
+        assertNotNull("DataValue not available", f);
+        assertEquals(clazz, f.getClass());
+        testJSON(f, chapter, exampleIndex);
 //        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
-        BufferedReader resultStr = new BufferedReader(new StringReader(frames.get(0).toString()));
+        BufferedReader resultStr = new BufferedReader(new StringReader(f.toString()));
         int line = 1;
         String dataLine = br.readLine();
         String parsedLine = resultStr.readLine();
@@ -106,13 +103,11 @@ public class MBusDocumentationExamplesTest implements DecoderListener {
 
     @Before
     public void setUp() {
-        frames = new ArrayList<>();
-        instance = new Decoder(this);
+        instance = new Decoder();
     }
 
     @After
     public void tearDown() {
-        frames = null;
         instance = null;
     }
 
@@ -202,10 +197,8 @@ public class MBusDocumentationExamplesTest implements DecoderListener {
     }
 
     public void testRequestClass2Data() throws Exception {
-        for (byte b : Decoder.ascii2Bytes("107BFE7916")) {
-            instance.addByte(b);
-        }
-        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", frames.get(0).toString());
+        Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes("107BFE7916")));
+        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", f.toString());
     }
 
     private void testJSON(Frame frame, String chapter, int exampleIndex) throws Exception {
@@ -231,11 +224,6 @@ public class MBusDocumentationExamplesTest implements DecoderListener {
         resultStr.close();
 
         assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
-    }
-
-    @Override
-    public void success(Frame parsingFrame) {
-        frames.add(parsingFrame);
     }
 
 }

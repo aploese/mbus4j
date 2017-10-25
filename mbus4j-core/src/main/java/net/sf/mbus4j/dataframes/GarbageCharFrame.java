@@ -34,7 +34,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  *
  * @author aploese
  */
-public class GarbageCharFrame implements Frame {
+public class GarbageCharFrame implements ResponseFrame {
 
     private final byte b;
 

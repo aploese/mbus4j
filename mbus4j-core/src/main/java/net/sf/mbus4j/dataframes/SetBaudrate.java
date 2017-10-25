@@ -37,7 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @version $Id$
  */
 public class SetBaudrate
-        implements ControlFrame {
+        implements ControlFrame, RequestFrame<SingleCharFrame> {
 
     public static final String SEND_USER_DATA_SUBTYPE = "set baudrate";
     private byte address;

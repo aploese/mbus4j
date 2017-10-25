@@ -6,9 +6,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>net.sf.mbus4j</groupId>
     <artifactId>mbus4j-core</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>mbus4j-core</name>
 
@@ -19,8 +17,8 @@
         </dependency>
         
         <dependency>
-            <groupId>net.sf.atmodem4j</groupId>
-            <artifactId>spsw-java</artifactId>
+            <groupId>de.ibapl.spsw</groupId>
+            <artifactId>de.ibapl.spsw.api</artifactId>
         </dependency>
 
         <dependency>

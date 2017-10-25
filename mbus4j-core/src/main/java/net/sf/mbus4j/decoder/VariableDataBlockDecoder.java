@@ -189,11 +189,11 @@ public class VariableDataBlockDecoder {
                     variableLengthType = VariableLengthType.BIG_DECIMAL;
                     startCollectingValue((b & 0xFF) - 0xD0);
                 } else if ((b & 0xFF) < 0xEF) {
-                    throw new DecodeException("binary number ???? how to decode");
+                    throw new DecodeException("binary number ???? how to decode", frame);
                 } else if ((b & 0xFF) < 0xFA) {
-                    throw new DecodeException("floating point to be defined");
+                    throw new DecodeException("floating point to be defined", frame);
                 } else {
-                    throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF));
+                    throw new DecodeException(String.format("reserved: 0x%02x ", b & 0xFF), frame);
                 }
                 return ds;
             default:
@@ -236,7 +236,7 @@ public class VariableDataBlockDecoder {
             case 0x5F:
             case 0x6F:
                 setState(DecodeState.ERROR);
-                throw new DecodeException(String.format("DIF reserved 0x%02x ", b & 0xFF)); // Reserverd,
+                throw new DecodeException(String.format("DIF reserved 0x%02x ", b & 0xFF), frame); // Reserverd,
             case 0x7F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST;
                 break;

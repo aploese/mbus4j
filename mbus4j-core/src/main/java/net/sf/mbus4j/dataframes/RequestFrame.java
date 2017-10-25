@@ -3,17 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package net.sf.mbus4j.decoder;
-
-import net.sf.mbus4j.dataframes.Frame;
+package net.sf.mbus4j.dataframes;
 
 /**
  *
  * @author aploese
  */
-public interface DecoderListener {
-
-    void success(Frame parsingFrame);
-
+public interface RequestFrame<T extends ResponseFrame> extends Frame {
+    
 }

@@ -37,7 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @version $Id$
  */
 public class SendUserDataManSpec
-        implements ControlFrame {
+        implements ControlFrame, RequestFrame<SingleCharFrame> {
 
     private byte address;
     private boolean fcb;
