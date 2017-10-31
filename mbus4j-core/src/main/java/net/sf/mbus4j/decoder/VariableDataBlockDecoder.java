@@ -239,7 +239,13 @@ public class VariableDataBlockDecoder {
                 throw new DecodeException(String.format("DIF reserved 0x%02x ", b & 0xFF), frame); // Reserverd,
             case 0x7F:
                 dfc = DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST;
-                break;
+                if (bytesLeft == 0) {
+                    createDataBlock();
+                    setState(DecodeState.RESULT_AVAIL);
+                    return;
+                } else {
+                    throw new DecodeException("SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST and not at the End!", frame);
+                }
             default:
 
                 // decode data field

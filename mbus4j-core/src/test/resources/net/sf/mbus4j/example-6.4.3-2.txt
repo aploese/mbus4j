@@ -1,6 +1,6 @@
 680404685303517F2616
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0x03
 datablock[0]:
   dataType = Special Function Global readout request

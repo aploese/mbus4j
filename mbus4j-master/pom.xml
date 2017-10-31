@@ -33,6 +33,11 @@
             <scope>test</scope>
             <classifier>tests</classifier>
         </dependency>
+        <dependency>
+            <groupId>de.ibapl.spsw</groupId>
+            <artifactId>de.ibapl.spsw.provider</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

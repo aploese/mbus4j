@@ -366,7 +366,7 @@ public class UserDataResponseTest {
         assertEquals(udr.toString(), udr1.toString());
 
         Encoder enc = new Encoder();
-        byte[] data = enc.encode(udr);
+        byte[] data = enc.encodeFrame(udr);
         System.out.print(Decoder.bytes2Ascii(data));
 
         try {

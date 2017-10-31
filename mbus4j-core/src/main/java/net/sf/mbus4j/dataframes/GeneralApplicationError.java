@@ -233,8 +233,8 @@ public class GeneralApplicationError implements LongFrame, PrimaryAddress, Respo
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append("isAcd = ").append(isAcd()).append('\n');
-        sb.append("isDfc = ").append(isDfc()).append('\n');
+        sb.append("acd = ").append(isAcd()).append('\n');
+        sb.append("dfc = ").append(isDfc()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         sb.append("error = ").append(error).append('\n');
         return sb.toString();

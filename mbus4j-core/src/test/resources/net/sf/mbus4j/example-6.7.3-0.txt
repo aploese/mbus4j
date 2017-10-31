@@ -1,7 +1,7 @@
 681515680802727856341224400107130000000C78040302019D16
 control code = RSP_UD
-isAcd = false
-isDfc = false
+acd = false
+dfc = false
 address = 0x02
 ident number = 12345678
 manufacturer = PAD

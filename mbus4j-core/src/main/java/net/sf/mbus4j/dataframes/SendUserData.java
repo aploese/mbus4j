@@ -31,11 +31,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.ReadOutDataBlock;
 import net.sf.mbus4j.json.JSONFactory;
 import net.sf.mbus4j.json.JsonSerializeType;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -43,11 +44,10 @@ import java.util.List;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SendUserData
-        implements LongFrame, RequestFrame<SingleCharFrame> {
+public class SendUserData implements SendUserDataFrame, LongFrame {
 
     public static final String SEND_USER_DATA_SUBTYPE = "send user data";
-    private final List<DataBlock> dataBlocks = new ArrayList<>();
+    private final List<DataBlock> dataBlocks = new LinkedList<>();
     private byte address;
     private boolean fcb;
 
@@ -58,7 +58,19 @@ public class SendUserData
     public SendUserData() {
     }
 
-    @Override
+    public SendUserData(byte address, boolean fcb, DataBlock db) {
+    	this.address = address;
+    	this.fcb = fcb;
+    	this.dataBlocks.add(db);
+    }
+
+	public SendUserData(byte address, DataBlock db) {
+    	this.address = address;
+    	this.fcb = DEFAULT_FCB;
+    	this.dataBlocks.add(db);
+	}
+
+	@Override
     public boolean addDataBlock(DataBlock dataBlock) {
         return dataBlocks.add(dataBlock);
     }
@@ -78,6 +90,7 @@ public class SendUserData
         return dataBlocks.get(dataBlocks.size() - 1);
     }
 
+    @Override
     public boolean isFcb() {
         return fcb;
     }
@@ -99,6 +112,7 @@ public class SendUserData
         this.address = address;
     }
 
+    @Override
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
     }
@@ -107,7 +121,7 @@ public class SendUserData
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append("isFcb = ").append(isFcb()).append('\n');
+        sb.append("fcb = ").append(isFcb()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
 
         for (int i = 0; i < dataBlocks.size(); i++) {
@@ -145,7 +159,7 @@ public class SendUserData
     @Override
     public void fromJSON(JSONObject json) {
         fcb = json.getBoolean("fcb");
-        address = (byte) json.getInt("address");
+        address = (byte)json.getInt("address");
 
         JSONFactory.readDataBlocks(this, json);
 

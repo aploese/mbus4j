@@ -1,6 +1,6 @@
 680A0A685301510C8600070100003F16
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0x01
 datablock[0]:
   action = write(replace)

@@ -1,6 +1,6 @@
 680F0F6853FE510C79785634120C06070100005516
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0xFE
 datablock[0]:
   dataType = 8 digit BCD

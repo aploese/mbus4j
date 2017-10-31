@@ -1,6 +1,6 @@
 680707685307510813085A2816
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0x07
 datablock[0]:
   dataType = Selection for readout

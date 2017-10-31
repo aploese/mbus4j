@@ -1,6 +1,6 @@
 680D0D6853FE51077904030201244001049516
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0xFE
 datablock[0]:
   dataType = 64 Bit Integer

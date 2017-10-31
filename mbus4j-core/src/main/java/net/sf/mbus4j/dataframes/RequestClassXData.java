@@ -36,31 +36,35 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class RequestClassXData implements ShortFrame, RequestFrame<UserDataResponse> {
+public class RequestClassXData implements ShortFrame<UserDataResponse> {
 
     private byte address;
     private boolean fcb;
     private boolean fcv;
     private final ControlCode controlCode;
 
+    public RequestClassXData(byte address, boolean fcb, boolean fcv, ControlCode controlCode) {
+    	this.address = address;
+    	this.fcb = fcb;
+        this.fcv = fcv;
+        this.controlCode = controlCode;
+    }
+
+    public RequestClassXData(byte address, ControlCode controlCode) {
+        this(address, DEFAULT_FCB, DEFAULT_FCV, controlCode);
+    }
+
     public RequestClassXData(boolean fcb, boolean fcv, ControlCode controlCode) {
-        this.fcb = fcb;
+    	this.fcb = fcb;
         this.fcv = fcv;
         this.controlCode = controlCode;
-    }
+	}
 
-    public RequestClassXData(boolean fcb, boolean fcv, ControlCode controlCode, byte address) {
-        this.fcb = fcb;
-        this.fcv = fcv;
+	public RequestClassXData(ControlCode controlCode) {
         this.controlCode = controlCode;
-        this.address = address;
-    }
+	}
 
-    public RequestClassXData(ControlCode controlCode) {
-        this(false, true, controlCode);
-    }
-
-    @Override
+	@Override
     public byte getAddress() {
         return address;
     }
@@ -75,7 +79,6 @@ public class RequestClassXData implements ShortFrame, RequestFrame<UserDataRespo
         return fcb;
     }
 
-    @Override
     public boolean isFcv() {
         return fcv;
     }
@@ -90,7 +93,6 @@ public class RequestClassXData implements ShortFrame, RequestFrame<UserDataRespo
         this.fcb = fcb;
     }
 
-    @Override
     public void setFcv(boolean fcv) {
         this.fcv = fcv;
     }
@@ -99,8 +101,8 @@ public class RequestClassXData implements ShortFrame, RequestFrame<UserDataRespo
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append("isFcb = ").append(isFcb()).append('\n');
-        sb.append("isFcv = ").append(isFcv()).append('\n');
+        sb.append("ifb = ").append(isFcb()).append('\n');
+        sb.append("fcv = ").append(isFcv()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         return sb.toString();
     }
@@ -112,18 +114,19 @@ public class RequestClassXData implements ShortFrame, RequestFrame<UserDataRespo
         if (JsonSerializeType.ALL == jsonSerializeType) {
             result.accumulate("fcb", isFcb());
             result.accumulate("fcv", isFcv());
-            result.accumulate("address", JSONFactory.encodeHexByte(getAddress()));
+            result.accumulate("address", address & 0xFF);
         }
         return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
-        setFcb(JSONFactory.getBoolean(json, "fcb", false));
-        setFcv(JSONFactory.getBoolean(json, "fcv", false));
-        setAddress(JSONFactory.decodeHexByte(json, "address", (byte) 0));
+        fcb = JSONFactory.getBoolean(json, "fcb", DEFAULT_FCB);
+        fcv = JSONFactory.getBoolean(json, "fcv", DEFAULT_FCV);
+        address = (byte)json.getInt("address");
     }
 
+    @Override
     public void toggleFcb() {
         fcb = !fcb;
     }

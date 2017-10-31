@@ -1,6 +1,6 @@
 680A0A685305510C8608110500005916
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0x05
 datablock[0]:
   action = add entry

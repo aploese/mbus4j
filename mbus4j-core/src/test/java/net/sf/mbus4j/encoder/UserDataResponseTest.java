@@ -131,7 +131,7 @@ public class UserDataResponseTest {
         
         assertEquals("ParserState", Decoder.DecodeState.SUCCESS, parser.getState());
         assertNotNull("DataValue not available", f);
-        byte[] result = instance.encode(f);
+        byte[] result = instance.encodeFrame(f);
         assertArrayEquals(data, result);
     }
 

@@ -29,19 +29,15 @@ package net.sf.mbus4j.dataframes;
  */
 import net.sf.json.JSONObject;
 
-import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.json.JSONFactory;
 import net.sf.mbus4j.json.JsonSerializeType;
-
-import java.util.Iterator;
 
 /**
  *
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class ApplicationReset
-        implements LongFrame, RequestFrame<SingleCharFrame> {
+public class ApplicationReset implements SendUserDataFrame {
 
     public static final String SEND_USER_DATA_SUBTYPE = "application reset";
 
@@ -60,19 +56,18 @@ public class ApplicationReset
                 getSubTelegram());
 
         if (JsonSerializeType.ALL == jsonSerializeType) {
-            result.accumulate("fcb",
-                    isFcb());
-            result.accumulate("address",
-                    JSONFactory.encodeHexByte(address));
-        }
+            result.accumulate("fcb", isFcb());
+            result.accumulate("address", address & 0xFF);
+
+       }
 
         return result;
     }
 
     @Override
     public void fromJSON(JSONObject json) {
-        fcb = JSONFactory.getBoolean(json, "fcb", false);
-        address = JSONFactory.decodeHexByte(json, "address", (byte) 0);
+        fcb = json.getBoolean("fcb");
+        address = (byte)json.getInt("address");
         telegramType = TelegramType.fromLabel(json.getString("telegramType"));
         subTelegram = json.getInt("subTelegram");
     }
@@ -135,13 +130,12 @@ public class ApplicationReset
     }
 
     private byte address;
-    private boolean fcb;
     private TelegramType telegramType;
     private int subTelegram;
+    private boolean fcb;
 
     public ApplicationReset(SendUserData old) {
         this.address = old.getAddress();
-        this.setFcb(old.isFcb());
     }
 
     public ApplicationReset(TelegramType telegramType, int subTelegram) {
@@ -149,12 +143,7 @@ public class ApplicationReset
         this.subTelegram = subTelegram;
     }
 
-    @Override
-    public boolean addDataBlock(DataBlock dataBlock) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
+     @Override
     public byte getAddress() {
         return address;
     }
@@ -162,11 +151,6 @@ public class ApplicationReset
     @Override
     public ControlCode getControlCode() {
         return ControlCode.SND_UD;
-    }
-
-    @Override
-    public DataBlock getLastDataBlock() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     /**
@@ -183,42 +167,9 @@ public class ApplicationReset
         return telegramType;
     }
 
-    public boolean isFcb() {
-        return fcb;
-    }
-
-    @Override
-    public Iterator<DataBlock> iterator() {
-        return new Iterator<DataBlock>() {
-            @Override
-            public boolean hasNext() {
-                return false;
-            }
-
-            @Override
-            public DataBlock next() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-
-            @Override
-            public void remove() {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        };
-    }
-
-    @Override
-    public void replaceDataBlock(DataBlock oldDataBlock, DataBlock newDataBlock) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     @Override
     public void setAddress(byte address) {
         this.address = address;
-    }
-
-    public void setFcb(boolean fcb) {
-        this.fcb = fcb;
     }
 
     /**
@@ -247,7 +198,7 @@ public class ApplicationReset
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append("isFcb = ").append(isFcb()).append('\n');
+        sb.append("fcb = ").append(isFcb()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
         sb.append("telegramType = ").append(getTelegramType()).append('\n');
         sb.append("subTelegram = ").append(getSubTelegram()).append('\n');
@@ -266,5 +217,16 @@ public class ApplicationReset
             return false;
         }
     }
+
+    @Override
+    public boolean isFcb() {
+        return fcb;
+    }
+
+    @Override
+    public void setFcb(boolean fcb) {
+        this.fcb = fcb;
+    }
+
 
 }

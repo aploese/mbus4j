@@ -29,12 +29,8 @@ package net.sf.mbus4j.dataframes;
  */
 import net.sf.json.JSONObject;
 
-import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.json.JsonSerializeType;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import net.sf.mbus4j.MBusUtils;
 
 /**
@@ -43,7 +39,7 @@ import net.sf.mbus4j.MBusUtils;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFrame> {
+public class SelectionOfSlaves implements SendUserDataFrame {
 
     public enum WildcardNibbles {
 
@@ -97,8 +93,9 @@ public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFram
     private byte maskedVersion;
     private short maskedMan;
     private byte maskedMedium;
-    private final List<DataBlock> datablocks = new ArrayList<>();
-
+    private boolean fcb;
+    
+    
     public SelectionOfSlaves(byte address) {
         this.address = address;
     }
@@ -107,12 +104,7 @@ public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFram
         this.address = old.getAddress();
     }
 
-    @Override
-    public boolean addDataBlock(DataBlock dataBlock) {
-        return datablocks.add(dataBlock);
-    }
-
-    @Override
+     @Override
     public byte getAddress() {
         return address;
     }
@@ -120,11 +112,6 @@ public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFram
     @Override
     public ControlCode getControlCode() {
         return ControlCode.SND_UD;
-    }
-
-    @Override
-    public DataBlock getLastDataBlock() {
-        return datablocks.get(datablocks.size() - 1);
     }
 
     /**
@@ -153,25 +140,6 @@ public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFram
      */
     public int getMaskedVersion() {
         return maskedVersion;
-    }
-
-    /**
-     * @return the fcb
-     */
-    public boolean isFcb() {
-        return false;
-    }
-
-    @Override
-    public Iterator<DataBlock> iterator() {
-        return datablocks.iterator();
-    }
-
-    @Override
-    public void replaceDataBlock(DataBlock oldDataBlock, DataBlock newDataBlock) {
-        final int pos = datablocks.indexOf(oldDataBlock);
-        datablocks.remove(pos);
-        datablocks.add(pos, newDataBlock);
     }
 
     @Override
@@ -437,4 +405,15 @@ public class SelectionOfSlaves implements LongFrame, RequestFrame<SingleCharFram
                 throw new RuntimeException("Cant handle " + wildcardNibbles);
         }
     }
+
+    @Override
+    public boolean isFcb() {
+        return fcb;
+    }
+
+    @Override
+    public void setFcb(boolean fcb) {
+        this.fcb = fcb;
+    }
+
 }

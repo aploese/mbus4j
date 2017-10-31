@@ -32,13 +32,23 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import net.sf.mbus4j.dataframes.Frame;
+import net.sf.mbus4j.dataframes.SendUserData;
+import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import junit.framework.Assert;
+
 import static org.junit.Assert.*;
 
 /**
@@ -130,6 +140,20 @@ public class DecoderTest {
 		} catch (EOFException e) {
 			assertTrue(true);
 		}
+	}
+	
+	@Test
+	public void testDecode() throws IOException {
+		SendUserData sud = (SendUserData)instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes("680e0e6873fd5107fd0b0800180f00000000ff16")));
+		assertTrue(sud.isFcb());
+		assertTrue(sud.isFcb());
+
+		Iterator<DataBlock> iter = sud.iterator();
+		assertTrue(iter.hasNext());
+		LongDataBlock ldb = (LongDataBlock)iter.next();
+		assertEquals(DataFieldCode._64_BIT_INTEGER, ldb.getDataFieldCode());
+		assertEquals(VifFD.PARAMETER_SET_IDENTIFICATION, ldb.getVif());
+		assertEquals(0x000000000f180008L, ldb.getValue());
 	}
 
 }

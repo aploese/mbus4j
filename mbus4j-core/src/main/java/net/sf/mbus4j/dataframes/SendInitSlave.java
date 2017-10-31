@@ -36,10 +36,10 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public class SendInitSlave implements ShortFrame, RequestFrame<SingleCharFrame> {
+public class SendInitSlave implements ShortFrame<SingleCharFrame> {
 
     private byte address;
-
+ 
     public SendInitSlave() {
     }
 
@@ -58,28 +58,8 @@ public class SendInitSlave implements ShortFrame, RequestFrame<SingleCharFrame> 
     }
 
     @Override
-    public boolean isFcb() {
-        return false;
-    }
-
-    @Override
-    public boolean isFcv() {
-        return false;
-    }
-
-    @Override
     public void setAddress(byte address) {
-        this.address = address;
-    }
-
-    @Override
-    public void setFcb(boolean fcb) {
-        throw new UnsupportedOperationException("set FCB not supported.");
-    }
-
-    @Override
-    public void setFcv(boolean fcv) {
-        throw new UnsupportedOperationException("set FCV not supported.");
+      this.address = address;
     }
 
     @Override
@@ -91,4 +71,29 @@ public class SendInitSlave implements ShortFrame, RequestFrame<SingleCharFrame> 
     public void fromJSON(JSONObject json) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean isFcb() {
+        return false;
+    }
+
+    @Override
+	public void setFcv(boolean fcv) {
+		if (fcv) {
+			throw new IllegalArgumentException("Can't set fcv to true!");
+		}
+	}
+
+	@Override
+	public boolean isFcv() {
+		return false;
+	}
+
+	@Override
+	public void setFcb(boolean fcb) {
+		if (fcb) {
+			throw new IllegalArgumentException("Can't set fcb to true!");
+		}
+	}
+
 }

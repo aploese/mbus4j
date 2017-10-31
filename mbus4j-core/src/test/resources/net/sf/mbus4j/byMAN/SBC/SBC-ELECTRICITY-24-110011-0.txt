@@ -1,7 +1,7 @@
 6838386808037211001100434c2402010000008c1004000000008c11040000000002fdc9ff01ed0002fddbff01000002acff0100008240acff0100004116
 control code = RSP_UD
-isAcd = false
-isDfc = false
+acd = false
+dfc = false
 address = 0x03
 ident number = 00110011
 manufacturer = SBC

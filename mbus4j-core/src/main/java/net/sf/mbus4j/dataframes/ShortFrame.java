@@ -32,15 +32,6 @@ package net.sf.mbus4j.dataframes;
  * @author arnep@users.sourceforge.net
  * @version $Id$
  */
-public interface ShortFrame
-        extends Frame,
-        PrimaryAddress {
-
-    boolean isFcb();
-
-    boolean isFcv();
-
-    void setFcb(boolean fcb);
-
-    void setFcv(boolean fcv);
+public interface ShortFrame<T extends ResponseFrame> extends RequestFrame<T> {
+	
 }

@@ -37,7 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @version $Id$
  */
 public class SynchronizeAction
-        implements ControlFrame, RequestFrame<SingleCharFrame> {
+        implements SendUserDataFrame {
 
     public static final String SEND_USER_DATA_SUBTYPE = "synchronize action";
     private byte address;
@@ -64,6 +64,7 @@ public class SynchronizeAction
     /**
      * @return the fcb
      */
+    @Override
     public boolean isFcb() {
         return fcb;
     }
@@ -76,6 +77,7 @@ public class SynchronizeAction
     /**
      * @param fcb the fcb to set
      */
+    @Override
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
     }
@@ -84,7 +86,7 @@ public class SynchronizeAction
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("control code = ").append(getControlCode()).append('\n');
-        sb.append("isFcb = ").append(isFcb()).append('\n');
+        sb.append("fcb = ").append(isFcb()).append('\n');
         sb.append(String.format("address = 0x%02X\n", address));
 
         return sb.toString();

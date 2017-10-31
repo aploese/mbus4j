@@ -1,6 +1,6 @@
 6806066853FE51017A082516
 control code = SND_UD
-isFcb = false
+fcb = false
 address = 0xFE
 datablock[0]:
   dataType = 8 Bit Integer

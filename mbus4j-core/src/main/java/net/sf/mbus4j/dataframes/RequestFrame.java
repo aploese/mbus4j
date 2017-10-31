@@ -9,6 +9,21 @@ package net.sf.mbus4j.dataframes;
  *
  * @author aploese
  */
-public interface RequestFrame<T extends ResponseFrame> extends Frame {
+public interface RequestFrame<T extends ResponseFrame> extends Frame, PrimaryAddress {
     
+	static final boolean DEFAULT_FCB = true;
+	static final boolean DEFAULT_FCV = true;
+
+	boolean isFcb();
+	
+	boolean isFcv();
+	
+	void setFcb(boolean fcb);
+	
+	void setFcv(boolean fcv);
+
+	default void toggleFcb() {
+		setFcb(isFcb());
+	}
+	
 }

@@ -1,7 +1,7 @@
 681B1B6808007269320403AC4808037F00000006150D87080000000F0101016316
 control code = RSP_UD
-isAcd = false
-isDfc = false
+acd = false
+dfc = false
 address = 0x00
 ident number = 03043269
 manufacturer = REL

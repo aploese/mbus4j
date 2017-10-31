@@ -37,7 +37,7 @@ import net.sf.mbus4j.json.JsonSerializeType;
  * @version $Id$
  */
 public class SendUserDataManSpec
-        implements ControlFrame, RequestFrame<SingleCharFrame> {
+        implements SendUserDataFrame {
 
     private byte address;
     private boolean fcb;
@@ -72,6 +72,7 @@ public class SendUserDataManSpec
     /**
      * @return the fcb
      */
+    @Override
     public boolean isFcb() {
         return fcb;
     }
@@ -94,6 +95,7 @@ public class SendUserDataManSpec
     /**
      * @param fcb the fcb to set
      */
+    @Override
     public void setFcb(boolean fcb) {
         this.fcb = fcb;
     }
