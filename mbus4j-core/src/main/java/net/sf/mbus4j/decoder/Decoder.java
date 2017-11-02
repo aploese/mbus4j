@@ -109,6 +109,7 @@ public class Decoder {
 
         return sb.toString();
     }
+
     private int expectedLengt;
     private byte checksum;
     private Frame parsingFrame;

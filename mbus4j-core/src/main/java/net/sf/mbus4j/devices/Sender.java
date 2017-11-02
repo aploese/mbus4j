@@ -39,6 +39,6 @@ public interface Sender {
 
     <T extends ResponseFrame> T send(RequestFrame<T> frame, int maxTries) throws IOException;
 
-    public final static int DEFAULT_SEND_TRIES = 1;
+    public final static int DEFAULT_SEND_TRIES = 3;
 
 }

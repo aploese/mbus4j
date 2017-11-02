@@ -44,6 +44,8 @@ import de.ibapl.spsw.ser2net.Ser2NetProvider;
 
 import java.util.LinkedList;
 import net.sf.mbus4j.MBusUtils;
+import net.sf.mbus4j.SerialPortConnection;
+import net.sf.mbus4j.TcpIpConnection;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -53,15 +55,24 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
 
-import net.sf.mbus4j.TcpIpConnection;
-import net.sf.mbus4j.SerialPortConnection;
 import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.SendInitSlave;
+import net.sf.mbus4j.dataframes.SendUserDataFrame;
+import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
+import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.ReadOutDataBlock;
+import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
+import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
+import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 import net.sf.mbus4j.json.JsonSerializeType;
 import net.sf.mbus4j.log.LogUtils;
 import net.sf.mbus4j.master.MBusMaster;
@@ -221,7 +232,7 @@ public class ConsoleApp {
 		}
 
 		if (cmd.hasOption("logFile")) {
-			final FileOutputStream logStream = new FileOutputStream(cmd.getOptionValue("logFile"), true);
+			final FileOutputStream logStream = new FileOutputStream(cmd.getOptionValue("logFile"), false);
 			serialPortSocket = LoggingSerialPortSocket.wrapWithHexOutputStream(serialPortSocket, logStream, false,
 					TimeStampLogging.FROM_OPEN);
 		}
@@ -237,7 +248,7 @@ public class ConsoleApp {
 						deviceIds.add(devId);
 					});
 					for (DeviceId devId : deviceIds) {
-						UserDataResponse udr = master.sendRequestUserData(false, true, devId.address);
+						UserDataResponse udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
 						System.err.println("NewDevice\n" + udr + "\n\n");
 					}
 				} else if (cmd.hasOption("saddr")) {
@@ -255,8 +266,20 @@ public class ConsoleApp {
 						deviceIds.add(devId);
 					});
 					for (DeviceId devId : deviceIds) {
-						UserDataResponse udr = master.sendRequestUserData(true, true, devId);
-						System.err.println("NewDevice\n" + udr + "\n\n");
+
+
+						
+					//	master.sendInitSlave(devId.address);
+					//TODO	master.waitIdleTime();
+						
+						ReadOutDataBlock db = new ReadOutDataBlock();
+						db.setDataFieldCode(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
+					master.sendSendUserData(devId.address, SendUserDataFrame.DEFAULT_FCB, db);
+						
+						
+						UserDataResponse udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, devId);
+						System.err.println("Found NewDevice");
+						printUdr(udr,cmd.hasOption("json"));
 					}
 					LOG.info("Reading done - Closing down");
 				}
@@ -264,40 +287,64 @@ public class ConsoleApp {
 				UserDataResponse udr = null;
 				if (cmd.hasOption("paddr")) {
 					final byte slaveAddress = (byte) Short.parseShort(cmd.getOptionValue("address"));
-					udr = master.sendRequestUserData(false, true, slaveAddress);
+					master.sendInitSlave(slaveAddress);
+					master.sendInitSlave(slaveAddress);
+					master.sendInitSlave(slaveAddress);
+					ReadOutDataBlock db = new ReadOutDataBlock();
+					db.setDataFieldCode(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
+				 master.sendSendUserData(slaveAddress, SendUserDataFrame.DEFAULT_FCB, db);
+
+					udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, slaveAddress);
 				} else if (cmd.hasOption("saddr")) {
 					if (master.selectDevice(cmd.hasOption("id") ? Integer.valueOf(cmd.getOptionValue("id")) : null,
 							cmd.hasOption("manufacturer") ? cmd.getOptionValue("manufacturer") : null,
 							cmd.hasOption("version") ? (byte) Short.parseShort(cmd.getOptionValue("version")) : null,
 							cmd.hasOption("medium") ? MBusMedium.fromLabel(cmd.getOptionValue("medium")) : null)) {
+/*
+						Thread.sleep(2000);
+						master.sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+						Thread.sleep(2000);
+						
+						LongDataBlock db = new LongDataBlock();
+						db.setDataFieldCode(DataFieldCode._64_BIT_INTEGER);
+						db.setVif(VifFD.PARAMETER_SET_IDENTIFICATION);
+						db.setValue(0x000000000f180008L);
+						
+						master.sendSendUserData(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, true, db);
+						Thread.sleep(2000);
+*/						
 						udr = master.sendRequestUserData(true, true, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
 					} else {
 						throw new RuntimeException("No device found");
 					}
 				}
-				System.err.println("Check for double dbs");
-				for (int i = 0; i < udr.getDataBlockCount(); i++) {
-					DataBlock db = udr.getDataBlock(i);
-					try {
-						udr.findDataBlock(db.getDataFieldCode(), db.getParamDescr(), db.getUnitOfMeasurement(),
-								db.getFunctionField(), db.getStorageNumber(), db.getSubUnit(), db.getTariff());
-					} catch (Exception e) {
-						System.err.println("DB[" + i + "] is double: " + db);
-					}
-				}
-				System.err.println("... done");
-
-				if (cmd.hasOption("json")) {
-					System.out.print(udr.toJSON(JsonSerializeType.ALL).toString(2));
-				} else {
-					System.out.print(udr.toString());
-				}
+				printUdr(udr,cmd.hasOption("json"));
 			}
 
 		} catch (Exception e) {
 			LOG.log(Level.SEVERE, "Error", e);
 		}
 		LOG.log(Level.INFO, "Finished!");
+	}
+
+	private static void printUdr(UserDataResponse udr, boolean printJson) {
+		System.err.println("Check for double dbs");
+		for (int i = 0; i < udr.getDataBlockCount(); i++) {
+			DataBlock db = udr.getDataBlock(i);
+			try {
+				udr.findDataBlock(db.getDataFieldCode(), db.getParamDescr(), db.getUnitOfMeasurement(),
+						db.getFunctionField(), db.getStorageNumber(), db.getSubUnit(), db.getTariff());
+			} catch (Exception e) {
+				System.err.println("DB[" + i + "] is double: " + db);
+			}
+		}
+		System.err.println("... done");
+
+		if (printJson) {
+			System.out.print(udr.toJSON(JsonSerializeType.ALL).toString(2));
+		} else {
+			System.out.print(udr.toString());
+		}
 	}
 
 	private static void printHelp(Options opts) {

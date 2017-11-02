@@ -35,6 +35,7 @@ import de.ibapl.spsw.api.SerialPortSocket;
 import de.ibapl.spsw.api.StopBits;
 import de.ibapl.spsw.api.TimeoutIOException;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.RequestClassXData;
@@ -47,7 +48,9 @@ import net.sf.mbus4j.devices.Sender;
 import net.sf.mbus4j.encoder.Encoder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.Deque;
@@ -82,9 +85,9 @@ public class MBusMaster implements Sender {
 	public static final Parity PARITY = Parity.EVEN;
 	
 	private void readGarbage() throws IOException {
-		final int avail = serialPortSocket.getInputStream().available();
+		final int avail = inputStream.available();
 		if (avail > 0) {
-			serialPortSocket.getInputStream().read(new byte[avail]);
+			inputStream.read(new byte[avail]);
 		}
 	}
 
@@ -124,6 +127,8 @@ public class MBusMaster implements Sender {
 	private final Encoder encoder = new Encoder();
 	private final Decoder parser = new Decoder();
 	private SerialPortSocket serialPortSocket;
+	private OutputStream outputStream;
+	private InputStream inputStream;
 	private int responseTimeOutOffset;
 	private int idleTime;
 	private int minSlaveAnswerTime;
@@ -166,7 +171,7 @@ public class MBusMaster implements Sender {
 	
 	protected void calcIdleTimes(Baudrate baudrate) {
 		minSlaveAnswerTime = (int)Math.round((1000.0 * 11 / baudrate.value) + responseTimeOutOffset);
-		maxSlaveAnswerTime = (int)Math.round((1000.0 * 330 / baudrate.value) + 50 + responseTimeOutOffset);
+		maxSlaveAnswerTime = (int)Math.round((1000.0 * 330  / baudrate.value) + 50 + responseTimeOutOffset);
 		idleTime = (int)Math.round((1000.0 * 33 / baudrate.value) + responseTimeOutOffset);
 	}
 
@@ -218,26 +223,20 @@ public class MBusMaster implements Sender {
 			try {
 				readGarbage();
 
-				serialPortSocket.getOutputStream().write(encoder.encodeFrame(request));
-				serialPortSocket.getOutputStream().flush();
-/*TODO?				try {
-					Thread.sleep(getIdleTime());
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				*/
-				return (T) parser.parse(serialPortSocket.getInputStream());
+				outputStream.write(encoder.encodeFrame(request));
+				outputStream.flush();
+				return (T) parser.parse(inputStream);
 
 			} catch (TimeoutIOException | DecodeException e) {
 				if (tries == maxTries -1) {
+					if (log.isLoggable(Level.FINE)) {
+						log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[] { maxTries, request });
+					}
 					throw new RuntimeException(e);
 				}
 			}
 		}
-		if (log.isLoggable(Level.FINE)) {
-			log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[] { maxTries, request });
-		}
-		throw new RuntimeException("No Response after " + maxTries + " Request:\n" + request);
+		throw new RuntimeException("Should never happen Fall trough send()");
 	}
 
 	public SingleCharFrame sendInitSlave(byte address) throws IOException {
@@ -252,17 +251,51 @@ public class MBusMaster implements Sender {
 	}
 
 	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, byte address) throws IOException {
-		RequestClassXData req = new RequestClassXData(address, fcb, fcv, Frame.ControlCode.REQ_UD2);
-		UserDataResponse result = send(req, getSendReTries());
+		return sendRequestUserData(fcb, fcv, null, address);
+	}
+
+	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DataBlock sendUserDataDb, byte address) throws IOException {
+		sendInitSlave(address);
+		if (sendUserDataDb != null) {
+			sendSendUserData(address, fcb, sendUserDataDb);
+		}
+		final RequestClassXData req = new RequestClassXData(address, fcb, fcv, Frame.ControlCode.REQ_UD2);
+		UserDataResponse result = null;
+		ResponseFrame responseFrame = send(req, getSendReTries());
+		if (responseFrame instanceof UserDataResponse) {
+			result = (UserDataResponse)responseFrame;
+		} else if (responseFrame instanceof SingleCharFrame) {
+			//Busy
+			wait_RSP_UD_Recover();
+			result = send(req, getSendReTries());
+		}  else {
+			throw new DecodeException("Expected  RSP_UD or E5!", responseFrame);
+		}
+		
+		if (result.isDfc()) {
+			wait_RSP_UD_Recover();
+		}
+		
 		if (result.isLastPackage()) {
 			return result;
 		}
 		UserDataResponse udr;
 		req.setFcv(true);
 		do {
-//TODO			waitIdleTime(10);//TODO  Was muß hier rein??? das es stabil wird
 			req.toggleFcb();
-			udr = send(req, 3);//TODO ??
+			responseFrame = send(req, getSendReTries());
+			if (responseFrame instanceof UserDataResponse) {
+				udr = (UserDataResponse)responseFrame;
+			} else if (responseFrame instanceof SingleCharFrame) {
+				//Busy
+				wait_RSP_UD_Recover();
+				udr = send(req, getSendReTries());
+			}  else {
+				throw new DecodeException("Expected  RSP_UD or E5!", responseFrame);
+			} 
+			if (udr.isDfc()) {
+				wait_RSP_UD_Recover();
+			}
 			result.addAllDataBlocks(udr.getDataBlocks());
 		} while (!udr.isLastPackage());
 		return result;
@@ -288,16 +321,16 @@ public class MBusMaster implements Sender {
 
 		readGarbage();
 
-		serialPortSocket.getOutputStream().write(encoder.encodeFrame(selectionOfSlaves));
-		serialPortSocket.getOutputStream().flush();
+		outputStream.write(encoder.encodeFrame(selectionOfSlaves));
+		outputStream.flush();
 		try {
-			Thread.sleep(getIdleTime() * 3);
+			Thread.sleep(getMaxAnswerTime());
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 		try {
 			final byte[] data = new byte[16];
-			final int readed = serialPortSocket.getInputStream().read(data);
+			final int readed = inputStream.read(data);
 			if (readed == -1) {
 				throw new IOException("port closed");
 			} else if (readed == 0) {
@@ -308,7 +341,7 @@ public class MBusMaster implements Sender {
 			} else {
 				return readed;
 			}
-		} catch (InterruptedIOException e) {
+		} catch (TimeoutIOException e) {
 			return 0;
 		}
 	}
@@ -317,6 +350,8 @@ public class MBusMaster implements Sender {
 		serialPortSocket.openRaw(DEFAULT_BAUDRATE, DATA_BITS, STOP_BITS, PARITY, FLOW_CONTROL);
 		calcIdleTimes(DEFAULT_BAUDRATE); 
 		serialPortSocket.setTimeouts(100, maxSlaveAnswerTime, maxSlaveAnswerTime);
+		inputStream = new BufferedInputStream(serialPortSocket.getInputStream(), 255);
+		outputStream = serialPortSocket.getOutputStream();
 		return () -> {
 			MBusMaster.this.close();
 		};
@@ -349,14 +384,12 @@ public class MBusMaster implements Sender {
 		boolean finished = false;
 		while (!finished) {
 			selectionOfSlaves.setWildcardNibble(currentNibble, currentNibbleValue);
-//TODO			waitIdleTime();
 			switch (sendSlaveSelect(selectionOfSlaves)) {
 			case 0:
 				log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
 				currentNibbleValue++;
 				break;
 			case 1:
-//TODO				waitIdleTime();
 				if (searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
 					// We found exactly one device so no further searching is needed at this nibble.
 					currentNibbleValue++;
@@ -389,7 +422,6 @@ public class MBusMaster implements Sender {
 	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DeviceId deviceId) throws IOException {
 		if (selectDevice(MBusUtils.int2Bcd(deviceId.identNumber), MBusUtils.man2Short(deviceId.manufacturer),
 				deviceId.version, MBusUtils.byte2Bcd(deviceId.medium.id))) {
-//TODO			waitIdleTime();
 			return sendRequestUserData(fcb, fcv, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
 		} else {
 			throw new RuntimeException("Can't select device");
@@ -459,20 +491,12 @@ public class MBusMaster implements Sender {
 		return send(req, getSendReTries()) instanceof SingleCharFrame;
 	}
 
-	public void waitMaxSlaveAnswerTime() {
+	public void wait_RSP_UD_Recover() {
 		try {
-			Thread.sleep(getIdleTime());
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}
 		
-	public void waitMaxSlaveAnswerTime(int multiplyer) {
-		try {
-			Thread.sleep(maxSlaveAnswerTime * multiplyer);
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 }

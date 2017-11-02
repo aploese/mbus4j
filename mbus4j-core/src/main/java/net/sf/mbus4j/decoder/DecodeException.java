@@ -44,7 +44,7 @@ public class DecodeException
     
     private final Frame frame;
 
-    DecodeException(String message, Frame frame) {
+    public DecodeException(String message, Frame frame) {
         super(message);
         this.frame = frame;
     }
