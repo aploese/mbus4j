@@ -59,6 +59,7 @@ import org.apache.commons.cli.ParseException;
 import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserDataFrame;
 import net.sf.mbus4j.dataframes.SingleCharFrame;
@@ -248,7 +249,7 @@ public class ConsoleApp {
 						deviceIds.add(devId);
 					});
 					for (DeviceId devId : deviceIds) {
-						UserDataResponse udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+						UserDataResponse udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 						System.err.println("NewDevice\n" + udr + "\n\n");
 					}
 				} else if (cmd.hasOption("saddr")) {
@@ -313,7 +314,7 @@ public class ConsoleApp {
 						master.sendSendUserData(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, true, db);
 						Thread.sleep(2000);
 */						
-						udr = master.sendRequestUserData(true, true, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+						udr = master.sendRequestUserData(true, true, PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 					} else {
 						throw new RuntimeException("No device found");
 					}

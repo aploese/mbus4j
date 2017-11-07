@@ -28,7 +28,6 @@ package net.sf.mbus4j.master;
  * #L%
  */
 
-import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
@@ -49,7 +48,6 @@ public class DataBlockLocator<T> {
     private Vif vif;
     private Vife[] vifes = DataBlock.EMPTY_VIFE;
     private DataBlock db;
-    private DataBlock timestampDb;
     private T reference;
 
     /**
@@ -176,20 +174,6 @@ public class DataBlockLocator<T> {
      */
     public void setDb(DataBlock db) {
         this.db = db;
-    }
-
-    /**
-     * @return the timestampDb
-     */
-    public DataBlock getTimestampDb() {
-        return timestampDb;
-    }
-
-    /**
-     * @param timestampDb the timestampDb to set
-     */
-    public void setTimestampDb(DataBlock timestampDb) {
-        this.timestampDb = timestampDb;
     }
 
 }

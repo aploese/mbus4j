@@ -198,7 +198,7 @@ public class UserDataResponse
     private boolean dfc;
     private byte version;
     private short accessNumber;
-    private EnumSet<StatusCode> status = EnumSet.noneOf(StatusCode.class);
+    private final EnumSet<StatusCode> status = EnumSet.noneOf(StatusCode.class);
     private short signature;
     private MBusMedium medium;
     private int identNumber;

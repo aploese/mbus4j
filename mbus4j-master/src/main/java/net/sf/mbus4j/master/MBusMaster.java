@@ -49,7 +49,6 @@ import net.sf.mbus4j.encoder.Encoder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.Set;
@@ -60,6 +59,7 @@ import java.util.logging.Logger;
 import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.MBusMedium;
+import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestFrame;
 import net.sf.mbus4j.dataframes.ResponseFrame;
 import net.sf.mbus4j.dataframes.SendInitSlave;
@@ -83,7 +83,7 @@ public class MBusMaster implements Sender {
 	public static final DataBits DATA_BITS = DataBits.DB_8;
 	public static final StopBits STOP_BITS = StopBits.SB_1;
 	public static final Parity PARITY = Parity.EVEN;
-	
+
 	private void readGarbage() throws IOException {
 		final int avail = inputStream.available();
 		if (avail > 0) {
@@ -109,7 +109,7 @@ public class MBusMaster implements Sender {
 		default:
 			throw new RuntimeException("Unknown addressing: " + dr.addressing);
 		}
-		dr.fullResponse = udr;
+		dr.setFullResponse(udr);
 	}
 
 	private class MaskedQueueEntry {
@@ -134,22 +134,21 @@ public class MBusMaster implements Sender {
 	private int minSlaveAnswerTime;
 	private int maxSlaveAnswerTime;
 
-
 	public MBusMaster() {
 		super();
 	}
 
-	public boolean searchDeviceByAddress(byte address, Consumer<DeviceId> deviceIdConsumer) throws IOException {
-		RequestClassXData req = new RequestClassXData(address, Frame.ControlCode.REQ_UD2);
-		UserDataResponse udr = send(req, getSendReTries());
-		if (udr != null) {
+	private boolean searchDeviceByAddress(byte primaryAddress, Consumer<DeviceId> deviceIdConsumer) throws IOException {
+		try {
+			final RequestClassXData req = new RequestClassXData(primaryAddress, RequestFrame.DEFAULT_FCB, RequestFrame.DEFAULT_FCV, Frame.ControlCode.REQ_UD2);
+			
+			UserDataResponse udr = send(req, 1);
 			deviceIdConsumer.accept(udr.getDeviceId());
-			log.info(String.format("found device: address = 0x%02X, id = %08d, man = %s, medium = %s, version = 0x%02X",
-					udr.getAddress(), udr.getIdentNumber(), udr.getManufacturer(), udr.getMedium(), udr.getVersion()));
 			return true;
-		}
-		log.info(String.format("no device at address = 0x%02X", address));
-		return false;
+		} catch (TimeoutIOException  timeoutIOException) {
+			// no device at this address
+			return false;
+		} //TODO handle DecodeException...
 	}
 
 	public void close() throws IOException {
@@ -158,26 +157,22 @@ public class MBusMaster implements Sender {
 	}
 
 	/**
-	 * Idle time is 33 bit periods see M-Bus doc chaper 5.4
-	 * + responseTimeOutOffset
+	 * Idle time is 33 bit periods see M-Bus doc chaper 5.4 + responseTimeOutOffset
 	 *
 	 * @return
 	 */
 	public int getIdleTime() {
 		return idleTime;
 	}
-	
-	
-	
+
 	protected void calcIdleTimes(Baudrate baudrate) {
-		minSlaveAnswerTime = (int)Math.round((1000.0 * 11 / baudrate.value) + responseTimeOutOffset);
-		maxSlaveAnswerTime = (int)Math.round((1000.0 * 330  / baudrate.value) + 50 + responseTimeOutOffset);
-		idleTime = (int)Math.round((1000.0 * 33 / baudrate.value) + responseTimeOutOffset);
+		minSlaveAnswerTime = (int) Math.round((1000.0 * 11 / baudrate.value) + responseTimeOutOffset);
+		maxSlaveAnswerTime = (int) Math.round((1000.0 * 330 / baudrate.value) + 50 + responseTimeOutOffset);
+		idleTime = (int) Math.round((1000.0 * 33 / baudrate.value) + responseTimeOutOffset);
 	}
 
 	/**
-	 * Timeout is 11 bit periods see M-Bus doc chaper 5.4 2 
-	 * + responseTimeOutOffset
+	 * Timeout is 11 bit periods see M-Bus doc chaper 5.4 2 + responseTimeOutOffset
 	 *
 	 */
 	public long getMinAnswerTime() {
@@ -185,8 +180,8 @@ public class MBusMaster implements Sender {
 	}
 
 	/**
-	 * Timeout is 330 bit periods + 50ms see M-Bus doc chaper 5.4 2
-	 * +  responseTimeOutOffset
+	 * Timeout is 330 bit periods + 50ms see M-Bus doc chaper 5.4 2 +
+	 * responseTimeOutOffset
 	 *
 	 */
 	public long getMaxAnswerTime() {
@@ -205,7 +200,7 @@ public class MBusMaster implements Sender {
 	 * @throws java.io.IOException
 	 */
 	public void searchDevicesByPrimaryAddress(Consumer<DeviceId> deviceIdConsumer) throws IOException {
-		searchDevicesByPrimaryAddress((byte) 0, MBusUtils.LAST_REGULAR_PRIMARY_ADDRESS, deviceIdConsumer);
+		searchDevicesByPrimaryAddress((byte) 0, PrimaryAddress.LAST_REGULAR_PRIMARY_ADDRESS, deviceIdConsumer);
 	}
 
 	public void searchDevicesByPrimaryAddress(byte first, byte last, Consumer<DeviceId> deviceIdConsumer)
@@ -213,13 +208,13 @@ public class MBusMaster implements Sender {
 		final short fAddr = (short) (first & 0xFF);
 		final short lAddr = (short) (last & 0xFF);
 		for (short i = fAddr; i <= lAddr; i++) {
-			searchDeviceByAddress((byte) i, deviceIdConsumer);
+			searchDeviceByAddress((byte)i, deviceIdConsumer);
 		}
 	}
 
 	@Override
 	public <T extends ResponseFrame> T send(RequestFrame<T> request, int maxTries) throws IOException {
-		for (int tries = 0; tries < maxTries; tries++) {
+		for (int tries = 1; tries <= maxTries; tries++) {
 			try {
 				readGarbage();
 
@@ -228,11 +223,12 @@ public class MBusMaster implements Sender {
 				return (T) parser.parse(inputStream);
 
 			} catch (TimeoutIOException | DecodeException e) {
-				if (tries == maxTries -1) {
+				if (tries == maxTries) {
 					if (log.isLoggable(Level.FINE)) {
-						log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}", new Object[] { maxTries, request });
+						log.log(Level.FINE, "max tries({0}) reached .. aborting send to: {1}",
+								new Object[] { maxTries, request });
 					}
-					throw new RuntimeException(e);
+					throw e;
 				}
 			}
 		}
@@ -254,28 +250,35 @@ public class MBusMaster implements Sender {
 		return sendRequestUserData(fcb, fcv, null, address);
 	}
 
-	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DataBlock sendUserDataDb, byte address) throws IOException {
-		sendInitSlave(address);
-		if (sendUserDataDb != null) {
-			sendSendUserData(address, fcb, sendUserDataDb);
+	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DataBlock sendUserDataDb, byte address)
+			throws IOException {
+		// Reset FCB Flags if neccesary if device was selecte by secondary Addressing
+		// its done
+		// Sending an additional SND_NKE to MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS will
+		// deselect device ...
+		if (address != PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS) {
+			SingleCharFrame singleCharFrame = sendInitSlave(address);
+			if (sendUserDataDb != null) {
+				sendSendUserData(address, fcb, sendUserDataDb);
+			}
 		}
 		final RequestClassXData req = new RequestClassXData(address, fcb, fcv, Frame.ControlCode.REQ_UD2);
 		UserDataResponse result = null;
 		ResponseFrame responseFrame = send(req, getSendReTries());
 		if (responseFrame instanceof UserDataResponse) {
-			result = (UserDataResponse)responseFrame;
+			result = (UserDataResponse) responseFrame;
 		} else if (responseFrame instanceof SingleCharFrame) {
-			//Busy
+			// Busy
 			wait_RSP_UD_Recover();
 			result = send(req, getSendReTries());
-		}  else {
+		} else {
 			throw new DecodeException("Expected  RSP_UD or E5!", responseFrame);
 		}
-		
+
 		if (result.isDfc()) {
 			wait_RSP_UD_Recover();
 		}
-		
+
 		if (result.isLastPackage()) {
 			return result;
 		}
@@ -285,14 +288,14 @@ public class MBusMaster implements Sender {
 			req.toggleFcb();
 			responseFrame = send(req, getSendReTries());
 			if (responseFrame instanceof UserDataResponse) {
-				udr = (UserDataResponse)responseFrame;
+				udr = (UserDataResponse) responseFrame;
 			} else if (responseFrame instanceof SingleCharFrame) {
-				//Busy
+				// Busy
 				wait_RSP_UD_Recover();
 				udr = send(req, getSendReTries());
-			}  else {
+			} else {
 				throw new DecodeException("Expected  RSP_UD or E5!", responseFrame);
-			} 
+			}
 			if (udr.isDfc()) {
 				wait_RSP_UD_Recover();
 			}
@@ -301,9 +304,18 @@ public class MBusMaster implements Sender {
 		return result;
 	}
 
+	/**
+	 * Send one time SND_NKE to the secondary address 
+	 * @param bcdMaskedId
+	 * @param maskedMan
+	 * @param maskedVersion
+	 * @param maskedMedium
+	 * @return
+	 * @throws IOException
+	 */
 	public int sendSlaveSelect(int bcdMaskedId, short maskedMan, byte maskedVersion, byte maskedMedium)
 			throws IOException {
-		final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+		final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 		selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
 		selectionOfSlaves.setMaskedMan(maskedMan);
 		selectionOfSlaves.setMaskedVersion(maskedVersion);
@@ -348,7 +360,7 @@ public class MBusMaster implements Sender {
 
 	public Closeable open() throws IOException {
 		serialPortSocket.openRaw(DEFAULT_BAUDRATE, DATA_BITS, STOP_BITS, PARITY, FLOW_CONTROL);
-		calcIdleTimes(DEFAULT_BAUDRATE); 
+		calcIdleTimes(DEFAULT_BAUDRATE);
 		serialPortSocket.setTimeouts(100, maxSlaveAnswerTime, maxSlaveAnswerTime);
 		inputStream = new BufferedInputStream(serialPortSocket.getInputStream(), 255);
 		outputStream = serialPortSocket.getOutputStream();
@@ -360,7 +372,7 @@ public class MBusMaster implements Sender {
 	public void widcardSearch(int bcdMaskedId, short bcdMaskedMan, byte bcdMaskedVersion, byte bcdMaskedMedium,
 			Consumer<DeviceId> deviceIdConsumer) throws IOException {
 
-		final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+		final SelectionOfSlaves selectionOfSlaves = new SelectionOfSlaves(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 		selectionOfSlaves.setBcdMaskedId(bcdMaskedId);
 		selectionOfSlaves.setMaskedMan(bcdMaskedMan);
 		selectionOfSlaves.setMaskedMedium(bcdMaskedMedium);
@@ -372,7 +384,7 @@ public class MBusMaster implements Sender {
 			log.fine(String.format("no slave with bcdMaskedId: 0x%08X", bcdMaskedId));
 			return;
 		case 1: {
-			if (searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
+			if (searchDeviceByAddress(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
 				return;
 			}
 		}
@@ -390,7 +402,7 @@ public class MBusMaster implements Sender {
 				currentNibbleValue++;
 				break;
 			case 1:
-				if (searchDeviceByAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
+				if (searchDeviceByAddress(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS, deviceIdConsumer)) {
 					// We found exactly one device so no further searching is needed at this nibble.
 					currentNibbleValue++;
 					break;
@@ -422,7 +434,7 @@ public class MBusMaster implements Sender {
 	public UserDataResponse sendRequestUserData(boolean fcb, boolean fcv, DeviceId deviceId) throws IOException {
 		if (selectDevice(MBusUtils.int2Bcd(deviceId.identNumber), MBusUtils.man2Short(deviceId.manufacturer),
 				deviceId.version, MBusUtils.byte2Bcd(deviceId.medium.id))) {
-			return sendRequestUserData(fcb, fcv, MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+			return sendRequestUserData(fcb, fcv, PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 		} else {
 			throw new RuntimeException("Can't select device");
 		}
@@ -459,8 +471,8 @@ public class MBusMaster implements Sender {
 
 	public boolean setPrimaryAddressOfDevice(DeviceId deviceId, byte newAddress) throws IOException {
 		if (selectDevice(deviceId)) {
-			final SingleCharFrame f = sendSetNewAddress(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
-			sendInitSlave(MBusUtils.SLAVE_SELECT_PRIMARY_ADDRESS);
+			final SingleCharFrame f = sendSetNewAddress(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS, newAddress);
+			sendInitSlave(PrimaryAddress.SLAVE_SELECT_PRIMARY_ADDRESS);
 			return true;
 		} else {
 			return false;
@@ -477,7 +489,7 @@ public class MBusMaster implements Sender {
 
 	public void setResponseTimeoutOffset(int responseTimeOutOffset) {
 		this.responseTimeOutOffset = responseTimeOutOffset;
-		if (serialPortSocket != null &&  serialPortSocket.isOpen()) {
+		if (serialPortSocket != null && serialPortSocket.isOpen()) {
 			try {
 				calcIdleTimes(serialPortSocket.getBaudrate());
 			} catch (IOException e) {
@@ -498,5 +510,5 @@ public class MBusMaster implements Sender {
 			throw new RuntimeException(e);
 		}
 	}
-		
+
 }

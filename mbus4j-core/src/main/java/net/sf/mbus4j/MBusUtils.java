@@ -33,12 +33,6 @@ package net.sf.mbus4j;
  */
 public class MBusUtils {
 
-    public final static byte UNCONFIGURED_PRIMARY_ADDRESS = (byte) 0x00;
-    public final static byte FIRST_REGULAR_PRIMARY_ADDRESS = (byte) 0x01;
-    public final static byte LAST_REGULAR_PRIMARY_ADDRESS = (byte) 0xFA;// 250
-    public final static byte SLAVE_SELECT_PRIMARY_ADDRESS = (byte) 0xFD; // 253
-    public final static byte BROADCAST_WITH_ANSWER_PRIMARY_ADDRESS = (byte) 0xFE;// 254
-    public final static byte BROADCAST_NO_ANSWER_PRIMARY_ADDRESS = (byte) 0xFF;//255
 
     public static String short2Man(short value) {
         if (value == -1) {

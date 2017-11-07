@@ -50,7 +50,7 @@ public class DeviceId {
 		if (!Objects.equals(this.manufacturer, manufacturer)) {
 			return false;
 		}
-		return this.medium != medium;
+		return this.medium == medium;
 	}
 
 	/**
