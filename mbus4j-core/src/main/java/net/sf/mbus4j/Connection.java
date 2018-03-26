@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 @Deprecated
 public abstract class Connection implements Serializable {
-    public static final int DEFAULT_BAUDRATE = 2400;
+    public static final int DEFAULT_SPEED = 2400;
 
     private int bitPerSecond;
 

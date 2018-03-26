@@ -37,7 +37,8 @@
         </dependency>
         <dependency>
             <groupId>de.ibapl.spsw</groupId>
-            <artifactId>de.ibapl.spsw.provider</artifactId>
+            <artifactId>de.ibapl.spsw.jniprovider</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
     

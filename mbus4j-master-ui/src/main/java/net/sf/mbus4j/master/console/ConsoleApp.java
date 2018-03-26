@@ -1,5 +1,3 @@
-package net.sf.mbus4j.master.console;
-
 /*
  * #%L
  * mbus4j-master-ui
@@ -28,24 +26,17 @@ package net.sf.mbus4j.master.console;
  * #L%
  */
 
+package net.sf.mbus4j.master.console;
+
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import de.ibapl.spsw.api.Baudrate;
-import de.ibapl.spsw.api.SerialPortSocket;
-import de.ibapl.spsw.logging.LoggingSerialPortSocket;
-import de.ibapl.spsw.logging.TimeStampLogging;
-import de.ibapl.spsw.provider.SerialPortSocketFactoryImpl;
-import de.ibapl.spsw.ser2net.Ser2NetProvider;
-
-import java.util.LinkedList;
-import net.sf.mbus4j.MBusUtils;
-import net.sf.mbus4j.SerialPortConnection;
-import net.sf.mbus4j.TcpIpConnection;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -56,24 +47,22 @@ import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.api.SerialPortSocketFactory;
+import de.ibapl.spsw.logging.LoggingSerialPortSocket;
+import de.ibapl.spsw.logging.TimeStampLogging;
+import de.ibapl.spsw.ser2net.Ser2NetProvider;
+import net.sf.mbus4j.MBusUtils;
+import net.sf.mbus4j.SerialPortConnection;
+import net.sf.mbus4j.TcpIpConnection;
 import net.sf.mbus4j.dataframes.DeviceId;
-import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
-import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserDataFrame;
-import net.sf.mbus4j.dataframes.SingleCharFrame;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.DataBlock;
-import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ReadOutDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifFD;
-import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeFC;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifeObjectAction;
-import net.sf.mbus4j.dataframes.datablocks.vif.VifePrimary;
 import net.sf.mbus4j.json.JsonSerializeType;
 import net.sf.mbus4j.log.LogUtils;
 import net.sf.mbus4j.master.MBusMaster;
@@ -228,8 +217,17 @@ public class ConsoleApp {
 			if (responseTimeoutOffset == -1) {
 				master.setResponseTimeoutOffset(SerialPortConnection.DEFAULT_RESPONSE_TIMEOUT_OFFSET);
 			}
-			serialPortSocket = SerialPortSocketFactoryImpl.singleton()
-					.createSerialPortSocket(cmd.getOptionValue("port"));
+			ServiceLoader<SerialPortSocketFactory> loader = ServiceLoader.load(SerialPortSocketFactory.class);
+			Iterator<SerialPortSocketFactory> iterator = loader.iterator();
+			if (!iterator.hasNext()) {
+				LOG.severe("NO implementation of SerialPortSocketFactory available - add a provider for that to the test dependencies");
+			}
+			SerialPortSocketFactory serialPortSocketFactory = iterator.next();
+			if (!iterator.hasNext()) {
+				LOG.severe("More than one implementation of SerialPortSocketFactory available - fix the test dependencies");
+			}
+			
+			serialPortSocket = serialPortSocketFactory.createSerialPortSocket(cmd.getOptionValue("port"));
 		}
 
 		if (cmd.hasOption("logFile")) {

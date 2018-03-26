@@ -4,7 +4,9 @@ import static org.junit.Assert.*;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ServiceLoader;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,9 +15,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.api.SerialPortSocketFactory;
 import de.ibapl.spsw.logging.LoggingSerialPortSocket;
 import de.ibapl.spsw.logging.TimeStampLogging;
-import de.ibapl.spsw.provider.SerialPortSocketFactoryImpl;
 import net.sf.mbus4j.dataframes.DeviceId;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.SendInitSlave;
@@ -41,7 +43,13 @@ public class Test_SBC_Electricity_0x24 {
 	@Before
 	public void setUp() throws Exception {
 		master = new MBusMaster();
-		SerialPortSocket serialPortSocket = SerialPortSocketFactoryImpl.singleton().createSerialPortSocket("/dev/ttyUSB0");
+		ServiceLoader<SerialPortSocketFactory> loader = ServiceLoader.load(SerialPortSocketFactory.class);
+		Iterator<SerialPortSocketFactory> iterator = loader.iterator();
+		assertTrue("NO implementation of SerialPortSocketFactory available - add a provider for that to the test dependencies", iterator.hasNext());
+		SerialPortSocketFactory serialPortSocketFactory = iterator.next();
+		assertTrue("More than one implementation of SerialPortSocketFactory available - fix the test dependencies", iterator.hasNext());
+		
+		SerialPortSocket serialPortSocket = serialPortSocketFactory.createSerialPortSocket("/dev/ttyUSB0");
 //		SerialPortSocket serialPortSocket = new Ser2NetProvider("localhost", 4001);
 		master.setSerialPort(LoggingSerialPortSocket.wrapWithHexOutputStream(serialPortSocket, new FileOutputStream("/tmp/test_SBC.txt", false),  false, TimeStampLogging.FROM_OPEN));
 		master.setResponseTimeoutOffset(0);

@@ -1,5 +1,3 @@
-package net.sf.mbus4j;
-
 /*
  * #%L
  * mbus4j-core
@@ -27,24 +25,14 @@ package net.sf.mbus4j;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+package net.sf.mbus4j;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Objects;
-import java.util.Set;
-import de.ibapl.spsw.api.Baudrate;
-import de.ibapl.spsw.api.DataBits;
-import de.ibapl.spsw.api.FlowControl;
-import de.ibapl.spsw.logging.LoggingSerialPortSocket;
-import de.ibapl.spsw.logging.TimeStampLogging;
-import de.ibapl.spsw.api.Parity;
-import de.ibapl.spsw.api.SerialPortSocket;
+
 import de.ibapl.spsw.api.SerialPortSocketFactory;
-import de.ibapl.spsw.api.StopBits;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import net.sf.json.JSONObject;
-import net.sf.mbus4j.json.JsonSerializeType;
 
 /**
  *
@@ -60,7 +48,7 @@ public class SerialPortConnection extends Connection {
     private String portName;
  
     public SerialPortConnection() {
-        super(DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
+        super(DEFAULT_SPEED, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
     }
 
     public SerialPortConnection(SerialPortSocketFactory serialPortSocketFactory, String portName, int bitPerSecond, int responseTimeoutOffset) {

@@ -51,11 +51,11 @@ public class TcpIpConnection extends Connection {
     private int port;
 
     public TcpIpConnection() {
-        super(Connection.DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
+        super(Connection.DEFAULT_SPEED, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
     }
 
     public TcpIpConnection(String host, int port) {
-        super(Connection.DEFAULT_BAUDRATE, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
+        super(Connection.DEFAULT_SPEED, DEFAULT_RESPONSE_TIMEOUT_OFFSET);
         this.host = host;
         this.port = port;
     }

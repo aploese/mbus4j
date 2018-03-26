@@ -1,9 +1,3 @@
-package net.sf.mbus4j.master;
-
-import de.ibapl.spsw.api.Baudrate;
-import de.ibapl.spsw.api.DataBits;
-import de.ibapl.spsw.api.FlowControl;
-import de.ibapl.spsw.api.Parity;
 /*
  * #%L
  * mbus4j-master
@@ -31,7 +25,13 @@ import de.ibapl.spsw.api.Parity;
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
+package net.sf.mbus4j.master;
+
+import de.ibapl.spsw.api.DataBits;
+import de.ibapl.spsw.api.FlowControl;
+import de.ibapl.spsw.api.Parity;
 import de.ibapl.spsw.api.SerialPortSocket;
+import de.ibapl.spsw.api.Speed;
 import de.ibapl.spsw.api.StopBits;
 import de.ibapl.spsw.api.TimeoutIOException;
 
@@ -78,7 +78,7 @@ import net.sf.mbus4j.log.LogUtils;
  *
  */
 public class MBusMaster implements Sender {
-	public static final Baudrate DEFAULT_BAUDRATE = Baudrate.B2400;
+	public static final Speed DEFAULT_SPEED = Speed._2400_BPS;
 	public static final Set<FlowControl> FLOW_CONTROL = FlowControl.getFC_NONE();
 	public static final DataBits DATA_BITS = DataBits.DB_8;
 	public static final StopBits STOP_BITS = StopBits.SB_1;
@@ -151,9 +151,15 @@ public class MBusMaster implements Sender {
 		} //TODO handle DecodeException...
 	}
 
+        public boolean isOpen() {
+            return serialPortSocket.isOpen();
+        }
+        
 	public void close() throws IOException {
 		serialPortSocket.close();
-		log.fine("CLOSED");
+		inputStream = null;
+		outputStream = null;
+                log.fine("CLOSED");
 	}
 
 	/**
@@ -165,10 +171,10 @@ public class MBusMaster implements Sender {
 		return idleTime;
 	}
 
-	protected void calcIdleTimes(Baudrate baudrate) {
-		minSlaveAnswerTime = (int) Math.round((1000.0 * 11 / baudrate.value) + responseTimeOutOffset);
-		maxSlaveAnswerTime = (int) Math.round((1000.0 * 330 / baudrate.value) + 50 + responseTimeOutOffset);
-		idleTime = (int) Math.round((1000.0 * 33 / baudrate.value) + responseTimeOutOffset);
+	protected void calcIdleTimes(Speed speed) {
+		minSlaveAnswerTime = (int) Math.round((1000.0 * 11 / speed.value) + responseTimeOutOffset);
+		maxSlaveAnswerTime = (int) Math.round((1000.0 * 330 / speed.value) + 50 + responseTimeOutOffset);
+		idleTime = (int) Math.round((1000.0 * 33 / speed.value) + responseTimeOutOffset);
 	}
 
 	/**
@@ -359,8 +365,8 @@ public class MBusMaster implements Sender {
 	}
 
 	public Closeable open() throws IOException {
-		serialPortSocket.openRaw(DEFAULT_BAUDRATE, DATA_BITS, STOP_BITS, PARITY, FLOW_CONTROL);
-		calcIdleTimes(DEFAULT_BAUDRATE);
+		serialPortSocket.open(DEFAULT_SPEED, DATA_BITS, STOP_BITS, PARITY, FLOW_CONTROL);
+		calcIdleTimes(DEFAULT_SPEED);
 		serialPortSocket.setTimeouts(100, maxSlaveAnswerTime, maxSlaveAnswerTime);
 		inputStream = new BufferedInputStream(serialPortSocket.getInputStream(), 255);
 		outputStream = serialPortSocket.getOutputStream();
@@ -491,7 +497,7 @@ public class MBusMaster implements Sender {
 		this.responseTimeOutOffset = responseTimeOutOffset;
 		if (serialPortSocket != null && serialPortSocket.isOpen()) {
 			try {
-				calcIdleTimes(serialPortSocket.getBaudrate());
+				calcIdleTimes(serialPortSocket.getSpeed());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
