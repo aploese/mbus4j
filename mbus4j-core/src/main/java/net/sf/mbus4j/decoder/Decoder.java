@@ -10,17 +10,17 @@ package net.sf.mbus4j.decoder;
  * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -80,7 +80,7 @@ public class Decoder {
         SIGNATURE,
         VARIABLE_DATA_BLOCK,
         CHECKSUM,
-        END_SIGN, 
+        END_SIGN,
         SUCCESS,
         ERROR;
     }
@@ -132,8 +132,8 @@ public class Decoder {
             addByte((byte)data);
         } while (state != DecodeState.SUCCESS && state != DecodeState.ERROR);
         return parsingFrame;
-    } 
-    
+    }
+
     private void addByte(final byte b) {
         checksum += b;
         dataPos++;
@@ -157,7 +157,7 @@ public class Decoder {
                         setState(DecodeState.LONG_LENGTH_1);
                         return;
                     case 0x10:
-                        dataPos = -1;
+                        dataPos = -2;
                         parsingFrame = null;
                         start = b;
                         expectedLengt = 2;
@@ -251,7 +251,7 @@ public class Decoder {
                             case 0x38://RSP_UD ACD is set DFC is set
                                 parsingFrame = new UserDataResponse(true, true);
                                 return;
-                            case 0x53://SND_UD FCB is clear 
+                            case 0x53://SND_UD FCB is clear
                                 parsingFrame = new SendUserData(false);
                                 return;
                             case 0x73://SND_UD FCB is set
@@ -286,7 +286,7 @@ public class Decoder {
                 }
 
             case CI_FIELD:
-                //ControlFrame or LongFrame 
+                //ControlFrame or LongFrame
                 if (parsingFrame instanceof SendUserData) {
                     decodeCiSendUserData(b & 0xFF);
                     return;
@@ -485,7 +485,7 @@ public class Decoder {
 
             case END_SIGN:
                 if (b == 0x16) {
-                    state = DecodeState.SUCCESS;                    
+                    state = DecodeState.SUCCESS;
                 } else {
                     throw  new DecodeException("end sign not found: data discarted!", parsingFrame);
                 }
