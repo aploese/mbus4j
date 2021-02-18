@@ -51,7 +51,7 @@ import org.jdesktop.application.Action;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class SlavePane
         extends JTabbedPane {

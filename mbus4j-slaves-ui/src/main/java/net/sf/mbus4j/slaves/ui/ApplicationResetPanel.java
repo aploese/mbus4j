@@ -33,7 +33,7 @@ import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class ApplicationResetPanel
         extends javax.swing.JPanel {

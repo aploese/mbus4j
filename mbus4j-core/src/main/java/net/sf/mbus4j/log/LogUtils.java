@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class LogUtils {
 

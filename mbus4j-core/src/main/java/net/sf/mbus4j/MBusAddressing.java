@@ -31,7 +31,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public enum MBusAddressing implements Serializable {
 

@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class DataBlockPanelTest {
 

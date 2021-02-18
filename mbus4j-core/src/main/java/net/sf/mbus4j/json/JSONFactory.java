@@ -47,7 +47,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vife;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class JSONFactory {
 

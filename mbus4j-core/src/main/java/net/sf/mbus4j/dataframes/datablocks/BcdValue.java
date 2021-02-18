@@ -29,7 +29,7 @@ package net.sf.mbus4j.dataframes.datablocks;
  */
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public interface BcdValue {
 

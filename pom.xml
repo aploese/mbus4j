@@ -8,7 +8,7 @@
     <name>mbus4j</name>
     <inceptionYear>2009</inceptionYear>
     <url>http://mbus4j.sf.net</url>
-     <description>
+    <description>
         libs and commandline tools for handling the m-bus protocol
     </description>
 
@@ -17,38 +17,34 @@
         <module>mbus4j-master</module>
         <module>mbus4j-master-ui</module>
     </modules>
-    
+
     <properties>
-        <compile.source>1.7</compile.source>
-        <compile.target>1.7</compile.target>
+        <compile.source>11</compile.source>
+        <compile.target>11</compile.target>
         <sourceEncoding>UTF-8</sourceEncoding>
         <sonatypeOssDistMgmtSnapshotsUrl>https://oss.sonatype.org/content/repositories/snapshots/</sonatypeOssDistMgmtSnapshotsUrl>
     </properties>
 
     <!-- Developers and Contributors -->
-    <organization>
-        <name>MBus4J</name>
-        <url>http://sourceforge.net/projects/mbus4j/</url>
-    </organization>
-    
     <developers>
         <developer>
             <id>apl</id>
             <name>Arne Plöse</name>
-            <email>arnep@users.sourceforge.net</email>
-            <url>http://sourceforge.net/users/arnep/</url>
-            <organization>Sourceforge User</organization>
-            <organizationUrl>http://www.sourceforge.net</organizationUrl>
+            <email>aploese@gmx.de</email>
+            <url>http://github.com/aploese</url>
             <roles>
                 <role>architect</role>
                 <role>developer</role>
             </roles>
             <timezone>+1</timezone>
-            <!--properties>
-              <picUrl>http://tinyurl.com/prv4t</picUrl>
-            </properties-->
         </developer>
     </developers>
+
+    <issueManagement>
+        <url>https://github.com/aploese/jnhw/mbus4j</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
 
     <!-- Licenses -->
     <licenses>
@@ -58,11 +54,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
-    <issueManagement>
-        <system>Sourceforge</system>
-        <url>https://sourceforge.net/tracker/?group_id=269266&amp;atid=1145513</url>
-    </issueManagement>
 
     <distributionManagement>
         <!--
@@ -89,27 +80,33 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
                 <scope>test</scope>
+                <version>5.7.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <scope>test</scope>
+                <version>5.7.0</version>
             </dependency>
             <dependency>
                 <groupId>de.ibapl.spsw</groupId>
                 <artifactId>de.ibapl.spsw.api</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <version>2.1.0</version>
             </dependency>
             <dependency>
                 <groupId>de.ibapl.spsw</groupId>
-                <artifactId>de.ibapl.spsw.jniprovider</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <artifactId>de.ibapl.spsw.jnhwprovider</artifactId>
+                <version>2.1.0</version>
                 <scope>runtime</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.5</version>
+                <version>3.11</version>
             </dependency>
             <dependency>
                 <groupId>net.sf.json-lib</groupId>
@@ -120,20 +117,20 @@
             <dependency>
                 <groupId>commons-cli</groupId>
                 <artifactId>commons-cli</artifactId>
-                <version>1.3.1</version>
+                <version>1.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
 
     <build>
-        
+
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <maxmem>512m</maxmem>
                         <source>${compile.source}</source>
@@ -144,22 +141,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <encoding>${sourceEncoding}</encoding>
                     </configuration>
@@ -167,13 +164,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version><!-- wait for 2.5 2.3 - 2.4 delivers corrupted jar file: META-INF/maven-->
+                    <version>3.2.0</version><!-- wait for 2.5 2.3 - 2.4 delivers corrupted jar file: META-INF/maven-->
                 </plugin>
                 <plugin>
                     <!-- mvn package appassembler:assemble -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <descriptorRefs>
                             <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -206,7 +203,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>appassembler-maven-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>2.1.0</version>
                     <executions>
                         <execution>
                             <phase>package</phase> <!-- append to the packaging phase. -->
@@ -217,9 +214,14 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.2</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>1.10</version>
+                    <version>2.0.0</version>
                     <configuration>
                         <licenseName>mbus4j-lgpl</licenseName>
                         <licenseResolver>${project.baseUri}/src/license</licenseResolver>
@@ -230,19 +232,15 @@
                         </excludes>
                     </configuration>
                 </plugin>
-                
+
             </plugins>
-  
+
         </pluginManagement>
 
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -264,7 +262,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 

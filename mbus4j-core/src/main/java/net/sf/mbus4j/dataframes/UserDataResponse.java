@@ -43,6 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
 import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.Vif;

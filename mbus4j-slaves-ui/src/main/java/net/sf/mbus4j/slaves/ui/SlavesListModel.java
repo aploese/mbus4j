@@ -40,7 +40,7 @@ import org.aspectj.lang.annotation.Pointcut;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 class SlavesListModel
         extends AbstractListModel {

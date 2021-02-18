@@ -7,7 +7,7 @@ package net.sf.mbus4j.dataframes;
 
 /**
  * Marker interface to mark this frame as response
- * @author aploese
+ * @author Arne Plöse
  */
 public interface ResponseFrame extends Frame {
     

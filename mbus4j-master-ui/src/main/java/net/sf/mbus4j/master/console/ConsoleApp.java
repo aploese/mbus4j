@@ -49,6 +49,7 @@ import org.apache.commons.cli.ParseException;
 
 import de.ibapl.spsw.api.SerialPortSocket;
 import de.ibapl.spsw.api.SerialPortSocketFactory;
+import de.ibapl.spsw.api.TimeoutIOException;
 import de.ibapl.spsw.logging.LoggingSerialPortSocket;
 import de.ibapl.spsw.logging.TimeStampLogging;
 import de.ibapl.spsw.ser2net.Ser2NetProvider;
@@ -70,7 +71,7 @@ import net.sf.mbus4j.master.MBusMaster;
 /**
  * DOCUMENT ME!
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class ConsoleApp {
 
@@ -223,8 +224,13 @@ public class ConsoleApp {
 				LOG.severe("NO implementation of SerialPortSocketFactory available - add a provider for that to the test dependencies");
 			}
 			SerialPortSocketFactory serialPortSocketFactory = iterator.next();
-			if (!iterator.hasNext()) {
-				LOG.severe("More than one implementation of SerialPortSocketFactory available - fix the test dependencies");
+			if (iterator.hasNext()) {
+                            StringBuilder sb = new StringBuilder("More than one implementation of SerialPortSocketFactory available - fix the test dependencies\n");
+                                iterator = loader.iterator();
+                                while ( iterator.hasNext()) {
+                                    sb.append(iterator.next().getClass().getCanonicalName()).append("\n");
+                            }
+				LOG.severe(sb.toString());
 			}
 			
 			serialPortSocket = serialPortSocketFactory.createSerialPortSocket(cmd.getOptionValue("port"));
@@ -271,10 +277,13 @@ public class ConsoleApp {
 					//	master.sendInitSlave(devId.address);
 					//TODO	master.waitIdleTime();
 						
-						ReadOutDataBlock db = new ReadOutDataBlock();
+try {
+                                        ReadOutDataBlock db = new ReadOutDataBlock();
 						db.setDataFieldCode(DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST);
 					master.sendSendUserData(devId.address, SendUserDataFrame.DEFAULT_FCB, db);
-						
+} catch (TimeoutIOException tio) {
+    LOG.warning("No response to DataFieldCode.SPECIAL_FUNCTION_GLOBAL_READOUT_REQUEST device:" + devId);
+}						
 						
 						UserDataResponse udr = master.sendRequestUserData(SendUserDataFrame.DEFAULT_FCB, SendUserDataFrame.DEFAULT_FCV, devId);
 						System.err.println("Found NewDevice");

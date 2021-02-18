@@ -31,7 +31,7 @@ import net.sf.json.JSONObject;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 @Deprecated
 public interface JSONSerializable {

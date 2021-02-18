@@ -34,7 +34,7 @@ import net.sf.mbus4j.dataframes.ResponseFrameContainer;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class RequestClassXDataPanel
         extends javax.swing.JPanel {

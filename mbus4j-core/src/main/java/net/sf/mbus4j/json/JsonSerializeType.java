@@ -29,7 +29,7 @@ package net.sf.mbus4j.json;
  */
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public enum JsonSerializeType {
 

@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class DeviceId {
 	public final byte version;
@@ -82,8 +82,12 @@ public class DeviceId {
 		hash = 83 * hash + Objects.hashCode(this.medium);
 		hash = 83 * hash + this.identNumber;
 		hash = 83 * hash + Objects.hashCode(this.manufacturer);
-		hash = 83 * hash + this.address;
 		return hash;
 	}
+        
+        @Override
+        public String toString() {
+        	return String.format("version=0x%02x, medium = %s, identNumber = %08d, manufacturer = %s, address = 0x%02x", version, medium, identNumber, manufacturer, address);
+        }
 
 }

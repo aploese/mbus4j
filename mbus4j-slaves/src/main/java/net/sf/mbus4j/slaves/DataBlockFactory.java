@@ -30,7 +30,7 @@ package net.sf.mbus4j.slaves;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class DataBlockFactory {
 

@@ -38,7 +38,7 @@ import javax.swing.ListCellRenderer;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class SlavesCellRenderer
         extends JLabel

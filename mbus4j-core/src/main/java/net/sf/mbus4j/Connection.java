@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 @Deprecated
 public abstract class Connection implements Serializable {

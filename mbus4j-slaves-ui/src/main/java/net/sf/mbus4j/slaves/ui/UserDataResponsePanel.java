@@ -34,7 +34,7 @@ import net.sf.mbus4j.dataframes.UserDataResponse;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class UserDataResponsePanel
         extends javax.swing.JPanel {

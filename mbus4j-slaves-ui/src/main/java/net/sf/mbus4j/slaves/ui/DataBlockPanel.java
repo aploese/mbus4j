@@ -50,7 +50,7 @@ import net.sf.mbus4j.dataframes.datablocks.vif.Vif;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class DataBlockPanel
         extends javax.swing.JPanel {

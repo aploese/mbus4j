@@ -7,7 +7,7 @@ package net.sf.mbus4j.dataframes;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public interface RequestFrame<T extends ResponseFrame> extends Frame, PrimaryAddress {
     

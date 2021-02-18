@@ -47,7 +47,7 @@ import java.io.StringReader;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class SlavesPersitenceTest {
 

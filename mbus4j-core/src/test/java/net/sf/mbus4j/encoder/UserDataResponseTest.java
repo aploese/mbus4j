@@ -10,44 +10,37 @@ package net.sf.mbus4j.encoder;
  * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import net.sf.mbus4j.dataframes.Frame;
 
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.decoder.Decoder;
+import org.junit.jupiter.api.AfterEach;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -56,26 +49,19 @@ import org.junit.Test;
  */
 public class UserDataResponseTest {
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
     private Decoder parser;
     private Encoder instance;
-  
+
     public UserDataResponseTest() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         parser = new Decoder();
         instance = new Encoder();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         instance = null;
         parser = null;
@@ -127,10 +113,10 @@ public class UserDataResponseTest {
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 
         final byte[] data = Decoder.ascii2Bytes(br.readLine());
-        Frame f =  parser.parse(new ByteArrayInputStream(data));
-        
-        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, parser.getState());
-        assertNotNull("DataValue not available", f);
+        Frame f = parser.parse(new ByteArrayInputStream(data));
+
+        assertEquals(Decoder.DecodeState.SUCCESS, parser.getState(), "ParserState");
+        assertNotNull(f, "DataValue not available");
         byte[] result = instance.encodeFrame(f);
         assertArrayEquals(data, result);
     }

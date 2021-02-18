@@ -41,7 +41,7 @@ import net.sf.mbus4j.slaves.Slave;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class ResponseFramePanel
         extends javax.swing.JPanel {

@@ -10,17 +10,17 @@ package net.sf.mbus4j.decoder;
  * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -28,39 +28,29 @@ package net.sf.mbus4j.decoder;
  * #L%
  */
 import java.util.Date;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class StackTest {
 
     public StackTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
     private Stack stack;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         stack = new Stack();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         stack = null;
     }
@@ -69,7 +59,7 @@ public class StackTest {
      * Test of peekIsTimestampRes1 method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPeekIsTimestampRes1() {
         System.out.println("peekIsTimestampRes1");
         Stack instance = new Stack();
@@ -84,7 +74,7 @@ public class StackTest {
      * Test of peekIsTimestampRes2 method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPeekIsTimestampRes2() {
         System.out.println("peekIsTimestampRes2");
         Stack instance = new Stack();
@@ -99,7 +89,7 @@ public class StackTest {
      * Test of peekIsTimestampRes3 method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPeekIsTimestampRes3() {
         System.out.println("peekIsTimestampRes3");
         Stack instance = new Stack();
@@ -114,7 +104,7 @@ public class StackTest {
      * Test of peekIsTimestampSummertime method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPeekIsTimestampSummertime() {
         System.out.println("peekIsTimestampSummertime");
         Stack instance = new Stack();
@@ -129,7 +119,7 @@ public class StackTest {
      * Test of peekIsTimestampValid method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPeekIsTimestampValid() {
         System.out.println("peekIsTimestampValid");
         Stack instance = new Stack();
@@ -173,7 +163,7 @@ public class StackTest {
      * Test of popBcdInteger method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopBcdInteger() {
         System.out.println("popBcdInteger");
         int digits = 0;
@@ -189,7 +179,7 @@ public class StackTest {
      * Test of popBcdShort method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopBcdShort() {
         System.out.println("popBcdShort");
         int digits = 0;
@@ -205,7 +195,7 @@ public class StackTest {
      * Test of popBcdLong method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopBcdLong() {
         System.out.println("popBcdLong");
         int digits = 0;
@@ -221,7 +211,7 @@ public class StackTest {
      * Test of popByte method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopByte() {
         System.out.println("popByte");
         Stack instance = new Stack();
@@ -236,7 +226,7 @@ public class StackTest {
      * Test of popBytes method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopBytes() {
         System.out.println("popBytes");
         Stack instance = new Stack();
@@ -251,7 +241,7 @@ public class StackTest {
      * Test of popDate method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopDate() {
         System.out.println("popDate");
         Stack instance = new Stack();
@@ -266,7 +256,7 @@ public class StackTest {
      * Test of popFloat method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopFloat() {
         System.out.println("popFloat");
         Stack instance = new Stack();
@@ -281,7 +271,7 @@ public class StackTest {
      * Test of popInteger method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopInteger_0args() {
         System.out.println("popInteger");
         Stack instance = new Stack();
@@ -296,7 +286,7 @@ public class StackTest {
      * Test of popInteger method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopInteger_int() {
         System.out.println("popInteger");
         int bytes = 0;
@@ -312,7 +302,7 @@ public class StackTest {
      * Test of popLong method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopLong_0args() {
         System.out.println("popLong");
         Stack instance = new Stack();
@@ -327,7 +317,7 @@ public class StackTest {
      * Test of popLong method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopLong_int() {
         System.out.println("popLong");
         int bytes = 0;
@@ -343,7 +333,7 @@ public class StackTest {
      * Test of popMan method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopMan() {
         System.out.println("popMan");
         Stack instance = new Stack();
@@ -358,7 +348,7 @@ public class StackTest {
      * Test of popShort method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopShort() {
         System.out.println("popShort");
         Stack instance = new Stack();
@@ -373,7 +363,7 @@ public class StackTest {
      * Test of popString method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopString() {
         System.out.println("popString");
         Stack instance = new Stack();
@@ -388,7 +378,7 @@ public class StackTest {
      * Test of popTimeStamp method, of class Stack.
      */
     @Test
-    @Ignore
+    @Disabled
     public void testPopTimeStamp() {
         System.out.println("popTimeStamp");
         Stack instance = new Stack();

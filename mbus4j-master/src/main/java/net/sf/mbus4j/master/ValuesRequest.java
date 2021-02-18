@@ -36,7 +36,7 @@ import net.sf.mbus4j.dataframes.MBusMedium;
 
 /**
  * Request that bundles requests to different devices
- * @author aploese
+ * @author Arne Plöse
  * @param <T>
  */
 public class ValuesRequest<T>

@@ -36,7 +36,7 @@ import de.ibapl.spsw.api.SerialPortSocketFactory;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 @Deprecated
 public class SerialPortConnection extends Connection {

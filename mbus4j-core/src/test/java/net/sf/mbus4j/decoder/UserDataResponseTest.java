@@ -10,38 +10,30 @@ package net.sf.mbus4j.decoder;
  * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  * #L%
  */
-import net.sf.mbus4j.dataframes.Frame;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
 import net.sf.json.JSONObject;
-
+import net.sf.mbus4j.dataframes.Frame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.UserDataResponse;
 import net.sf.mbus4j.dataframes.datablocks.ByteDataBlock;
@@ -51,17 +43,14 @@ import net.sf.mbus4j.dataframes.datablocks.LongDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.ShortDataBlock;
 import net.sf.mbus4j.dataframes.datablocks.dif.DataFieldCode;
 import net.sf.mbus4j.dataframes.datablocks.dif.FunctionField;
-import net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement;
 import net.sf.mbus4j.dataframes.datablocks.vif.VifPrimary;
 import net.sf.mbus4j.encoder.Encoder;
 import net.sf.mbus4j.json.JSONFactory;
 import net.sf.mbus4j.json.JsonSerializeType;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -70,24 +59,17 @@ import org.junit.Test;
  */
 public class UserDataResponseTest {
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
     private Decoder instance;
-    
+
     public UserDataResponseTest() {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         instance = new Decoder();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         instance = null;
     }
@@ -143,13 +125,13 @@ public class UserDataResponseTest {
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         Frame f = null;
         try {
-               f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(br.readLine())));
+            f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(br.readLine())));
         } catch (RuntimeException ex) {
             System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", f.toString()));
             throw ex;
         }
-        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, instance.getState());
-        assertNotNull("DataValue not available", f);
+        assertEquals(Decoder.DecodeState.SUCCESS, instance.getState(), "ParserState");
+        assertNotNull(f, "DataValue not available");
         testJSON(f, man, deviceName);
         if (testUniqueDB) {
             testUniqueDB(f);
@@ -160,14 +142,14 @@ public class UserDataResponseTest {
         String parsedLine = resultStr.readLine();
         while (parsedLine != null && dataLine != null) {
             line++;
-            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
+            assertEquals(dataLine, parsedLine, String.format("Line %d", line));
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
         }
         resultStr.close();
         br.close();
 
-        assertEquals(String.format("Length mismatch at line %d Data:", line), dataLine, parsedLine);
+        assertEquals(dataLine, parsedLine, String.format("Length mismatch at line %d Data:", line));
         return f;
     }
 
@@ -261,7 +243,7 @@ public class UserDataResponseTest {
         System.out.println(json.toString(1));
         Frame jsonFrame = JSONFactory.createFrame(json);
         jsonFrame.fromJSON(json);
-        assertEquals("JSON Serializing of " + deviceName, frame.toString(), jsonFrame.toString());
+        assertEquals(frame.toString(), jsonFrame.toString(), "JSON Serializing of " + deviceName);
 
         InputStream is = UserDataResponseTest.class.getResourceAsStream(String.format("../byMAN/%s/%s-all.json", man, deviceName));
         BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -271,14 +253,14 @@ public class UserDataResponseTest {
         String parsedLine = resultStr.readLine();
         while (parsedLine != null && dataLine != null) {
             line++;
-            assertEquals(String.format("Line %d", line), dataLine, parsedLine);
+            assertEquals(dataLine, parsedLine, String.format("Line %d", line));
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
         }
         resultStr.close();
         br.close();
 
-        assertEquals(String.format("Length mismatch at line %d Data", line), dataLine, parsedLine);
+        assertEquals(dataLine, parsedLine, String.format("Length mismatch at line %d Data", line));
     }
 
     @Test
@@ -370,11 +352,11 @@ public class UserDataResponseTest {
         System.out.print(Decoder.bytes2Ascii(data));
 
         try {
-        Frame f = instance.parse(new ByteArrayInputStream(data));
-        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", f.toString()));
-        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, instance.getState());
-        assertNotNull("DataValue not available", f);
-        assertEquals(udr.toString(), f.toString());
+            Frame f = instance.parse(new ByteArrayInputStream(data));
+            System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", f.toString()));
+            assertEquals(Decoder.DecodeState.SUCCESS, instance.getState(), "ParserState");
+            assertNotNull(f, "DataValue not available");
+            assertEquals(udr.toString(), f.toString());
         } catch (RuntimeException ex) {
             System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", udr.toString()));
             throw ex;
@@ -394,7 +376,7 @@ public class UserDataResponseTest {
         //final String dataStr = "68F7F768080172372110572E2809020200000006047E18000000008610047E18000000008620040000000000008640042800000000008650040000000000008660042800000000008680400492180000000084402400000000848040240000000084C040240000000084808040240000000084C0804024000000008480C04024000000000424FA4F000084808040FD590000000084C080402B000000008480C0402B0000000084C0C0402B000000008440FD48C8080000848040FD48ED03000084C040FD48EC0300008440FD5900000000848040FD590000000084C040FD590000000084402B000000008480402B0000000084C0402B000000000F2516";
         //WRONG_CS final String dataStr =   "68f7f768083272121700262e2809020f0000000604ff80d701000086100444ec2a020000862004486b53000000864004f35924000000865004650e790000008660048b4babffffff86804004607dbf02000084402000000000848040240000000084c040240000000084808040240000000084c0804024000000008480c0402400000000042468c88b0284808040fd59a9e1010084c080402bfa1601008480c0402b95bcffff84c0c0402b6c2a01008440fd48b5080000848040fd48e908000084c040fd48ea0800008440e85988ca0200848040fd598362010084c040fd5917ff000084402b259a00008480402b144c000084c0402bbf3000000f4316";
         //final String dataStr =   "68f7f768083272121700262e2809021100000006040c81d701000086100451ec2a020000862004486b53000000864004f35924000000865004680e79000000866004884babffffff868040046f7dbf02000084402400000000848040240000000084c040240000000084808040240000000084c0804024000000008480c040240000000004246fc88b0284808040fd59f5fe010084c080402b942701008480c0402bf6bcffff84c0c0402b713901008440fd48b2080000848040fd48ed08000084c040fd48e90800008440fd5927f80200848040fd592e68010084c040fd59610f010084402b86a400008480402b924d000084c0402b7b3500000f8316";
-        
+
 //final String dataStr = "68F7F768083272121700262E2809028700000006040DB0EF010000861004942770020000862004897780000000864004C5F53100000086500448709F0000008660047B8592FFFFFF86804004D6AB4603000084402400000000848040240000000084C040240000000084808040240000000084C0804024000000008480C0402400000000042459C7F10284808040FD59C087000084C080402B5D7700008480C0402B31CEFFFF84C0C0402B408400008440FD48F0080000848040FD48F708000084C040FD48F50800008440FD59ECFB0000848040FD59B6A5000084C040FD59719F000084402B7C3300008480402B5F22000084C0402B812100000F4916";
 //final String dataStr = "68F7F768083372753700262E280902B00000000604C90E60010000861004D90E600100008620040300000000008640044CC9010000008650047A6537000000866004E363CAFFFFFF8680400439697201000084402400000000848040240000000084C040240000000084808040240000000084C0804024000000008480C04024000000000424E4FA350284808040FD597148000084C080402BA12700008480C0402B97F0FFFF84C0C0402B2F2D00008440FD48ED080000848040FD48FA08000084C040FD48F10800008440FD592A620000848040FD59F136000084C040FD59312C000084402BC01300008480402B5C0A000084C0402B840900000F0816";
 //final String dataStr = "68F7F768083472773700262E280902650000000604531AFFFFFFFF861004004608000000862004AE2B090000008640049D1626000000865004D9CF03000000866004B3462200000086804004DFD84B01000084402400000000848040240000000084C040240000000084808040240000000084C0804024000000008480C04024000000000424A35D720284808040FD599C35000084C080402B060100008480C0402B3906000084C0C0402B483000008440FD48F3080000848040FD48FB08000084C040FD48F00800008440FD59025A0000848040FD592738000084C040FD596A40000084402BFB0000008480402B5B0B000084C0402BB0F4FFFF0F4E16";
@@ -405,25 +387,25 @@ public class UserDataResponseTest {
 //final String dataStr = "68D6D668083972085101003051020272000000841005D5A902008420050300000004AAFC014416000004AAFC02E60F000004AAFC0332230000042A664900008440AAFC01E40C00008440AAFC026C0C00008440AAFC03361A000084402A90330000848040AAFC01BE190000848040AAFC0232140000848040AAFC03E82B00008480402ABA59000002FDC8FC01F20802FDC8FC02FD0802FDC8FC03F40802FB2EF50102FF13010003FDD9FC01400B0003FDD9FC02C7080003FDD9FC0327130003FD592F270001FFF1FC015601FFF1FC024E01FFF1FC035001FF6151EB16";
 //final String dataStr = "68D6D668083A7230510100305102027E000000841005164702008420050300000004AAFC01903D000004AAFC022E3B000004AAFC03B6440000042A74BD00008440AAFC013A1100008440AAFC023C0F00008440AAFC03E60F000084402A5C300000848040AAFC01E83F0000848040AAFC02183D0000848040AAFC03824600008480402A8CC3000002FDC8FC01F40802FDC8FC02FC0802FDC8FC03F60802FB2EF50102FF13010003FDD9FC01DE1F0003FDD9FC02331E0003FDD9FC0368220003FD597B600001FFF1FC016001FFF1FC026001FFF1FC036101FF61604116";
 //final String dataStr = "68D6D668083B7241840000305102026E0000008410054CFF02008420050300000004AAFC01B220000004AAFC02820A000004AAFC037E130000042AC63E00008440AAFC01641E00008440AAFC02BE0500008440AAFC035A19000084402A863D0000848040AAFC01A62C0000848040AAFC02FE0B0000848040AAFC03FE1F00008480402AEE57000002FDC8FC01F40802FDC8FC02FD0802FDC8FC03F50802FB2EF50102FF13010003FDD9FC017E130003FDD9FC0239050003FDD9FC03F30D0003FD59AB260001FFF1FC014901FFF1FC025701FFF1FC033C01FF61479216";
-final String dataStr = "68D6D668083C72752603003051020238000000841005AC3901008420052000000004AAFC010000000004AAFC020000000004AAFC0300000000042A000000008440AAFC01F6FFFFFF8440AAFC02000000008440AAFC030000000084402AECFFFFFF848040AAFC010A000000848040AAFC0200000000848040AAFC03000000008480402A1400000002FDC8FC01F30802FDC8FC02FB0802FDC8FC03FB0802FB2EF40102FF13010003FDD9FC0104000003FDD9FC0202000003FDD9FC0304000003FD590A000001FFF1FC016401FFF1FC022C01FFF1FC036401FF6164E616";
+        final String dataStr = "68D6D668083C72752603003051020238000000841005AC3901008420052000000004AAFC010000000004AAFC020000000004AAFC0300000000042A000000008440AAFC01F6FFFFFF8440AAFC02000000008440AAFC030000000084402AECFFFFFF848040AAFC010A000000848040AAFC0200000000848040AAFC03000000008480402A1400000002FDC8FC01F30802FDC8FC02FB0802FDC8FC03FB0802FB2EF40102FF13010003FDD9FC0104000003FDD9FC0202000003FDD9FC0304000003FD590A000001FFF1FC016401FFF1FC022C01FFF1FC036401FF6164E616";
 
 //final String dataStr = "";
         //final String dataStr = "";
         Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(dataStr)));
-        assertEquals("ParserState", Decoder.DecodeState.SUCCESS, instance.getState());
-        assertNotNull("DataValue not available", f);
+        assertEquals(Decoder.DecodeState.SUCCESS, instance.getState(), "ParserState");
+        assertNotNull(f, "DataValue not available");
         if (f instanceof UserDataResponse) {
-            UserDataResponse udr = (UserDataResponse)f;
-        System.out.println(String.format("%s-%s-%d-%d-%d", udr.getManufacturer(), udr.getMedium().name(), udr.getVersion(), udr.getIdentNumber(), 0));
+            UserDataResponse udr = (UserDataResponse) f;
+            System.out.println(String.format("%s-%s-%d-%d-%d", udr.getManufacturer(), udr.getMedium().name(), udr.getVersion(), udr.getIdentNumber(), 0));
         }
         System.out.println(String.format("JSON>>> >>> >>>%s<<< <<< <<<JSON", f.toJSON(JsonSerializeType.ALL).toString()));
         System.out.println(String.format("PACKAGE>>> >>> >>>%s\n%s<<< <<< <<<PACKAGE", dataStr, f.toString()));
     }
 
     private void testUniqueDB(Frame frame) {
-        UserDataResponse udr = (UserDataResponse)frame;
+        UserDataResponse udr = (UserDataResponse) frame;
         for (DataBlock db : udr) {
-            assertEquals(db, udr.findDataBlock(db.getDataFieldCode(),db.getParamDescr(), db.getUnitOfMeasurement(), db.getFunctionField(), db.getStorageNumber(), db.getSubUnit(),db.getTariff()));
+            assertEquals(db, udr.findDataBlock(db.getDataFieldCode(), db.getParamDescr(), db.getUnitOfMeasurement(), db.getFunctionField(), db.getStorageNumber(), db.getSubUnit(), db.getTariff()));
         }
     }
 

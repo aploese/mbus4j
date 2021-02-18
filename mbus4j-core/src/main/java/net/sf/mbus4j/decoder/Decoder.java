@@ -10,17 +10,17 @@ package net.sf.mbus4j.decoder;
  * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -80,7 +80,7 @@ public class Decoder {
         SIGNATURE,
         VARIABLE_DATA_BLOCK,
         CHECKSUM,
-        END_SIGN, 
+        END_SIGN,
         SUCCESS,
         ERROR;
     }
@@ -125,15 +125,15 @@ public class Decoder {
     public Frame parse(InputStream is) throws IOException {
         reset();
         do {
-        int  data = is.read();
+            int data = is.read();
             if (data == -1) {
-                throw new EOFException("Closed");
+                throw new EOFException("EOF reached");
             }
-            addByte((byte)data);
+            addByte((byte) data);
         } while (state != DecodeState.SUCCESS && state != DecodeState.ERROR);
         return parsingFrame;
-    } 
-    
+    }
+
     private void addByte(final byte b) {
         checksum += b;
         dataPos++;
@@ -141,7 +141,7 @@ public class Decoder {
         if (start != 0) {
             if (expectedLengt == dataPos - 1) {
                 if (state != DecodeState.CHECKSUM) {
-                    throw  new DecodeException("expectedLengt reached: data discarted!",  parsingFrame);
+                    throw new DecodeException("expectedLengt reached: data discarted!", parsingFrame);
                 }
             }
         }
@@ -157,7 +157,7 @@ public class Decoder {
                         setState(DecodeState.LONG_LENGTH_1);
                         return;
                     case 0x10:
-                        dataPos = -1;
+                        dataPos = -2;
                         parsingFrame = null;
                         start = b;
                         expectedLengt = 2;
@@ -168,7 +168,7 @@ public class Decoder {
                         state = DecodeState.SUCCESS;
                         return;
                     default:
-                    throw  new DecodeException("Garbage collected",  parsingFrame);
+                        throw new DecodeException("Garbage collected", parsingFrame);
                 }
 
             case LONG_LENGTH_1:
@@ -233,7 +233,7 @@ public class Decoder {
                                 return;
                             default:
                                 // are we collecting garbage? - maybe try to recover.
-                                throw  new DecodeException("short frame c field reached: data discarted!", parsingFrame);
+                                throw new DecodeException("short frame c field reached: data discarted!", parsingFrame);
                         }
 
                     case 0x68:
@@ -251,7 +251,7 @@ public class Decoder {
                             case 0x38://RSP_UD ACD is set DFC is set
                                 parsingFrame = new UserDataResponse(true, true);
                                 return;
-                            case 0x53://SND_UD FCB is clear 
+                            case 0x53://SND_UD FCB is clear
                                 parsingFrame = new SendUserData(false);
                                 return;
                             case 0x73://SND_UD FCB is set
@@ -269,24 +269,24 @@ public class Decoder {
             case A_FIELD:
 
                 try {
-                    ((PrimaryAddress) parsingFrame).setAddress(b);
-                } catch (ClassCastException e) {
-                    throw new DecodeException("No set Address Ex:" + parsingFrame.getClass(), parsingFrame);
-                }
+                ((PrimaryAddress) parsingFrame).setAddress(b);
+            } catch (ClassCastException e) {
+                throw new DecodeException("No set Address Ex:" + parsingFrame.getClass(), parsingFrame);
+            }
 
-                switch (start) {
-                    case 0x10:
-                        setState(DecodeState.CHECKSUM);
-                        return;
-                    case 0x68:
-                        setState(DecodeState.CI_FIELD);
-                        return;
-                    default:
-                        throw new DecodeException(String.format("A Field dont know where to go start: %02x", start), parsingFrame);
-                }
+            switch (start) {
+                case 0x10:
+                    setState(DecodeState.CHECKSUM);
+                    return;
+                case 0x68:
+                    setState(DecodeState.CI_FIELD);
+                    return;
+                default:
+                    throw new DecodeException(String.format("A Field dont know where to go start: %02x", start), parsingFrame);
+            }
 
             case CI_FIELD:
-                //ControlFrame or LongFrame 
+                //ControlFrame or LongFrame
                 if (parsingFrame instanceof SendUserData) {
                     decodeCiSendUserData(b & 0xFF);
                     return;
@@ -300,22 +300,22 @@ public class Decoder {
             case GENERAL_APPLICATION_ERRORCODE:
 
                 try {
-                    ((GeneralApplicationError) parsingFrame).setError(b);
-                    setState(DecodeState.CHECKSUM);
-                    return;
-                } catch (ClassCastException e) {
-                    throw new DecodeException("GENERAL_APPLICATION_ERRORCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
-                }
+                ((GeneralApplicationError) parsingFrame).setError(b);
+                setState(DecodeState.CHECKSUM);
+                return;
+            } catch (ClassCastException e) {
+                throw new DecodeException("GENERAL_APPLICATION_ERRORCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
+            }
 
             case APPLICATION_RESET_SUBCODE:
 
                 try {
-                    ((ApplicationReset) parsingFrame).setTelegramTypeAndSubTelegram(b);
-                    setState(DecodeState.CHECKSUM);
-                    return;
-                } catch (ClassCastException e) {
-                    throw new DecodeException("APPLICATION_RESET_SUBCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
-                }
+                ((ApplicationReset) parsingFrame).setTelegramTypeAndSubTelegram(b);
+                setState(DecodeState.CHECKSUM);
+                return;
+            } catch (ClassCastException e) {
+                throw new DecodeException("APPLICATION_RESET_SUBCODE Field dont know where to go: " + parsingFrame.getClass(), parsingFrame);
+            }
 
             case IDENT_NUMBER:
                 stack.push(b);
@@ -354,8 +354,8 @@ public class Decoder {
                 if (parsingFrame instanceof SelectionOfSlaves) {
                     ((SelectionOfSlaves) parsingFrame).setMaskedVersion((byte) (b & 0xFF));
                 } else {
-                	//TODO BCD???
-                    ((UserDataResponse) parsingFrame).setVersion(((byte)b));
+                    //TODO BCD???
+                    ((UserDataResponse) parsingFrame).setVersion(((byte) b));
                 }
 
                 setState(DecodeState.MEDIUM);
@@ -469,7 +469,7 @@ public class Decoder {
                             return;
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    throw  new DecodeException("collect variable data block: data discarted!", parsingFrame);
+                    throw new DecodeException("collect variable data block: data discarted!", parsingFrame);
                 }
 
             case CHECKSUM:
@@ -480,14 +480,14 @@ public class Decoder {
 
                     break;
                 } else {
-                    throw  new DecodeException("checksum mismatch: data discarted!", parsingFrame);
+                    throw new DecodeException("checksum mismatch: data discarted!", parsingFrame);
                 }
 
             case END_SIGN:
                 if (b == 0x16) {
-                    state = DecodeState.SUCCESS;                    
+                    state = DecodeState.SUCCESS;
                 } else {
-                    throw  new DecodeException("end sign not found: data discarted!", parsingFrame);
+                    throw new DecodeException("end sign not found: data discarted!", parsingFrame);
                 }
                 break;
             default:

@@ -33,7 +33,7 @@ import net.sf.mbus4j.dataframes.ResponseFrame;
 
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public interface Sender {
 

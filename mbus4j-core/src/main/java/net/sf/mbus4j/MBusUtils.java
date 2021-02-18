@@ -29,7 +29,7 @@ package net.sf.mbus4j;
  */
 /**
  *
- * @author aploese
+ * @author Arne Plöse
  */
 public class MBusUtils {
 
