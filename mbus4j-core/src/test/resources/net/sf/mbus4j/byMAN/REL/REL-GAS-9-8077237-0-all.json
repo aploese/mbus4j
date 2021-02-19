@@ -1,38 +1,44 @@
 {
- "controlCode": "RSP_UD",
- "manufacturer": "REL",
- "medium": "Gas",
- "version": "0x09",
- "identNumber": 8077237,
- "address": "0x00",
- "accessNumber": 51,
- "acd": false,
- "dfc": false,
- "signature": "0x0000",
- "status": ["No application error"],
- "dataBlocks":  [
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "48 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Volume",
-     "unitOfMeasurement": "m³",
-     "siPrefix": "",
-     "exponent": 0
-    }}
-   },
-   "data": 6537
-  },
-    {
-   "drh": {"dib": {"dataFieldCode": "Special Function Manufacturer specific data"}},
-   "data": "0x[010101]"
-  }
- ]
+    "controlCode": "RSP_UD",
+    "manufacturer": "REL",
+    "medium": "Gas",
+    "version": "0x09",
+    "identNumber": 8077237,
+    "address": "0x00",
+    "accessNumber": 51,
+    "acd": false,
+    "dfc": false,
+    "signature": "0x0000",
+    "status": ["No application error"],
+    "dataBlocks": [
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "48 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Volume",
+                        "unitOfMeasurement": "m³",
+                        "siPrefix": "",
+                        "exponent": 0
+                    }
+                }
+            },
+            "data": 6537
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "Special Function Manufacturer specific data"
+                }
+            },
+            "data": "0x[010101]"
+        }
+    ]
 }

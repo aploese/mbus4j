@@ -1,158 +1,168 @@
 {
- "controlCode": "RSP_UD",
- "manufacturer": "TIP",
- "medium": "Electricity",
- "version": "0x02",
- "identNumber": 15808,
- "address": "0x37",
- "accessNumber": 111,
- "acd": false,
- "dfc": false,
- "signature": "0x0000",
- "status": ["No application error"],
- "dataBlocks":  [
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 1
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 2
-    }}
-   },
-   "data": 34549
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 1
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 2
-    }}
-   },
-   "data": -15591
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 2
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 2
-    }}
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 2
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 2
-    }}
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "extention FB",
-     "description": "Frequency",
-     "unitOfMeasurement": "Hz",
-     "siPrefix": "",
-     "exponent": -1
-    }}
-   },
-   "data": 501
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)",
-      "siPrefix": "",
-      "exponent": 0
-     },
-     "vifes": [     {
-      "vifeType": "manufacturer specific",
-      "name": "13"
-     }]
-    }
-   },
-   "data": 1
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "manufacturer specific",
-      "description": "Manufacturer specific coding (including VIFE's)",
-      "siPrefix": "",
-      "exponent": 0
-     },
-     "vifes": [     {
-      "vifeType": "manufacturer specific",
-      "name": "61"
-     }]
-    }
-   },
-   "data": 99
-  }
- ]
+    "controlCode": "RSP_UD",
+    "manufacturer": "TIP",
+    "medium": "Electricity",
+    "version": "0x02",
+    "identNumber": 15808,
+    "address": "0x37",
+    "accessNumber": 111,
+    "acd": false,
+    "dfc": false,
+    "signature": "0x0000",
+    "status": ["No application error"],
+    "dataBlocks": [
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 1
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 2
+                    }
+                }
+            },
+            "data": 34549
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 1
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 2
+                    }
+                }
+            },
+            "data": -15591
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 2
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 2
+                    }
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 2
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 2
+                    }
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "extention FB",
+                        "description": "Frequency",
+                        "unitOfMeasurement": "Hz",
+                        "siPrefix": "",
+                        "exponent": -1
+                    }
+                }
+            },
+            "data": 501
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "manufacturer specific",
+                        "description": "Manufacturer specific coding (including VIFE's)",
+                        "siPrefix": "",
+                        "exponent": 0
+                    },
+                    "vifes": [{
+                            "vifeType": "manufacturer specific",
+                            "name": "13"
+                        }]
+                }
+            },
+            "data": 1
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "8 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "manufacturer specific",
+                        "description": "Manufacturer specific coding (including VIFE's)",
+                        "siPrefix": "",
+                        "exponent": 0
+                    },
+                    "vifes": [{
+                            "vifeType": "manufacturer specific",
+                            "name": "61"
+                        }]
+                }
+            },
+            "data": 99
+        }
+    ]
 }

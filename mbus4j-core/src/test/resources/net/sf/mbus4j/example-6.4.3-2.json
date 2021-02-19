@@ -1,7 +1,13 @@
 {
- "controlCode": "SND_UD",
- "subType": "send user data",
- "fcb": false,
- "address": 3,
- "dataBlocks": [{"drh": {"dib": {"dataFieldCode": "Special Function Global readout request"}}}]
+    "controlCode": "SND_UD",
+    "subType": "send user data",
+    "fcb": false,
+    "address": 3,
+    "dataBlocks": [{
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "Special Function Global readout request"
+                }
+            }
+        }]
 }

@@ -1,0 +1,12 @@
+-noimportjava: true
+Export-Package: \
+    net.sf.mbus4j,\
+    net.sf.mbus4j.dataframes,\
+    net.sf.mbus4j.dataframes.datablocks,\
+    net.sf.mbus4j.dataframes.datablocks.dif,\
+    net.sf.mbus4j.dataframes.datablocks.vif,\
+    net.sf.mbus4j.decoder,\
+    net.sf.mbus4j.devices,\
+    net.sf.mbus4j.encoder,\
+    net.sf.mbus4j.json,\
+    net.sf.mbus4j.log

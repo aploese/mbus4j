@@ -1,32 +1,26 @@
-package net.sf.mbus4j.dataframes;
-
 /*
- * #%L
- * mbus4j-core
- * %%
- * Copyright (C) 2009 - 2014 MBus4J
- * %%
- * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
+ * MBus4J - Drivers for the M-Bus protocol , https://github.com/aploese/mbus4j/
+ * Copyright (C) 2009-2021, Arne Plöse and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as
+ * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * #L%
  */
+package net.sf.mbus4j.dataframes;
+
 import net.sf.json.JSONObject;
 import net.sf.mbus4j.json.JSONFactory;
 import net.sf.mbus4j.json.JsonSerializeType;
@@ -44,8 +38,8 @@ public class RequestClassXData implements ShortFrame<UserDataResponse> {
     private final ControlCode controlCode;
 
     public RequestClassXData(byte address, boolean fcb, boolean fcv, ControlCode controlCode) {
-    	this.address = address;
-    	this.fcb = fcb;
+        this.address = address;
+        this.fcb = fcb;
         this.fcv = fcv;
         this.controlCode = controlCode;
     }
@@ -55,16 +49,16 @@ public class RequestClassXData implements ShortFrame<UserDataResponse> {
     }
 
     public RequestClassXData(boolean fcb, boolean fcv, ControlCode controlCode) {
-    	this.fcb = fcb;
+        this.fcb = fcb;
         this.fcv = fcv;
         this.controlCode = controlCode;
-	}
+    }
 
-	public RequestClassXData(ControlCode controlCode) {
+    public RequestClassXData(ControlCode controlCode) {
         this.controlCode = controlCode;
-	}
+    }
 
-	@Override
+    @Override
     public byte getAddress() {
         return address;
     }
@@ -123,7 +117,7 @@ public class RequestClassXData implements ShortFrame<UserDataResponse> {
     public void fromJSON(JSONObject json) {
         fcb = JSONFactory.getBoolean(json, "fcb", DEFAULT_FCB);
         fcv = JSONFactory.getBoolean(json, "fcv", DEFAULT_FCV);
-        address = (byte)json.getInt("address");
+        address = (byte) json.getInt("address");
     }
 
     @Override

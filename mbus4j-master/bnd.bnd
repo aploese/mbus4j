@@ -1,0 +1,3 @@
+-noimportjava: true
+Export-Package: \
+    net.sf.mbus4j.master

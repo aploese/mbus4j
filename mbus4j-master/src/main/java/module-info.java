@@ -19,13 +19,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package net.sf.mbus4j.dataframes;
+module net.sf.mbus4j.master {
+    requires java.logging;
 
-/**
- * Marker interface to mark this frame as response
- *
- * @author Arne Plöse
- */
-public interface ResponseFrame extends Frame {
+    requires transitive net.sf.mbus4j.core;
 
+    exports net.sf.mbus4j.master;
 }

@@ -1,239 +1,255 @@
 {
- "controlCode": "RSP_UD",
- "manufacturer": "ACW",
- "medium": "Heat",
- "version": "0x0b",
- "identNumber": 9803784,
- "address": "0x00",
- "accessNumber": 49,
- "acd": false,
- "dfc": false,
- "signature": "0x0000",
- "status": ["No application error"],
- "dataBlocks":  [
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Fabrication No"
-    }}
-   },
-   "data": 9803784
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Time Point",
-     "unitOfMeasurement": "Date"
-    }}
-   },
-   "data": {"date": "2009-02-28"}
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "k",
-     "exponent": 0
-    }}
-   },
-   "data": 101
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Volume",
-     "unitOfMeasurement": "l",
-     "siPrefix": "",
-     "exponent": 1
-    }}
-   },
-   "data": 1952
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "primary",
-      "description": "Power",
-      "unitOfMeasurement": "W",
-      "siPrefix": "k",
-      "exponent": 0
-     },
-     "vifes": [     {
-      "vifeType": "primary",
-      "name": "Date(/time) end of last upper limit exceed"
-     }]
-    }
-   },
-   "data":    {
-    "timestamp": "2009-02-18T11:26:00",
-    "summertime": false,
-    "valid": true,
-    "res1": false,
-    "res2": false,
-    "res3": false
-   }
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Real",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Power",
-     "unitOfMeasurement": "W",
-     "siPrefix": "k",
-     "exponent": 0
-    }}
-   },
-   "data": 8.912766456604004
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "primary",
-      "description": "Volume Flow",
-      "unitOfMeasurement": "m³/h",
-      "siPrefix": "",
-      "exponent": 0
-     },
-     "vifes": [     {
-      "vifeType": "primary",
-      "name": "Date(/time) end of last upper limit exceed"
-     }]
-    }
-   },
-   "data":    {
-    "timestamp": "2009-02-27T10:26:00",
-    "summertime": false,
-    "valid": true,
-    "res1": false,
-    "res2": false,
-    "res3": false
-   }
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Real",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Volume Flow",
-     "unitOfMeasurement": "m³/h",
-     "siPrefix": "",
-     "exponent": 0
-    }}
-   },
-   "data": 0.9919999837875366
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Integer",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "primary",
-      "description": "Flow Temperature",
-      "unitOfMeasurement": "°C",
-      "siPrefix": "",
-      "exponent": 0
-     },
-     "vifes": [     {
-      "vifeType": "primary",
-      "name": "Date(/time) end of last upper limit exceed"
-     }]
-    }
-   },
-   "data":    {
-    "timestamp": "2009-02-18T14:26:00",
-    "summertime": false,
-    "valid": true,
-    "res1": false,
-    "res2": false,
-    "res3": false
-   }
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "32 Bit Real",
-     "functionField": "Maximum value",
-     "storageNumber": 1,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Flow Temperature",
-     "unitOfMeasurement": "°C",
-     "siPrefix": "",
-     "exponent": 0
-    }}
-   },
-   "data": 34.000282287597656
-  }
- ]
+    "controlCode": "RSP_UD",
+    "manufacturer": "ACW",
+    "medium": "Heat",
+    "version": "0x0b",
+    "identNumber": 9803784,
+    "address": "0x00",
+    "accessNumber": 49,
+    "acd": false,
+    "dfc": false,
+    "signature": "0x0000",
+    "status": ["No application error"],
+    "dataBlocks": [
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "8 digit BCD",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Fabrication No"
+                    }
+                }
+            },
+            "data": 9803784
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Time Point",
+                        "unitOfMeasurement": "Date"
+                    }
+                }
+            },
+            "data": {
+                "date": "2009-02-28"
+            }
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "k",
+                        "exponent": 0
+                    }
+                }
+            },
+            "data": 101
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "8 digit BCD",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Volume",
+                        "unitOfMeasurement": "l",
+                        "siPrefix": "",
+                        "exponent": 1
+                    }
+                }
+            },
+            "data": 1952
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Power",
+                        "unitOfMeasurement": "W",
+                        "siPrefix": "k",
+                        "exponent": 0
+                    },
+                    "vifes": [{
+                            "vifeType": "primary",
+                            "name": "Date(/time) end of last upper limit exceed"
+                        }]
+                }
+            },
+            "data": {
+                "timestamp": "2009-02-18T11:26:00",
+                "summertime": false,
+                "valid": true,
+                "res1": false,
+                "res2": false,
+                "res3": false
+            }
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Real",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Power",
+                        "unitOfMeasurement": "W",
+                        "siPrefix": "k",
+                        "exponent": 0
+                    }
+                }
+            },
+            "data": 8.912766456604004
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Volume Flow",
+                        "unitOfMeasurement": "m³/h",
+                        "siPrefix": "",
+                        "exponent": 0
+                    },
+                    "vifes": [{
+                            "vifeType": "primary",
+                            "name": "Date(/time) end of last upper limit exceed"
+                        }]
+                }
+            },
+            "data": {
+                "timestamp": "2009-02-27T10:26:00",
+                "summertime": false,
+                "valid": true,
+                "res1": false,
+                "res2": false,
+                "res3": false
+            }
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Real",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Volume Flow",
+                        "unitOfMeasurement": "m³/h",
+                        "siPrefix": "",
+                        "exponent": 0
+                    }
+                }
+            },
+            "data": 0.9919999837875366
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Integer",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Flow Temperature",
+                        "unitOfMeasurement": "°C",
+                        "siPrefix": "",
+                        "exponent": 0
+                    },
+                    "vifes": [{
+                            "vifeType": "primary",
+                            "name": "Date(/time) end of last upper limit exceed"
+                        }]
+                }
+            },
+            "data": {
+                "timestamp": "2009-02-18T14:26:00",
+                "summertime": false,
+                "valid": true,
+                "res1": false,
+                "res2": false,
+                "res3": false
+            }
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "32 Bit Real",
+                    "functionField": "Maximum value",
+                    "storageNumber": 1,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Flow Temperature",
+                        "unitOfMeasurement": "°C",
+                        "siPrefix": "",
+                        "exponent": 0
+                    }
+                }
+            },
+            "data": 34.000282287597656
+        }
+    ]
 }

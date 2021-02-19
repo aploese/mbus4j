@@ -9,7 +9,7 @@
 
     <artifactId>mbus4j-master-ui</artifactId>
     <packaging>jar</packaging>
-    <name>mbus4j-master-ui</name>
+    <name>MBus4J :: Master UI</name>
 
     <dependencies>
         <dependency>

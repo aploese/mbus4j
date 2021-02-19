@@ -1,39 +1,32 @@
-package net.sf.mbus4j.dataframes.datablocks.vif;
-
 /*
- * #%L
- * mbus4j-core
- * %%
- * Copyright (C) 2009 - 2014 MBus4J
- * %%
- * mbus4j - Drivers for the M-Bus protocol - http://mbus4j.sourceforge.net/
- * Copyright (C) 2009-2014, mbus4j.sf.net, and individual contributors as indicated
+ * MBus4J - Drivers for the M-Bus protocol , https://github.com/aploese/mbus4j/
+ * Copyright (C) 2009-2021, Arne Plöse and individual contributors as indicated
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
- * 
+ *
  * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as
+ * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- * #L%
  */
+package net.sf.mbus4j.dataframes.datablocks.vif;
+
 import java.util.Arrays;
 import java.util.Collection;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.DAY;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.HOUR;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.MINUTE;
 import static net.sf.mbus4j.dataframes.datablocks.vif.UnitOfMeasurement.SECOND;
-
 
 /**
  *
@@ -144,9 +137,9 @@ public enum VifePrimary implements Vife {
     MAN_SPEC("next VIFE's and data of this block are manufacturer specific");
 
     public final static int CODE_OFFSET = 0x20;
-    
+
     public final static VifePrimary valueOfTableIndex(byte ordinal) {
-            return map[ordinal - CODE_OFFSET];
+        return map[ordinal - CODE_OFFSET];
     }
 
     public static boolean isTimestampVife(Collection<Vife> vifes) {
@@ -200,20 +193,29 @@ public enum VifePrimary implements Vife {
         }
         return valueOf(label);
     }
-    
+
     public static double getVifeCorrectionFactor(Vife[] vifes) {
         for (Vife vife : vifes) {
             if (vife instanceof VifePrimary) {
-                switch ((VifePrimary)vife) {
-                    case FACTOR_E__6: return 0.000001;
-                    case FACTOR_E__5: return 0.00001;
-                    case FACTOR_E__4: return 0.0001;
-                    case FACTOR_E__3: return 0.001;
-                    case FACTOR_E__2: return 0.01;
-                    case FACTOR_E__1: return 0.1;
-                    case FACTOR_E_0:return 1.0;
-                    case FACTOR_E_1:return 10.0;
-                    case FACTOR_E_3:return 1000.0;
+                switch ((VifePrimary) vife) {
+                    case FACTOR_E__6:
+                        return 0.000001;
+                    case FACTOR_E__5:
+                        return 0.00001;
+                    case FACTOR_E__4:
+                        return 0.0001;
+                    case FACTOR_E__3:
+                        return 0.001;
+                    case FACTOR_E__2:
+                        return 0.01;
+                    case FACTOR_E__1:
+                        return 0.1;
+                    case FACTOR_E_0:
+                        return 1.0;
+                    case FACTOR_E_1:
+                        return 10.0;
+                    case FACTOR_E_3:
+                        return 1000.0;
                     default: ;
                 }
             }
@@ -224,16 +226,25 @@ public enum VifePrimary implements Vife {
     public static int getVifeCorrectionExponent(Vife[] vifes) {
         for (Vife vife : vifes) {
             if (vife instanceof VifePrimary) {
-                switch ((VifePrimary)vife) {
-                    case FACTOR_E__6: return -6;
-                    case FACTOR_E__5: return -5;
-                    case FACTOR_E__4: return -4;
-                    case FACTOR_E__3: return -3;
-                    case FACTOR_E__2: return -2;
-                    case FACTOR_E__1: return -1;
-                    case FACTOR_E_0:return 0;
-                    case FACTOR_E_1:return 1;
-                    case FACTOR_E_3:return 3;
+                switch ((VifePrimary) vife) {
+                    case FACTOR_E__6:
+                        return -6;
+                    case FACTOR_E__5:
+                        return -5;
+                    case FACTOR_E__4:
+                        return -4;
+                    case FACTOR_E__3:
+                        return -3;
+                    case FACTOR_E__2:
+                        return -2;
+                    case FACTOR_E__1:
+                        return -1;
+                    case FACTOR_E_0:
+                        return 0;
+                    case FACTOR_E_1:
+                        return 1;
+                    case FACTOR_E_3:
+                        return 3;
                     default: ;
                 }
             }
@@ -244,11 +255,15 @@ public enum VifePrimary implements Vife {
     public static double getVifeCorrectionConstant(Vife[] vifes) {
         for (Vife vife : vifes) {
             if (vife instanceof VifePrimary) {
-                switch ((VifePrimary)vife) {
-                    case CONST_E_0: return 1;
-                    case CONST_E__1: return 0.1;
-                    case CONST_E__2: return 0.01;
-                    case CONST_E__3: return 0.001;
+                switch ((VifePrimary) vife) {
+                    case CONST_E_0:
+                        return 1;
+                    case CONST_E__1:
+                        return 0.1;
+                    case CONST_E__2:
+                        return 0.01;
+                    case CONST_E__3:
+                        return 0.001;
                     default: ;
                 }
             }

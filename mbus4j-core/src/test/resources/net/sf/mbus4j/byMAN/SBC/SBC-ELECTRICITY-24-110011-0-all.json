@@ -1,177 +1,181 @@
 {
- "controlCode": "RSP_UD",
- "manufacturer": "SBC",
- "medium": "Electricity",
- "version": "0x24",
- "identNumber": 110011,
- "address": "0x03",
- "accessNumber": 1,
- "acd": false,
- "dfc": false,
- "signature": "0x0000",
- "status": ["No application error"],
- "dataBlocks":  [
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 1
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 1
-    }}
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "8 digit BCD",
-     "functionField": "Instantaneous value",
-     "storageNumber": 2,
-     "subUnit": 0,
-     "tariff": 1
-    },
-    "vib": {"vif":     {
-     "vifType": "primary",
-     "description": "Energy",
-     "unitOfMeasurement": "Wh",
-     "siPrefix": "",
-     "exponent": 1
-    }}
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "extention FD",
-      "description": "Voltage",
-      "unitOfMeasurement": "V",
-      "siPrefix": "",
-      "exponent": 0
-     },
-     "vifes":      [
-            {
-       "vifeType": "primary",
-       "name": "next VIFE's and data of this block are manufacturer specific"
-      },
-            {
-       "vifeType": "manufacturer specific",
-       "name": "01"
-      }
-     ]
-    }
-   },
-   "data": 237
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "extention FD",
-      "description": "Current",
-      "unitOfMeasurement": "A",
-      "siPrefix": "m",
-      "exponent": 2
-     },
-     "vifes":      [
-            {
-       "vifeType": "primary",
-       "name": "next VIFE's and data of this block are manufacturer specific"
-      },
-            {
-       "vifeType": "manufacturer specific",
-       "name": "01"
-      }
-     ]
-    }
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 0,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "primary",
-      "description": "Power",
-      "unitOfMeasurement": "W",
-      "siPrefix": "",
-      "exponent": 1
-     },
-     "vifes":      [
-            {
-       "vifeType": "primary",
-       "name": "next VIFE's and data of this block are manufacturer specific"
-      },
-            {
-       "vifeType": "manufacturer specific",
-       "name": "01"
-      }
-     ]
-    }
-   },
-   "data": 0
-  },
-    {
-   "drh":    {
-    "dib":     {
-     "dataFieldCode": "16 Bit Integer",
-     "functionField": "Instantaneous value",
-     "storageNumber": 0,
-     "subUnit": 1,
-     "tariff": 0
-    },
-    "vib":     {
-     "vif":      {
-      "vifType": "primary",
-      "description": "Power",
-      "unitOfMeasurement": "W",
-      "siPrefix": "",
-      "exponent": 1
-     },
-     "vifes":      [
-            {
-       "vifeType": "primary",
-       "name": "next VIFE's and data of this block are manufacturer specific"
-      },
-            {
-       "vifeType": "manufacturer specific",
-       "name": "01"
-      }
-     ]
-    }
-   },
-   "data": 0
-  }
- ]
+    "controlCode": "RSP_UD",
+    "manufacturer": "SBC",
+    "medium": "Electricity",
+    "version": "0x24",
+    "identNumber": 110011,
+    "address": "0x03",
+    "accessNumber": 1,
+    "acd": false,
+    "dfc": false,
+    "signature": "0x0000",
+    "status": ["No application error"],
+    "dataBlocks": [
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "8 digit BCD",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 1
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 1
+                    }
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "8 digit BCD",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 2,
+                    "subUnit": 0,
+                    "tariff": 1
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Energy",
+                        "unitOfMeasurement": "Wh",
+                        "siPrefix": "",
+                        "exponent": 1
+                    }
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "extention FD",
+                        "description": "Voltage",
+                        "unitOfMeasurement": "V",
+                        "siPrefix": "",
+                        "exponent": 0
+                    },
+                    "vifes": [
+                        {
+                            "vifeType": "primary",
+                            "name": "next VIFE's and data of this block are manufacturer specific"
+                        },
+                        {
+                            "vifeType": "manufacturer specific",
+                            "name": "01"
+                        }
+                    ]
+                }
+            },
+            "data": 237
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "extention FD",
+                        "description": "Current",
+                        "unitOfMeasurement": "A",
+                        "siPrefix": "m",
+                        "exponent": 2
+                    },
+                    "vifes": [
+                        {
+                            "vifeType": "primary",
+                            "name": "next VIFE's and data of this block are manufacturer specific"
+                        },
+                        {
+                            "vifeType": "manufacturer specific",
+                            "name": "01"
+                        }
+                    ]
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 0,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Power",
+                        "unitOfMeasurement": "W",
+                        "siPrefix": "",
+                        "exponent": 1
+                    },
+                    "vifes": [
+                        {
+                            "vifeType": "primary",
+                            "name": "next VIFE's and data of this block are manufacturer specific"
+                        },
+                        {
+                            "vifeType": "manufacturer specific",
+                            "name": "01"
+                        }
+                    ]
+                }
+            },
+            "data": 0
+        },
+        {
+            "drh": {
+                "dib": {
+                    "dataFieldCode": "16 Bit Integer",
+                    "functionField": "Instantaneous value",
+                    "storageNumber": 0,
+                    "subUnit": 1,
+                    "tariff": 0
+                },
+                "vib": {
+                    "vif": {
+                        "vifType": "primary",
+                        "description": "Power",
+                        "unitOfMeasurement": "W",
+                        "siPrefix": "",
+                        "exponent": 1
+                    },
+                    "vifes": [
+                        {
+                            "vifeType": "primary",
+                            "name": "next VIFE's and data of this block are manufacturer specific"
+                        },
+                        {
+                            "vifeType": "manufacturer specific",
+                            "name": "01"
+                        }
+                    ]
+                }
+            },
+            "data": 0
+        }
+    ]
 }

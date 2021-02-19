@@ -8,7 +8,7 @@
 
     <artifactId>mbus4j-master</artifactId>
     <packaging>jar</packaging>
-    <name>mbus4j-master</name>
+    <name>MBus4J :: Master</name>
 
 
     <dependencies>
