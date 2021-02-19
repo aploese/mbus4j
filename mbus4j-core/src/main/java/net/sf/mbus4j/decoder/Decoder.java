@@ -33,7 +33,6 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.sf.mbus4j.MBusUtils;
 import net.sf.mbus4j.NotSupportedException;
 import net.sf.mbus4j.dataframes.ApplicationReset;
 import net.sf.mbus4j.dataframes.Frame;
@@ -42,7 +41,6 @@ import net.sf.mbus4j.dataframes.LongFrame;
 import net.sf.mbus4j.dataframes.MBusMedium;
 import net.sf.mbus4j.dataframes.PrimaryAddress;
 import net.sf.mbus4j.dataframes.RequestClassXData;
-import net.sf.mbus4j.dataframes.ResponseFrame;
 import net.sf.mbus4j.dataframes.SelectionOfSlaves;
 import net.sf.mbus4j.dataframes.SendInitSlave;
 import net.sf.mbus4j.dataframes.SendUserData;
@@ -85,6 +83,23 @@ public class Decoder {
         ERROR;
     }
 
+    private enum FrameType {
+        UNINITIALIZED,
+        /**
+         * only 0xe5
+         */
+        SINGLE_CHARACTER,
+        /**
+         * start is 0x86
+         */
+        LONG_FAME_OR_CONTROL_FRAME,
+        /**
+         * start is 0x10
+         */
+        SHORT_FRAME;
+
+    }
+
     private final static Logger log = LogUtils.getDecoderLogger();
     public static final byte EXTENTION_BIT = (byte) 0x80;
 
@@ -115,7 +130,7 @@ public class Decoder {
     private Frame parsingFrame;
     private final Stack stack = new Stack();
     private int dataPos;
-    private byte start;
+    private FrameType dataLengthType = FrameType.UNINITIALIZED;
     private final VariableDataBlockDecoder vdbd = new VariableDataBlockDecoder();
     private DecodeState state = DecodeState.EXPECT_START;
 
@@ -138,7 +153,7 @@ public class Decoder {
         checksum += b;
         dataPos++;
 
-        if (start != 0) {
+        if (dataLengthType != FrameType.UNINITIALIZED) {
             if (expectedLengt == dataPos - 1) {
                 if (state != DecodeState.CHECKSUM) {
                     throw new DecodeException("expectedLengt reached: data discarted!", parsingFrame);
@@ -152,14 +167,14 @@ public class Decoder {
                     case 0x68:
                         dataPos = -3;
                         parsingFrame = null;
-                        start = b;
+                        dataLengthType = FrameType.LONG_FAME_OR_CONTROL_FRAME;
                         expectedLengt = 0xFF;//max possible
                         setState(DecodeState.LONG_LENGTH_1);
                         return;
                     case 0x10:
                         dataPos = -2;
                         parsingFrame = null;
-                        start = b;
+                        dataLengthType = FrameType.SHORT_FRAME;
                         expectedLengt = 2;
                         setState(DecodeState.C_FIELD);
                         return;
@@ -174,7 +189,6 @@ public class Decoder {
             case LONG_LENGTH_1:
                 expectedLengt = b & 0xFF;
                 setState(DecodeState.LONG_LENGTH_2);
-
                 return;
 
             case LONG_LENGTH_2:
@@ -212,8 +226,8 @@ public class Decoder {
                 checksum = b;
                 setState(DecodeState.A_FIELD);
 
-                switch (start) {
-                    case 0x10:
+                switch (dataLengthType) {
+                    case SHORT_FRAME:
 
                         switch (b & 0xFF) {
                             case 0x40://SND_NKE
@@ -236,7 +250,7 @@ public class Decoder {
                                 throw new DecodeException("short frame c field reached: data discarted!", parsingFrame);
                         }
 
-                    case 0x68:
+                    case LONG_FAME_OR_CONTROL_FRAME:
 
                         switch (b & 0xFF) {
                             case 0x08://RSP_UD ACD is clear DFC is clear
@@ -274,15 +288,15 @@ public class Decoder {
                 throw new DecodeException("No set Address Ex:" + parsingFrame.getClass(), parsingFrame);
             }
 
-            switch (start) {
-                case 0x10:
+            switch (dataLengthType) {
+                case SHORT_FRAME:
                     setState(DecodeState.CHECKSUM);
                     return;
-                case 0x68:
+                case LONG_FAME_OR_CONTROL_FRAME:
                     setState(DecodeState.CI_FIELD);
                     return;
                 default:
-                    throw new DecodeException(String.format("A Field dont know where to go start: %02x", start), parsingFrame);
+                    throw new DecodeException(String.format("A Field dont know where to go start: %02x", dataLengthType), parsingFrame);
             }
 
             case CI_FIELD:
@@ -640,7 +654,7 @@ public class Decoder {
     }
 
     private void reset() {
-        start = 0;
+        dataLengthType = FrameType.UNINITIALIZED;
         expectedLengt = 0;
         vdbd.reset();
         setState(DecodeState.EXPECT_START);

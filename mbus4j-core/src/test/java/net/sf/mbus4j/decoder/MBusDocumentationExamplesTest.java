@@ -32,8 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 import net.sf.json.JSONObject;
 
 import net.sf.mbus4j.dataframes.ApplicationReset;
@@ -64,26 +62,28 @@ public class MBusDocumentationExamplesTest {
     private void doTest(String chapter, int exampleIndex, Class<?> clazz) throws Exception {
         System.out.println(String.format("testPackage chapter %s example: %d ", chapter, exampleIndex));
         InputStream is = MBusDocumentationExamplesTest.class.getResourceAsStream(String.format("../example-%s-%d.txt", chapter, exampleIndex));
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-        Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(br.readLine())));
-
-        assertEquals(Decoder.DecodeState.SUCCESS, instance.getState(), "ParserState");
-        assertNotNull(f, "DataValue not available");
-        assertEquals(clazz, f.getClass());
-        testJSON(f, chapter, exampleIndex);
+        BufferedReader resultStr;
+        int line;
+        String dataLine;
+        String parsedLine;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+            Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes(br.readLine())));
+            assertEquals(Decoder.DecodeState.SUCCESS, instance.getState(), "ParserState");
+            assertNotNull(f, "DataValue not available");
+            assertEquals(clazz, f.getClass());
+            testJSON(f, chapter, exampleIndex);
 //        System.out.println(String.format("PACKAGE>>> >>> >>>%s<<< <<< <<<PACKAGE", instance.getDataValue().toString()));
-        BufferedReader resultStr = new BufferedReader(new StringReader(f.toString()));
-        int line = 1;
-        String dataLine = br.readLine();
-        String parsedLine = resultStr.readLine();
-        while (parsedLine != null && dataLine != null) {
-            line++;
-            assertEquals(dataLine, parsedLine, String.format("Line %d", line));
+            resultStr = new BufferedReader(new StringReader(f.toString()));
+            line = 1;
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
+            while (parsedLine != null && dataLine != null) {
+                line++;
+                assertEquals(dataLine, parsedLine, String.format("Line %d", line));
+                dataLine = br.readLine();
+                parsedLine = resultStr.readLine();
+            }
         }
-        br.close();
         resultStr.close();
 
         assertEquals(dataLine, parsedLine, String.format("Length mismatch at line %d Data", line));
@@ -184,9 +184,10 @@ public class MBusDocumentationExamplesTest {
         doTest("6.7.3", 0, UserDataResponse.class);
     }
 
+    @Test
     public void testRequestClass2Data() throws Exception {
         Frame f = instance.parse(new ByteArrayInputStream(Decoder.ascii2Bytes("107BFE7916")));
-        assertEquals("control code = REQ_UD2\nisFcb = true\naddress = 0xFE\n", f.toString());
+        assertEquals("control code = REQ_UD2\nifb = false\nfcv = true\naddress = 0xFE\n", f.toString());
     }
 
     private void testJSON(Frame frame, String chapter, int exampleIndex) throws Exception {
@@ -197,18 +198,22 @@ public class MBusDocumentationExamplesTest {
         assertEquals(frame.toString(), jsonFrame.toString(), "JSON Serializing of " + chapter + " " + exampleIndex);
 
         InputStream is = MBusDocumentationExamplesTest.class.getResourceAsStream(String.format("../example-%s-%d.json", chapter, exampleIndex));
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        BufferedReader resultStr = new BufferedReader(new StringReader(json.toString(1)));
-        int line = 0;
-        String dataLine = br.readLine();
-        String parsedLine = resultStr.readLine();
-        while (parsedLine != null && dataLine != null) {
-            line++;
-            assertEquals(dataLine, parsedLine, String.format("Line %d", line));
+        BufferedReader resultStr;
+        int line;
+        String dataLine;
+        String parsedLine;
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+            resultStr = new BufferedReader(new StringReader(json.toString(1)));
+            line = 0;
             dataLine = br.readLine();
             parsedLine = resultStr.readLine();
+            while (parsedLine != null && dataLine != null) {
+                line++;
+                assertEquals(dataLine, parsedLine, String.format("Line %d", line));
+                dataLine = br.readLine();
+                parsedLine = resultStr.readLine();
+            }
         }
-        br.close();
         resultStr.close();
 
         assertEquals(dataLine, parsedLine, String.format("Length mismatch at line %d Data", line));
